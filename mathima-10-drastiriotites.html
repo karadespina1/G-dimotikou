@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Μάθημα 10ο · Τα εξαρτήματα και οι συσκευές του υπολογιστή</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#dff0fa; --bg2:#cfe6f4; --card:#ffffff; --ink:#1b2a4a; --muted:#4d5d7d; --line:#a9cce2;
+  --in:#c81e75; --in-soft:#fde3f0;
+  --out:#1a6fbd; --out-soft:#dcecfb;
+  --mem:#5b6a10; --mem-soft:#eef2cc;
+  --cpu:#b1500d; --cpu-soft:#fde5d2;
+  --ok:#17803f; --ok-soft:#d9f4e3;
+  --bad:#c73030; --bad-soft:#fde2e2;
+  --accent:#0b7f7c; --accent-ink:#ffffff;
+  --dot:#b9d8ea;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1b33; --bg2:#152949; --card:#1b3157; --ink:#eef4ff; --muted:#aebcd8; --line:#34537f;
+    --in:#ff7ab8; --in-soft:#47203a;
+    --out:#75bbff; --out-soft:#173a63;
+    --mem:#cfe25f; --mem-soft:#3a421b;
+    --cpu:#ffab6b; --cpu-soft:#4a2d16;
+    --ok:#55d68e; --ok-soft:#173e2c;
+    --bad:#ff9090; --bad-soft:#4b2121;
+    --accent:#45d3cf; --accent-ink:#06302f;
+    --dot:#1c3358;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1b33; --bg2:#152949; --card:#1b3157; --ink:#eef4ff; --muted:#aebcd8; --line:#34537f;
+  --in:#ff7ab8; --in-soft:#47203a;
+  --out:#75bbff; --out-soft:#173a63;
+  --mem:#cfe25f; --mem-soft:#3a421b;
+  --cpu:#ffab6b; --cpu-soft:#4a2d16;
+  --ok:#55d68e; --ok-soft:#173e2c;
+  --bad:#ff9090; --bad-soft:#4b2121;
+  --accent:#45d3cf; --accent-ink:#06302f;
+  --dot:#1c3358;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0; min-height:100%;
+  background-color:var(--bg);
+  background-image:radial-gradient(var(--dot) 1.6px, transparent 1.7px);
+  background-size:24px 24px;
+  color:var(--ink);
+  font-family:'Ubuntu',system-ui,'Segoe UI',Roboto,Arial,sans-serif;
+  font-weight:500; font-size:18px; line-height:1.5;
+}
+button{font-family:inherit; color:inherit; cursor:pointer}
+:focus-visible{outline:4px solid var(--accent); outline-offset:3px}
+.wrap{max-width:980px; margin:0 auto; padding:20px 16px 40px}
+
+/* ---------- Header ---------- */
+.top{display:flex; flex-direction:column; align-items:flex-start; gap:8px; margin-bottom:18px}
+.badge{
+  background:var(--accent); color:var(--accent-ink);
+  font-family:'Comfortaa','Ubuntu',system-ui,sans-serif; font-weight:700; font-size:20px;
+  padding:6px 20px; border-radius:999px; box-shadow:0 4px 0 rgba(0,0,0,.18);
+}
+h1{
+  margin:4px 0 0; font-family:'Comfortaa','Ubuntu',system-ui,sans-serif; font-weight:700;
+  font-size:clamp(26px,5.4vw,42px); line-height:1.15; letter-spacing:-.01em; max-width:20ch;
+}
+.lead{margin:0; color:var(--muted); font-size:19px; max-width:52ch}
+
+/* ---------- Tabs ---------- */
+.tabs{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:0 0 16px}
+.tab{
+  display:flex; flex-direction:column; align-items:flex-start; gap:2px; text-align:left;
+  padding:12px 14px; min-height:84px;
+  background:var(--card); border:3px solid var(--line); border-radius:20px;
+  box-shadow:0 5px 0 var(--line); font-weight:700; font-size:17px; line-height:1.25;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.tab:active{transform:translateY(3px); box-shadow:0 2px 0 var(--line)}
+.tab[aria-selected="true"]{background:var(--accent); border-color:var(--accent); color:var(--accent-ink); box-shadow:0 5px 0 rgba(0,0,0,.25)}
+.tab .num{
+  display:inline-grid; place-items:center; width:26px; height:26px; border-radius:50%;
+  background:var(--bg2); color:var(--ink); font-size:15px; margin-bottom:2px;
+}
+.tab[aria-selected="true"] .num{background:rgba(255,255,255,.28); color:inherit}
+.tab .ts{font-size:17px; letter-spacing:2px; color:var(--cpu)}
+.tab[aria-selected="true"] .ts{color:inherit}
+
+/* ---------- Panel ---------- */
+.panel{
+  position:relative; background:var(--card); border:3px solid var(--line); border-radius:28px;
+  padding:22px 22px 26px; box-shadow:0 8px 0 var(--line);
+}
+.panel[hidden]{display:none}
+h2{margin:0 0 4px; font-family:'Comfortaa','Ubuntu',system-ui,sans-serif; font-weight:700; font-size:clamp(22px,4vw,30px); line-height:1.2}
+.how{margin:0 0 16px; color:var(--muted)}
+
+.prog{display:flex; align-items:center; gap:12px; margin:0 0 14px}
+.pbar{flex:1; height:14px; border-radius:999px; background:var(--bg2); overflow:hidden}
+.pbar span{display:block; height:100%; width:0; background:var(--accent); border-radius:999px; transition:width .3s ease}
+.ptxt{font-weight:700; min-width:5.5em; text-align:right; color:var(--muted); font-size:16px}
+
+.say{
+  display:flex; align-items:flex-start; gap:10px; min-height:3.4em;
+  padding:12px 16px; margin:0 0 16px; border-radius:16px; font-weight:700;
+  background:var(--bg2); border-left:8px solid var(--muted);
+}
+.say.good{background:var(--ok-soft); border-left-color:var(--ok)}
+.say.bad{background:var(--bad-soft); border-left-color:var(--bad)}
+.sicon{flex:none; font-size:20px; line-height:1.4}
+
+/* ---------- Device cards ---------- */
+.tray{
+  display:flex; flex-wrap:wrap; gap:12px; justify-content:center; align-items:flex-start;
+  padding:14px; margin-bottom:18px; border-radius:22px; background:var(--bg2); border:3px dashed var(--line);
+}
+.tray[hidden]{display:none}
+.dev{
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  width:126px; padding:10px 6px 8px; border:3px solid var(--line); border-radius:18px;
+  background:var(--card); font-weight:700; font-size:15px; line-height:1.2; text-align:center;
+  box-shadow:0 4px 0 var(--line); transition:transform .12s ease, border-color .12s ease;
+}
+.dev .ico{width:66px; height:66px; display:grid; place-items:center; background:#fff; border-radius:14px; border:2px solid #dbe5f0}
+.dev .ico svg{width:54px; height:54px}
+.dev.sel{border-color:var(--accent); transform:translateY(-5px); box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 32%, transparent), 0 4px 0 var(--accent)}
+.dev .plugview{display:none; align-items:center; gap:4px; font-size:12px; color:var(--muted)}
+.dev .plugview svg{width:52px; height:35px; background:#fff; border-radius:8px; border:2px solid #dbe5f0}
+.dev.hint .plugview{display:flex}
+
+.nope{animation:shake .45s ease; border-color:var(--bad) !important}
+@keyframes shake{20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+
+/* ---------- Activity 1 stage ---------- */
+.stage{display:grid; grid-template-columns:1fr auto auto auto 1fr; align-items:center; gap:10px}
+.bucket{
+  cursor:pointer; border:4px solid var(--c); background:var(--cs); border-radius:36px;
+  padding:14px 12px 16px; min-height:250px; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.bucket.in{--c:var(--in); --cs:var(--in-soft)}
+.bucket.out{--c:var(--out); --cs:var(--out-soft)}
+.bucket.sel{box-shadow:0 0 0 5px color-mix(in srgb, var(--c) 35%, transparent); transform:scale(1.02)}
+.bbtn{background:none; border:0; padding:4px 8px; color:var(--c); font-weight:700; text-align:center}
+.bbtn b{display:block; font-family:'Comfortaa','Ubuntu',system-ui,sans-serif; font-size:26px}
+.bbtn span{display:block; font-size:15px; color:var(--ink); font-weight:500}
+.bin{display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-content:flex-start}
+.mini{
+  display:inline-flex; align-items:center; gap:4px; background:#fff; color:#1b2a4a;
+  border-radius:999px; padding:2px 10px 2px 3px; font-size:14px; font-weight:700; border:2px solid var(--c, #dbe5f0);
+  animation:drop .35s ease;
+}
+.mini svg{width:30px; height:30px}
+@keyframes drop{from{transform:scale(.5) translateY(-16px); opacity:0}to{transform:none; opacity:1}}
+.tower{display:flex; flex-direction:column; align-items:center; gap:4px; font-size:14px; font-weight:700; color:var(--muted); text-align:center}
+.tower svg{width:70px; height:auto}
+.arrow svg{width:38px; height:24px}
+.arrow.in svg{color:var(--in)} .arrow.out svg{color:var(--out)}
+
+/* ---------- Activity 2 ---------- */
+.rows{display:grid; gap:12px; margin-bottom:18px}
+.row{display:flex; align-items:center; gap:14px; padding:12px 14px; border-radius:18px; background:var(--bg2)}
+.row .pic{flex:none; width:64px; height:64px; background:#fff; border-radius:14px; display:grid; place-items:center; border:2px solid #dbe5f0}
+.row .pic svg{width:52px; height:52px}
+.row p{margin:0; line-height:2.3}
+.slot{
+  display:inline-flex; align-items:center; justify-content:center; min-width:150px; height:44px; padding:0 12px;
+  border:3px dashed var(--muted); border-radius:12px; background:var(--card); font-size:18px; font-weight:700; vertical-align:middle; margin:0 2px;
+}
+.slot.sel{border-style:solid; border-color:var(--accent); box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 32%, transparent)}
+.slot.filled{border-style:solid; border-color:var(--c); background:var(--cs); color:var(--c); cursor:default}
+.slot.cpu{--c:var(--cpu); --cs:var(--cpu-soft)}
+.slot.mem{--c:var(--mem); --cs:var(--mem-soft)}
+.bank{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; padding:14px; border-radius:20px; background:var(--bg2); border:3px dashed var(--line); margin-bottom:6px}
+.bank[hidden]{display:none}
+.chip{
+  padding:9px 18px; border-radius:999px; border:3px solid var(--accent); background:var(--card);
+  font-size:18px; font-weight:700; box-shadow:0 4px 0 var(--accent); transition:transform .12s ease;
+}
+.chip.sel{background:var(--accent); color:var(--accent-ink); transform:translateY(-4px)}
+
+/* ---------- Activity 3 ---------- */
+.rear-title{margin:0 0 8px; font-weight:700; color:var(--muted); font-size:16px}
+.rear{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:16px; border-radius:22px;
+  background:#26324d; box-shadow:inset 0 0 0 4px #3a4a6d;
+}
+.port{
+  cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px 8px 10px; min-height:190px;
+  background:#33425f; border:3px solid #566a91; border-radius:16px; color:#fff;
+  transition:transform .12s ease;
+}
+.port.sel{border-color:#ffd166; box-shadow:0 0 0 4px rgba(255,209,102,.45); transform:scale(1.02)}
+.port > span{display:block; width:100%; text-align:center}
+.port svg.big{width:100%; max-width:150px; height:auto}
+.plabel{font-weight:700; font-size:15px; text-align:center; line-height:1.25}
+.plugged{display:flex; flex-wrap:wrap; justify-content:center; gap:4px}
+.port .mini{border-color:#fff}
+
+/* ---------- Activity 4 ---------- */
+.qcard{padding:8px 4px 4px}
+.qtext{
+  font-family:'Comfortaa','Ubuntu',system-ui,sans-serif; font-weight:700; font-size:clamp(22px,3.6vw,30px); line-height:1.3;
+  background:var(--bg2); border-radius:22px; padding:22px 24px; margin:0 0 16px; min-height:5.2em; display:flex; align-items:center;
+}
+.tf{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px}
+.tfb{
+  display:flex; align-items:center; justify-content:center; gap:10px; min-height:76px; border-radius:22px;
+  font-size:26px; font-weight:700; border:4px solid var(--c); background:var(--cs); color:var(--c);
+  box-shadow:0 5px 0 var(--c); transition:transform .12s ease;
+}
+.tfb:active{transform:translateY(3px); box-shadow:0 2px 0 var(--c)}
+.tfb.t{--c:var(--ok); --cs:var(--ok-soft)}
+.tfb.f{--c:var(--bad); --cs:var(--bad-soft)}
+.tfb:disabled{cursor:default; opacity:.55; transform:none}
+.tfb.picked{opacity:1; outline:5px solid var(--ink); outline-offset:3px}
+.tfb .mk{font-size:30px}
+
+/* ---------- Buttons, results ---------- */
+.btn{
+  padding:12px 22px; min-height:50px; border-radius:16px; border:3px solid var(--accent); background:var(--accent); color:var(--accent-ink);
+  font-size:18px; font-weight:700; box-shadow:0 4px 0 rgba(0,0,0,.22);
+}
+.btn.ghost{background:var(--card); color:var(--ink)}
+.btn:active{transform:translateY(2px)}
+.result{
+  margin-top:18px; padding:22px; text-align:center; border-radius:24px; background:var(--ok-soft); border:3px solid var(--ok);
+}
+.result .big{font-family:'Comfortaa','Ubuntu',system-ui,sans-serif; font-weight:700; font-size:34px}
+.result .rstars{font-size:44px; letter-spacing:6px; color:var(--cpu); line-height:1.2}
+.result p{margin:6px auto; max-width:46ch}
+.result .small{color:var(--muted); font-size:16px}
+.btns{display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:12px}
+
+.burst{position:absolute; left:50%; top:45%; width:0; height:0; pointer-events:none; z-index:5}
+.burst span{position:absolute; font-size:26px; animation:pop 1.2s ease-out forwards}
+@keyframes pop{from{transform:translate(0,0) scale(.4); opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(1.3); opacity:0}}
+
+.foot{margin-top:22px; font-size:15px; color:var(--muted)}
+
+/* ---------- Small screens ---------- */
+@media (max-width:760px){
+  .tabs{grid-template-columns:1fr 1fr}
+  .panel{padding:16px 14px 20px; border-radius:24px}
+  .stage{grid-template-columns:1fr 1fr}
+  .stage .tower,.stage .arrow{display:none}
+  .bucket{min-height:200px}
+  .rear{grid-template-columns:1fr 1fr}
+  .row{flex-direction:column; align-items:flex-start}
+  .slot{min-width:120px}
+}
+@media (max-width:420px){
+  .tf{grid-template-columns:1fr}
+  .dev{width:calc(50% - 6px)}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important; transition:none !important}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <div class="badge">Μάθημα 10ο</div>
+    <h1>Τα εξαρτήματα και οι συσκευές του υπολογιστή</h1>
+    <p class="lead">Τέσσερις δραστηριότητες για να δοκιμάσεις όσα έμαθες. Διάλεξε μία και ξεκίνα!</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Δραστηριότητες">
+    <button class="tab" role="tab" id="t0" aria-controls="p0" data-label="Είσοδος ή έξοδος;"><span class="num">1</span>Είσοδος ή έξοδος;<span class="ts" aria-hidden="true">☆☆☆</span></button>
+    <button class="tab" role="tab" id="t1" aria-controls="p1" data-label="Μέσα στην κεντρική μονάδα"><span class="num">2</span>Μέσα στην κεντρική μονάδα<span class="ts" aria-hidden="true">☆☆☆</span></button>
+    <button class="tab" role="tab" id="t2" aria-controls="p2" data-label="Καλώδιο και θύρα"><span class="num">3</span>Καλώδιο και θύρα<span class="ts" aria-hidden="true">☆☆☆</span></button>
+    <button class="tab" role="tab" id="t3" aria-controls="p3" data-label="Αλήθεια ή ψέμα;"><span class="num">4</span>Αλήθεια ή ψέμα;<span class="ts" aria-hidden="true">☆☆☆</span></button>
+  </nav>
+
+  <section class="panel" id="p0" role="tabpanel" aria-labelledby="t0"></section>
+  <section class="panel" id="p1" role="tabpanel" aria-labelledby="t1" hidden></section>
+  <section class="panel" id="p2" role="tabpanel" aria-labelledby="t2" hidden></section>
+  <section class="panel" id="p3" role="tabpanel" aria-labelledby="t3" hidden></section>
+
+  <p class="foot">Οι δραστηριότητες βασίζονται στο βιβλίο «Πληροφορική Γ΄ Δημοτικού», Μάθημα 10ο (σελ. 41–45).</p>
+</main>
+
+<script>
+(function(){
+'use strict';
+
+/* ================= Helpers ================= */
+const h = (tag, props = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (k === 'class') n.className = v;
+    else if (k === 'html') n.innerHTML = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) n.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat()) {
+    if (c == null || c === false) continue;
+    n.append(c.nodeType ? c : document.createTextNode(c));
+  }
+  return n;
+};
+const shuffle = a => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const smooth = () => reduced() ? 'auto' : 'smooth';
+const flash = (node, cls, ms = 600) => { node.classList.remove(cls); void node.offsetWidth; node.classList.add(cls); setTimeout(() => node.classList.remove(cls), ms); };
+
+/* ================= Icons ================= */
+const S = '#4a5a75', L = '#dfe6ee', M = '#b7c4d4', SK = '#7fd1ff';
+const ICON = {
+  keyboard: `<rect x="5" y="17" width="54" height="30" rx="5" fill="${L}" stroke="${S}" stroke-width="2.5"/>${[0,1,2,3,4,5].map(i => `<rect x="${10+i*8}" y="22" width="6" height="5" rx="1" fill="${S}"/>`).join('')}${[0,1,2,3,4].map(i => `<rect x="${14+i*8}" y="30" width="6" height="5" rx="1" fill="${S}"/>`).join('')}<rect x="18" y="38" width="28" height="5" rx="1.5" fill="${S}"/>`,
+  mouse: `<rect x="19" y="8" width="26" height="48" rx="13" fill="${L}" stroke="${S}" stroke-width="2.5"/><path d="M19 30h26M32 8v22" stroke="${S}" stroke-width="2.5" fill="none"/><rect x="29.5" y="14" width="5" height="10" rx="2.5" fill="#d6237f"/>`,
+  mic: `<rect x="23" y="5" width="18" height="30" rx="9" fill="${L}" stroke="${S}" stroke-width="2.5"/><path d="M27 13h10M27 19h10M27 25h10" stroke="${S}" stroke-width="2"/><path d="M15 28a17 17 0 0 0 34 0" fill="none" stroke="${S}" stroke-width="3" stroke-linecap="round"/><path d="M32 45v10M22 56h20" stroke="${S}" stroke-width="3.5" stroke-linecap="round"/>`,
+  webcam: `<circle cx="32" cy="25" r="19" fill="${S}"/><circle cx="32" cy="25" r="12" fill="#1e2a44"/><circle cx="32" cy="25" r="7" fill="${SK}"/><circle cx="29.5" cy="22.5" r="2.2" fill="#fff"/><rect x="28" y="43" width="8" height="8" fill="${M}"/><rect x="18" y="51" width="28" height="6" rx="3" fill="${M}" stroke="${S}" stroke-width="2"/>`,
+  scanner: `<polygon points="14,30 50,30 46,12 18,12" fill="${M}" stroke="${S}" stroke-width="2.5" stroke-linejoin="round"/><rect x="5" y="30" width="54" height="22" rx="4" fill="${L}" stroke="${S}" stroke-width="2.5"/><rect x="10" y="35" width="40" height="8" rx="2" fill="${SK}"/><circle cx="54" cy="46" r="2" fill="#1f9d55"/>`,
+  monitor: `<rect x="5" y="8" width="54" height="36" rx="5" fill="${S}"/><rect x="9" y="12" width="46" height="28" rx="2" fill="${SK}"/><circle cx="21" cy="21" r="4" fill="#ffd166"/><polygon points="9,40 27,26 37,35 44,29 55,40" fill="#4fb286"/><rect x="28" y="44" width="8" height="8" fill="${M}"/><rect x="18" y="52" width="28" height="5" rx="2.5" fill="${M}" stroke="${S}" stroke-width="2"/>`,
+  printer: `<rect x="18" y="5" width="28" height="18" rx="2" fill="#fff" stroke="${S}" stroke-width="2.5"/><rect x="5" y="22" width="54" height="24" rx="5" fill="${L}" stroke="${S}" stroke-width="2.5"/><rect x="15" y="38" width="34" height="20" rx="2" fill="#fff" stroke="${S}" stroke-width="2.5"/><path d="M21 44h22M21 51h16" stroke="${M}" stroke-width="2.5" stroke-linecap="round"/><circle cx="52" cy="29" r="2" fill="#1f9d55"/>`,
+  speakers: `<rect x="5" y="8" width="24" height="48" rx="5" fill="${S}"/><circle cx="17" cy="20" r="4" fill="${M}"/><circle cx="17" cy="41" r="9" fill="#1e2a44" stroke="${M}" stroke-width="2"/><rect x="35" y="8" width="24" height="48" rx="5" fill="${S}"/><circle cx="47" cy="20" r="4" fill="${M}"/><circle cx="47" cy="41" r="9" fill="#1e2a44" stroke="${M}" stroke-width="2"/>`,
+  headphones: `<path d="M12 38V32a20 20 0 0 1 40 0v6" fill="none" stroke="#d6237f" stroke-width="5" stroke-linecap="round"/><rect x="7" y="34" width="13" height="20" rx="6" fill="#d6237f"/><rect x="44" y="34" width="13" height="20" rx="6" fill="#d6237f"/><rect x="10" y="39" width="7" height="10" rx="3" fill="#f7b3d4"/><rect x="47" y="39" width="7" height="10" rx="3" fill="#f7b3d4"/>`,
+  flash: `<rect x="3" y="25" width="17" height="14" rx="2" fill="${M}" stroke="${S}" stroke-width="2.5"/><rect x="8" y="29" width="3" height="6" fill="${S}"/><rect x="14" y="29" width="3" height="6" fill="${S}"/><rect x="20" y="20" width="41" height="24" rx="6" fill="#e07a1f" stroke="${S}" stroke-width="2.5"/><circle cx="53" cy="32" r="3.5" fill="#fff"/><rect x="27" y="27" width="16" height="10" rx="2" fill="#f7c59a"/>`,
+  internet: `<circle cx="32" cy="32" r="24" fill="${SK}" stroke="${S}" stroke-width="2.5"/><ellipse cx="32" cy="32" rx="10" ry="24" fill="none" stroke="${S}" stroke-width="2"/><path d="M8 32h48M12 20h40M12 44h40" stroke="${S}" stroke-width="2" fill="none"/>`,
+  cpu: `${[0,1,2,3].map(i => `<rect x="${19+i*8}" y="7" width="3.5" height="8" fill="${M}"/><rect x="${19+i*8}" y="49" width="3.5" height="8" fill="${M}"/><rect x="7" y="${19+i*8}" width="8" height="3.5" fill="${M}"/><rect x="49" y="${19+i*8}" width="8" height="3.5" fill="${M}"/>`).join('')}<rect x="14" y="14" width="36" height="36" rx="5" fill="#2f3b52"/><rect x="23" y="23" width="18" height="18" rx="3" fill="#8fa0bc"/>`,
+  ram: `<rect x="3" y="18" width="58" height="28" rx="3" fill="#2e9e57" stroke="#1d6b3a" stroke-width="2"/>${[0,1,2,3].map(i => `<rect x="${8+i*13}" y="23" width="10" height="10" rx="1.5" fill="#1e2a44"/>`).join('')}${Array.from({length:12}, (_, i) => `<rect x="${7+i*4.5}" y="46" width="2.6" height="6" fill="#ffc93c"/>`).join('')}`,
+  disk: `<rect x="7" y="8" width="50" height="48" rx="6" fill="${M}" stroke="${S}" stroke-width="2.5"/><circle cx="29" cy="32" r="15" fill="#eef2f7" stroke="${S}" stroke-width="2"/><circle cx="29" cy="32" r="4" fill="${S}"/><path d="M50 16 33 30" stroke="${S}" stroke-width="3.5" stroke-linecap="round"/><circle cx="49" cy="49" r="2.5" fill="#1f9d55"/>`
+};
+const icon = id => `<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">${ICON[id]}</svg>`;
+
+/* Ports (socket) and plugs (cable end) — same silhouette so kids can match shapes */
+function portShape(type, plug) {
+  const dark = '#3a4a68', gold = '#ffc93c';
+  const wrap = inner => `<svg viewBox="0 0 84 56" aria-hidden="true" focusable="false" class="big">${inner}</svg>`;
+  if (type === 'usb') return wrap(plug
+    ? `<rect x="8" y="14" width="56" height="26" rx="3" fill="#cfd8e3" stroke="${S}" stroke-width="2.5"/><rect x="18" y="22" width="6" height="10" fill="${S}"/><rect x="30" y="22" width="6" height="10" fill="${S}"/><rect x="64" y="21" width="16" height="12" rx="4" fill="${S}"/>`
+    : `<rect x="8" y="14" width="56" height="26" rx="3" fill="${dark}"/><rect x="14" y="25" width="44" height="6" fill="#9fb0c8"/>`);
+  if (type === 'net') {
+    const p = 'M16 22h14v-8h24v8h14v24H16z';
+    const c = [0,1,2,3,4,5].map(i => `<path d="M${25+i*7} 36v8" stroke="${gold}" stroke-width="2.5"/>`).join('');
+    return wrap(plug
+      ? `<path d="${p}" fill="#dfe6ee" stroke="${S}" stroke-width="2.5" stroke-linejoin="round"/>${c}<rect x="68" y="30" width="13" height="12" rx="4" fill="#2a86d6"/>`
+      : `<path d="${p}" fill="${dark}"/>${c}`);
+  }
+  if (type === 'vga') {
+    const poly = '12,16 72,16 66,42 18,42';
+    const d1 = [26,34,42,50,58].map(x => `<circle cx="${x}" cy="25" r="2.4" fill="${'PIN'}"/>`).join('');
+    const d2 = [30,38,46,54].map(x => `<circle cx="${x}" cy="34" r="2.4" fill="${'PIN'}"/>`).join('');
+    const dots = (col) => (d1 + d2).replaceAll('PIN', col);
+    return wrap(plug
+      ? `<polygon points="${poly}" fill="#5b8fe0" stroke="#1e3f80" stroke-width="2.5" stroke-linejoin="round"/>${dots(gold)}<rect x="72" y="23" width="10" height="12" rx="4" fill="#1e3f80"/>`
+      : `<polygon points="${poly}" fill="#2b5fb5"/>${dots('#0f1f3d')}`);
+  }
+  /* audio */
+  return wrap(plug
+    ? `<circle cx="26" cy="28" r="14" fill="#f5f7fa" stroke="#e6398a" stroke-width="4"/><circle cx="26" cy="28" r="6" fill="${gold}"/><circle cx="58" cy="28" r="14" fill="#f5f7fa" stroke="#2e9e4f" stroke-width="4"/><circle cx="58" cy="28" r="6" fill="${gold}"/>`
+    : `<circle cx="26" cy="28" r="14" fill="${dark}" stroke="#e6398a" stroke-width="4"/><circle cx="26" cy="28" r="5" fill="#111c2e"/><circle cx="58" cy="28" r="14" fill="${dark}" stroke="#2e9e4f" stroke-width="4"/><circle cx="58" cy="28" r="5" fill="#111c2e"/>`);
+}
+
+/* ================= Shared UI pieces ================= */
+const stars = [0, 0, 0, 0];
+const tabs = [...document.querySelectorAll('.tab')];
+const panels = [...document.querySelectorAll('.panel')];
+
+function renderStars(i) {
+  tabs[i].querySelector('.ts').textContent = '★'.repeat(stars[i]) + '☆'.repeat(3 - stars[i]);
+  tabs[i].setAttribute('aria-label', `${tabs[i].dataset.label}, ${stars[i]} αστέρια από 3`);
+}
+function award(i, n) { stars[i] = Math.max(stars[i], n); renderStars(i); }
+function selectTab(i, focus) {
+  tabs.forEach((t, j) => { t.setAttribute('aria-selected', j === i ? 'true' : 'false'); t.tabIndex = j === i ? 0 : -1; panels[j].hidden = j !== i; });
+  if (focus) tabs[i].focus();
+}
+tabs.forEach((t, i) => {
+  t.addEventListener('click', () => selectTab(i));
+  t.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); selectTab((i + 1) % 4, true); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); selectTab((i + 3) % 4, true); }
+  });
+  renderStars(i);
+});
+
+function makeSay(text) {
+  const el = h('div', { class: 'say', role: 'status', 'aria-live': 'polite' });
+  const set = (kind, msg) => {
+    el.className = 'say ' + kind;
+    el.replaceChildren(h('span', { class: 'sicon', 'aria-hidden': 'true' }, { good: '✔', bad: '✖', info: '👉' }[kind]), h('span', {}, msg));
+  };
+  set('info', text);
+  return { el, set };
+}
+function makeProg(total) {
+  const bar = h('span');
+  const track = h('div', { class: 'pbar', role: 'progressbar', 'aria-label': 'Πρόοδος', 'aria-valuemin': 0, 'aria-valuemax': total, 'aria-valuenow': 0 }, bar);
+  const txt = h('span', { class: 'ptxt' });
+  const el = h('div', { class: 'prog' }, track, txt);
+  const set = n => { bar.style.width = (n / total * 100) + '%'; track.setAttribute('aria-valuenow', n); txt.textContent = n + ' από ' + total; };
+  set(0);
+  return { el, set };
+}
+function burst(host) {
+  if (reduced()) return;
+  const b = h('div', { class: 'burst', 'aria-hidden': 'true' });
+  for (let i = 0; i < 16; i++) {
+    const a = (i / 16) * Math.PI * 2, d = 90 + Math.random() * 90;
+    b.append(h('span', { style: `--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d}px` }, ['⭐', '✨', '🎉'][i % 3]));
+  }
+  host.append(b);
+  setTimeout(() => b.remove(), 1400);
+}
+function finish(idx, panel, mistakes, msg, again, thresholds = [1, 4]) {
+  const n = mistakes <= thresholds[0] ? 3 : mistakes <= thresholds[1] ? 2 : 1;
+  award(idx, n);
+  const next = idx < 3
+    ? h('button', { class: 'btn ghost', onclick: () => { selectTab(idx + 1); document.querySelector('.tabs').scrollIntoView({ block: 'start' }); } }, 'Επόμενη δραστηριότητα')
+    : h('button', { class: 'btn ghost', onclick: () => { selectTab(0); document.querySelector('.tabs').scrollIntoView({ block: 'start' }); } }, 'Πίσω στην πρώτη δραστηριότητα');
+  const res = h('div', { class: 'result' },
+    h('div', { class: 'big' }, 'Μπράβο!'),
+    h('div', { class: 'rstars', role: 'img', 'aria-label': `${n} αστέρια από 3` }, '★'.repeat(n) + '☆'.repeat(3 - n)),
+    h('p', {}, msg),
+    h('p', { class: 'small' }, !mistakes ? 'Χωρίς κανένα λάθος!' : n === 3 ? `Λάθη: ${mistakes}. Πολύ καλά!` : `Λάθη: ${mistakes}. Δοκίμασε ξανά για περισσότερα αστέρια!`),
+    h('div', { class: 'btns' }, h('button', { class: 'btn', onclick: again }, 'Παίξε ξανά'), next));
+  panel.append(res);
+  burst(panel);
+  res.scrollIntoView({ behavior: smooth(), block: 'nearest' });
+}
+/* Pick a source, pick a target — in either order. */
+function pairing(onPair) {
+  let s = null, t = null;
+  const mark = (n, on) => {
+    if (!n) return;
+    n.classList.toggle('sel', on);
+    const b = n.matches('button') ? n : n.querySelector('button');
+    if (b) b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  };
+  const api = {
+    src(n) { if (s === n) { mark(s, false); s = null; return; } mark(s, false); s = n; mark(s, true); go(); },
+    tgt(n) { if (t === n) { mark(t, false); t = null; return; } mark(t, false); t = n; mark(t, true); go(); },
+    reset() { mark(s, false); mark(t, false); s = t = null; }
+  };
+  function go() { if (s && t) { const a = s, b = t; api.reset(); onPair(a, b); } }
+  return api;
+}
+const head = (title, how) => [h('h2', {}, title), h('p', { class: 'how' }, how)];
+const devCard = (d, extra) => h('button', { class: 'dev', 'data-id': d.id, 'aria-pressed': 'false' },
+  h('span', { class: 'ico', html: icon(d.id) }), d.name, extra);
+const miniChip = d => h('span', { class: 'mini' }, h('span', { html: icon(d.id) }), d.name);
+
+/* ================= Activity 1: Είσοδος ή έξοδος; ================= */
+const DEV1 = [
+  { id: 'keyboard', name: 'Πληκτρολόγιο', kind: 'in', why: 'Με το πληκτρολόγιο δίνουμε κείμενο στον υπολογιστή.' },
+  { id: 'mouse', name: 'Ποντίκι', kind: 'in', why: 'Με το ποντίκι στέλνουμε εντολές στον υπολογιστή.' },
+  { id: 'mic', name: 'Μικρόφωνο', kind: 'in', why: 'Το μικρόφωνο δίνει ήχο στον υπολογιστή.' },
+  { id: 'webcam', name: 'Κάμερα', kind: 'in', why: 'Η κάμερα δίνει εικόνα στον υπολογιστή.' },
+  { id: 'scanner', name: 'Σαρωτής', kind: 'in', why: 'Ο σαρωτής δίνει στον υπολογιστή την εικόνα μιας σελίδας.' },
+  { id: 'monitor', name: 'Οθόνη', kind: 'out', why: 'Η οθόνη δείχνει κείμενο και εικόνα από τον υπολογιστή.' },
+  { id: 'printer', name: 'Εκτυπωτής', kind: 'out', why: 'Ο εκτυπωτής τυπώνει σε χαρτί κείμενο και εικόνα.' },
+  { id: 'speakers', name: 'Ηχεία', kind: 'out', why: 'Τα ηχεία βγάζουν ήχο, για να τον ακούσουμε.' },
+  { id: 'headphones', name: 'Ακουστικά', kind: 'out', why: 'Τα ακουστικά βγάζουν ήχο, για να τον ακούσουμε.' }
+];
+const TOWER = `<svg viewBox="0 0 80 130" aria-hidden="true" focusable="false"><rect x="10" y="4" width="60" height="122" rx="8" fill="#d5dde8" stroke="#4a5a75" stroke-width="3"/><rect x="18" y="14" width="44" height="8" rx="2" fill="#4a5a75"/><rect x="18" y="28" width="44" height="8" rx="2" fill="#4a5a75"/><circle cx="40" cy="98" r="8" fill="none" stroke="#4a5a75" stroke-width="3"/><path d="M40 92v6" stroke="#4a5a75" stroke-width="3" stroke-linecap="round"/><rect x="24" y="113" width="8" height="4" rx="1" fill="#4a5a75"/><rect x="48" y="113" width="8" height="4" rx="1" fill="#4a5a75"/></svg>`;
+const ARROW = `<svg viewBox="0 0 38 24" aria-hidden="true" focusable="false"><path d="M2 12h28M22 3l11 9-11 9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+function activity1(panel) {
+  function init() {
+    panel.replaceChildren();
+    let mistakes = 0, left = DEV1.length;
+    const say = makeSay('Πάτησε μια συσκευή και μετά την περιοχή που της ταιριάζει: Είσοδος ή Έξοδος.');
+    const prog = makeProg(DEV1.length);
+    const tray = h('div', { class: 'tray', role: 'group', 'aria-label': 'Συσκευές' });
+    const binIn = h('div', { class: 'bin' }), binOut = h('div', { class: 'bin' });
+    const bucket = (kind, title, sub, bin) => h('div', { class: 'bucket ' + kind, 'data-kind': kind },
+      h('button', { class: 'bbtn', 'aria-pressed': 'false' }, h('b', {}, title), h('span', {}, sub)), bin);
+    const bIn = bucket('in', 'Είσοδος', 'Δίνουμε πληροφορίες στον υπολογιστή', binIn);
+    const bOut = bucket('out', 'Έξοδος', 'Ο υπολογιστής μας τις δείχνει ή τις ακούμε', binOut);
+
+    const pair = pairing((dev, bk) => {
+      const d = DEV1.find(x => x.id === dev.dataset.id);
+      if (d.kind === bk.dataset.kind) {
+        dev.remove();
+        (bk.dataset.kind === 'in' ? binIn : binOut).append(miniChip(d));
+        left--; prog.set(DEV1.length - left);
+        say.set('good', 'Σωστά! ' + d.why);
+        if (!left) {
+          tray.hidden = true;
+          say.set('good', 'Όλες οι συσκευές μπήκαν στη θέση τους!');
+          finish(0, panel, mistakes, 'Οι συσκευές εισόδου δίνουν πληροφορίες στον υπολογιστή. Οι συσκευές εξόδου μας τις δείχνουν ή μας τις ακούνε.', init);
+        }
+      } else {
+        mistakes++;
+        flash(dev, 'nope'); flash(bk, 'nope');
+        say.set('bad', 'Όχι ακόμα. Σκέψου: η συσκευή δίνει κάτι στον υπολογιστή ή παίρνει κάτι από αυτόν;');
+      }
+    });
+    DEV1.length && shuffle(DEV1).forEach(d => {
+      const c = devCard(d);
+      c.addEventListener('click', () => pair.src(c));
+      tray.append(c);
+    });
+    [bIn, bOut].forEach(b => b.addEventListener('click', () => pair.tgt(b)));
+
+    const stage = h('div', { class: 'stage' },
+      bIn,
+      h('div', { class: 'arrow in', html: ARROW }),
+      h('div', { class: 'tower' }, h('span', { html: TOWER }), 'Κεντρική μονάδα'),
+      h('div', { class: 'arrow out', html: ARROW }),
+      bOut);
+    panel.append(...head('Είσοδος ή έξοδος;', 'Βάλε κάθε συσκευή στη σωστή περιοχή.'), prog.el, say.el, tray, stage);
+  }
+  init();
+}
+
+/* ================= Activity 2: Μέσα στην κεντρική μονάδα ================= */
+function activity2(panel) {
+  const CHIPS = [
+    { w: 'Μνήμη', cat: 'mem' }, { w: 'Επεξεργαστής', cat: 'cpu' }, { w: 'Δίσκος αποθήκευσης', cat: 'mem' },
+    { w: 'επεξεργασία', cat: 'cpu' }, { w: 'αποθήκευση', cat: 'mem' }
+  ];
+  function init() {
+    panel.replaceChildren();
+    let mistakes = 0, filled = 0;
+    const total = 5;
+    const say = makeSay('Πάτησε μια λέξη και μετά το κενό που ταιριάζει. Μπορείς και ανάποδα!');
+    const prog = makeProg(total);
+    const bank = h('div', { class: 'bank', role: 'group', 'aria-label': 'Λέξεις' });
+
+    const slotEl = (accept, hint, ok) => h('button', { class: 'slot', 'aria-label': 'κενό', 'aria-pressed': 'false', 'data-accept': accept.join('|'), 'data-hint': hint, 'data-ok': ok }, '\u00a0');
+    const rows = h('div', { class: 'rows' },
+      h('div', { class: 'row' }, h('div', { class: 'pic', html: icon('ram') }), h('p', {},
+        slotEl(['Μνήμη'], 'Προσωρινά σημαίνει ότι τα δεδομένα σβήνονται όταν κλείσει ο υπολογιστής.', 'Η μνήμη κρατά τα δεδομένα προσωρινά. Όταν κλείνει ο υπολογιστής, σβήνει.'),
+        ': Αποθηκεύει προσωρινά τα δεδομένα μέχρι να γίνει τερματισμός του υπολογιστή.')),
+      h('div', { class: 'row' }, h('div', { class: 'pic', html: icon('cpu') }), h('p', {},
+        slotEl(['Επεξεργαστής'], 'Ποιο εξάρτημα κάνει τις πράξεις και συγκρίνει τα δεδομένα;', 'Ο επεξεργαστής οργανώνει, συγκρίνει και κάνει πράξεις με τα δεδομένα.'),
+        ': Οργανώνει, συγκρίνει και κάνει πράξεις με τα δεδομένα.')),
+      h('div', { class: 'row' }, h('div', { class: 'pic', html: icon('disk') }), h('p', {},
+        slotEl(['Δίσκος αποθήκευσης'], 'Μόνιμα σημαίνει ότι τα δεδομένα μένουν και όταν κλείσει ο υπολογιστής.', 'Ο δίσκος αποθήκευσης κρατά τα δεδομένα μόνιμα, γι’ αυτό αποθηκεύουμε εκεί τα αρχεία μας.'),
+        ': Αποθηκεύει μόνιμα τα δεδομένα.')),
+      h('div', { class: 'row' }, h('div', { class: 'pic', html: TOWER.replace('<svg ', '<svg style="width:38px" ') }), h('p', {},
+        'Στην κεντρική μονάδα γίνεται ',
+        slotEl(['επεξεργασία', 'αποθήκευση'], 'Σκέψου τι κάνουν ο επεξεργαστής και ο δίσκος αποθήκευσης.', 'Σωστά!'),
+        ' και ',
+        slotEl(['επεξεργασία', 'αποθήκευση'], 'Σκέψου τι κάνουν ο επεξεργαστής και ο δίσκος αποθήκευσης.', 'Σωστά!'),
+        ' δεδομένων.')));
+
+    const pair = pairing((chip, slot) => {
+      const word = chip.dataset.w;
+      if (slot.dataset.accept.split('|').includes(word)) {
+        slot.textContent = word;
+        slot.classList.add('filled', chip.dataset.cat);
+        slot.disabled = true;
+        chip.remove();
+        filled++; prog.set(filled);
+        say.set('good', slot.dataset.ok === 'Σωστά!' ? 'Σωστά! Η κεντρική μονάδα επεξεργάζεται και αποθηκεύει δεδομένα.' : 'Σωστά! ' + slot.dataset.ok);
+        if (filled === total) {
+          bank.hidden = true;
+          say.set('good', 'Όλα τα κενά συμπληρώθηκαν!');
+          finish(1, panel, mistakes, 'Θυμήσου: αν δεν αποθηκεύσεις το αρχείο σου στον δίσκο, σβήνεται μαζί με τη μνήμη όταν κλείσεις τον υπολογιστή.', init);
+        }
+      } else {
+        mistakes++;
+        flash(chip, 'nope'); flash(slot, 'nope');
+        say.set('bad', 'Δεν ταιριάζει εδώ. ' + slot.dataset.hint);
+      }
+    });
+    shuffle(CHIPS).forEach(c => {
+      const b = h('button', { class: 'chip', 'data-w': c.w, 'data-cat': c.cat, 'aria-pressed': 'false' }, c.w);
+      b.addEventListener('click', () => pair.src(b));
+      bank.append(b);
+    });
+    rows.querySelectorAll('.slot').forEach(s => s.addEventListener('click', () => pair.tgt(s)));
+    panel.append(...head('Μέσα στην κεντρική μονάδα', 'Συμπλήρωσε τα κενά με τις λέξεις που ταιριάζουν.'), prog.el, say.el, bank, rows);
+  }
+  init();
+}
+
+/* ================= Activity 3: Καλώδιο και θύρα ================= */
+const DEV3 = [
+  { id: 'mouse', name: 'Ποντίκι', port: 'usb', ok: 'Το ποντίκι συνδέεται σε θύρα USB.' },
+  { id: 'keyboard', name: 'Πληκτρολόγιο', port: 'usb', ok: 'Και το πληκτρολόγιο συνδέεται σε θύρα USB.' },
+  { id: 'printer', name: 'Εκτυπωτής', port: 'usb', ok: 'Ο εκτυπωτής συνδέεται σε θύρα USB.' },
+  { id: 'flash', name: 'Μνήμη φλας', port: 'usb', ok: 'Η μνήμη φλας συνδέεται σε θύρα USB.' },
+  { id: 'monitor', name: 'Οθόνη', port: 'vga', ok: 'Η οθόνη συνδέεται στη θύρα οθόνης.' },
+  { id: 'mic', name: 'Μικρόφωνο', port: 'audio', ok: 'Το μικρόφωνο συνδέεται στη θύρα μικροφώνου–ακουστικών.' },
+  { id: 'headphones', name: 'Ακουστικά', port: 'audio', ok: 'Και τα ακουστικά συνδέονται στη θύρα μικροφώνου–ακουστικών.' },
+  { id: 'internet', name: 'Καλώδιο διαδικτύου', port: 'net', ok: 'Το καλώδιο του διαδικτύου συνδέεται στη θύρα διαδικτύου.' }
+];
+const PORTS = [
+  { id: 'usb', label: 'Θύρα USB' },
+  { id: 'net', label: 'Θύρα διαδικτύου' },
+  { id: 'vga', label: 'Θύρα οθόνης' },
+  { id: 'audio', label: 'Θύρα μικροφώνου – ακουστικών' }
+];
+function activity3(panel) {
+  function init() {
+    panel.replaceChildren();
+    let mistakes = 0, left = DEV3.length;
+    const say = makeSay('Διάλεξε μια συσκευή και μετά τη θύρα όπου εφαρμόζει το καλώδιό της.');
+    const prog = makeProg(DEV3.length);
+    const tray = h('div', { class: 'tray', role: 'group', 'aria-label': 'Συσκευές' });
+    const rear = h('div', { class: 'rear' });
+    const plugs = {};
+
+    const pair = pairing((dev, port) => {
+      const d = DEV3.find(x => x.id === dev.dataset.id);
+      if (d.port === port.dataset.port) {
+        dev.remove();
+        plugs[port.dataset.port].append(miniChip(d));
+        left--; prog.set(DEV3.length - left);
+        say.set('good', 'Σωστά! ' + d.ok);
+        if (!left) {
+          tray.hidden = true;
+          say.set('good', 'Όλες οι συσκευές συνδέθηκαν!');
+          finish(2, panel, mistakes, 'Κάθε καλώδιο εφαρμόζει μόνο στη θύρα του ίδιου είδους, όπως το καλώδιο ρεύματος στην πρίζα.', init);
+        }
+      } else {
+        mistakes++;
+        dev.classList.add('hint');
+        flash(dev, 'nope'); flash(port, 'nope');
+        say.set('bad', 'Το βύσμα δεν εφαρμόζει σε αυτή τη θύρα. Κοίτα το σχήμα του βύσματος κάτω από τη συσκευή!');
+      }
+    });
+
+    shuffle(DEV3).forEach(d => {
+      const c = devCard(d, h('span', { class: 'plugview', html: portShape(d.port, true).replace(' class="big"', '') }, h('span', {}, 'βύσμα')));
+      c.addEventListener('click', () => pair.src(c));
+      tray.append(c);
+    });
+    PORTS.forEach(p => {
+      const box = h('div', { class: 'plugged' });
+      plugs[p.id] = box;
+      const el = h('div', { class: 'port', 'data-port': p.id },
+        h('span', { html: portShape(p.id, false) }),
+        h('button', { class: 'plabel', style: 'background:none;border:0;color:inherit;padding:0', 'aria-pressed': 'false' }, p.label),
+        box);
+      el.addEventListener('click', () => pair.tgt(el));
+      rear.append(el);
+    });
+    panel.append(...head('Καλώδιο και θύρα', 'Συνδέσε κάθε συσκευή στη σωστή θύρα της κεντρικής μονάδας.'), prog.el, say.el, tray,
+      h('p', { class: 'rear-title' }, 'Πίσω όψη της κεντρικής μονάδας'), rear);
+  }
+  init();
+}
+
+/* ================= Activity 4: Αλήθεια ή ψέμα; ================= */
+const QS = [
+  { t: 'Όταν κλείνουμε τον υπολογιστή, σβήνεται το περιεχόμενο της μνήμης.', a: true, why: 'Η μνήμη κρατά τα δεδομένα μόνο προσωρινά. Γι’ αυτό αποθηκεύουμε τα αρχεία μας στον δίσκο.' },
+  { t: 'Το ποντίκι είναι συσκευή εξόδου.', a: false, why: 'Το ποντίκι είναι συσκευή εισόδου: με αυτό δίνουμε εντολές στον υπολογιστή.' },
+  { t: 'Η οθόνη και ο εκτυπωτής είναι περιφερειακές συσκευές.', a: true, why: 'Περιφερειακές λέγονται όλες οι συσκευές που συνδέονται στην κεντρική μονάδα.' },
+  { t: 'Η μνήμη αποθηκεύει τα αρχεία μας μόνιμα.', a: false, why: 'Τα δεδομένα αποθηκεύονται μόνιμα στον δίσκο αποθήκευσης. Η μνήμη τα κρατά προσωρινά.' },
+  { t: 'Το υλικό (hardware) του υπολογιστή είναι αντικείμενα που μπορούμε να δούμε και να πιάσουμε.', a: true, why: 'Υλικό είναι η κεντρική μονάδα με τα εξαρτήματά της και οι περιφερειακές συσκευές.' },
+  { t: 'Κάθε καλώδιο εφαρμόζει σε όλες τις θύρες του υπολογιστή.', a: false, why: 'Κάθε καλώδιο εφαρμόζει μόνο στη θύρα του ίδιου είδους.' },
+  { t: 'Και το έξυπνο κινητό τηλέφωνο κάνει είσοδο, αποθήκευση, επεξεργασία και έξοδο δεδομένων.', a: true, why: 'Το ίδιο συμβαίνει σε όλα τα είδη υπολογιστή: γραφείου, φορητό, ταμπλέτα και κινητό.' },
+  { t: 'Το μικρόφωνο συνδέεται στην ίδια θύρα με την οθόνη.', a: false, why: 'Το μικρόφωνο και τα ακουστικά έχουν δική τους θύρα, διαφορετική από της οθόνης.' }
+];
+function activity4(panel) {
+  function init() {
+    panel.replaceChildren();
+    const qs = shuffle(QS);
+    let i = 0, mistakes = 0;
+    const prog = makeProg(qs.length);
+    const holder = h('div', { class: 'qcard' });
+    panel.append(...head('Αλήθεια ή ψέμα;', 'Διάβασε την πρόταση και πάτησε αν είναι αλήθεια ή ψέμα.'), prog.el, holder);
+
+    function show() {
+      const q = qs[i];
+      const say = makeSay('Σκέψου και διάλεξε.');
+      const next = h('button', { class: 'btn', hidden: true }, i === qs.length - 1 ? 'Δες το αποτέλεσμα' : 'Επόμενη πρόταση');
+      const mk = (val, label, mark, cls) => {
+        const b = h('button', { class: 'tfb ' + cls }, h('span', { class: 'mk', 'aria-hidden': 'true' }, mark), label);
+        b.addEventListener('click', () => {
+          const right = val === q.a;
+          if (!right) mistakes++;
+          holder.querySelectorAll('.tfb').forEach(x => x.disabled = true);
+          b.classList.add('picked');
+          say.set(right ? 'good' : 'bad', (right ? 'Σωστά! ' : 'Όχι ακριβώς. ') + q.why);
+          if (!right) flash(b, 'nope');
+          prog.set(i + 1);
+          next.hidden = false; next.focus();
+        });
+        return b;
+      };
+      holder.replaceChildren(
+        h('p', { class: 'qtext' }, q.t),
+        h('div', { class: 'tf' }, mk(true, 'Αλήθεια', '✔', 't'), mk(false, 'Ψέμα', '✖', 'f')),
+        say.el, next);
+      next.addEventListener('click', () => {
+        i++;
+        if (i < qs.length) show();
+        else {
+          holder.replaceChildren();
+          finish(3, panel, mistakes, `Απάντησες σωστά σε ${qs.length - mistakes} από ${qs.length} προτάσεις.`, init, [1, 3]);
+        }
+      });
+    }
+    show();
+  }
+  init();
+}
+
+activity1(panels[0]); activity2(panels[1]); activity3(panels[2]); activity4(panels[3]);
+selectTab(0);
+})();
+</script>
+</body>
+</html>
