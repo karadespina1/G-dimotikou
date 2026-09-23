@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Μάθημα 10: Τα εξαρτήματα και οι συσκευές του υπολογιστή</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: 'Comic Sans MS', 'Fredoka', 'Quicksand', 'Trebuchet MS', sans-serif, Arial;
+    background: #1b264f; /* Σκούρο μπλε φόντο όπως στην εικόνα */
+    color: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px 15px 40px;
+  }
+
+  /* Πάνω κίτρινη καρτέλα */
+  .badge-class {
+    background: #ffc93c;
+    color: #1b264f;
+    font-weight: 800;
+    font-size: 15px;
+    padding: 8px 24px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(255, 201, 60, 0.4);
+    margin-bottom: 12px;
+  }
+
+  /* Τίτλοι */
+  h1.main-title {
+    font-size: 27px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+  p.sub-title {
+    font-size: 16px;
+    color: #b0c4de;
+    text-align: center;
+    margin-bottom: 22px;
+  }
+
+  /* Κουμπί Λήψης Αρχείου */
+  .download-strip {
+    margin-bottom: 20px;
+  }
+  .btn-download {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: bold;
+    padding: 9px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+    transition: all 0.2s;
+  }
+  .btn-download:hover {
+    transform: translateY(-2px);
+    background: #ff5252;
+  }
+
+  /* Μεγάλο σκοτεινό πλαίσιο πλοήγησης (Tabs) */
+  .nav-container {
+    background: #273469;
+    width: 100%;
+    max-width: 880px;
+    border-radius: 22px;
+    padding: 16px;
+    margin-bottom: 22px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  }
+  .tabs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .tab-btn {
+    background: transparent;
+    border: none;
+    color: #e2e8f0;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 14px 10px;
+    border-radius: 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.25s ease;
+  }
+  .tab-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .tab-btn.active {
+    background: #fffdf2;
+    color: #1b264f;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  }
+
+  /* Λευκό Κυρίως Πλαίσιο Δραστηριότητας */
+  .activity-card {
+    background: #ffffff;
+    color: #2d3748;
+    width: 100%;
+    max-width: 880px;
+    border-radius: 24px;
+    padding: 32px 30px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+    min-height: 420px;
+  }
+  .act-header h2 {
+    font-size: 23px;
+    color: #1b264f;
+    margin-bottom: 8px;
+  }
+  .act-header p {
+    font-size: 15px;
+    color: #4a5568;
+    margin-bottom: 24px;
+  }
+
+  /* Στυλ Δραστηριότητας 1: Δύο Κουτιά Ταξινόμησης */
+  .items-to-pick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 25px;
+  }
+  .pick-chip {
+    background: #edf2f7;
+    border: 2px solid #cbd5e0;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .pick-chip:hover { background: #e2e8f0; }
+  .pick-chip.selected {
+    background: #feebc8;
+    border-color: #dd6b20;
+    transform: scale(1.05);
+  }
+  .buckets-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .bucket {
+    border: 3px dashed #bbf7d0;
+    background: #f0fdf4;
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    min-height: 180px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .bucket.blue {
+    border-color: #bae6fd;
+    background: #f0f9ff;
+  }
+  .bucket:hover {
+    transform: translateY(-2px);
+    border-style: solid;
+  }
+  .bucket-icon { font-size: 34px; margin-bottom: 6px; }
+  .bucket-title { font-size: 18px; font-weight: 800; color: #1e293b; margin-bottom: 12px; }
+  .bucket-content { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .placed-tag {
+    background: white;
+    border: 2px solid #86efac;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #166534;
+  }
+  .placed-tag.blue {
+    border-color: #7dd3fc;
+    color: #0369a1;
+  }
+
+  /* Στυλ Δραστηριότητας 2: Ταίριασμα Ζευγαριών */
+  .match-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .match-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .match-card {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    padding: 14px;
+    border-radius: 14px;
+    font-weight: bold;
+    font-size: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .match-card:hover { background: #e0f2fe; border-color: #7dd3fc; }
+  .match-card.selected { background: #fef08a; border-color: #eab308; }
+  .match-card.matched { background: #dcfce7; border-color: #22c55e; color: #15803d; cursor: default; }
+
+  /* Στυλ Δραστηριότητας 3: Σωστό / Λάθος */
+  .tf-question {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .tf-text { font-size: 16px; font-weight: 600; color: #334155; }
+  .tf-buttons { display: flex; gap: 10px; }
+  .tf-btn {
+    border: none;
+    padding: 10px 18px;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.15s;
+    background: #e2e8f0;
+    color: #334155;
+  }
+  .tf-btn.true-btn:hover { background: #bbf7d0; color: #166534; }
+  .tf-btn.false-btn:hover { background: #fecdd3; color: #9f1239; }
+  .tf-btn.correct { background: #22c55e !important; color: white !important; }
+  .tf-btn.wrong { background: #ef4444 !important; color: white !important; }
+
+  /* Στυλ Δραστηριότητας 4: Κουίζ Ρόλων */
+  .quiz-item {
+    background: #f8fafc;
+    border: 2px solid #f1f5f9;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .quiz-q { font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 12px; }
+  .quiz-answers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .quiz-btn {
+    background: white;
+    border: 2px solid #cbd5e0;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .quiz-btn:hover { background: #f1f5f9; }
+  .quiz-btn.correct { background: #4ade80; color: #064e3b; border-color: #22c55e; }
+  .quiz-btn.wrong { background: #f87171; color: #7f1d1d; border-color: #ef4444; }
+
+  /* Στυλ Δραστηριότητας 5: Θύρες & Καλώδια */
+  .ports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .port-box {
+    background: #fdf4ff;
+    border: 2px solid #f0abfc;
+    border-radius: 18px;
+    padding: 16px;
+    text-align: center;
+  }
+  .port-title { font-weight: 800; font-size: 16px; color: #86198f; margin-bottom: 10px; }
+  .cable-opt {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 9px;
+    background: white;
+    border: 2px solid #e9d5ff;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .cable-opt.correct { background: #86efac; border-color: #22c55e; color: #14532d; }
+  .cable-opt.wrong { background: #fca5a5; border-color: #ef4444; color: #7f1d1d; }
+
+  /* Στυλ Δραστηριότητας 6: Συμπλήρωση με Κουμπιά */
+  .fill-sentence {
+    background: #fffbeb;
+    border: 2px solid #fde68a;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 18px;
+    font-size: 17px;
+    line-height: 2;
+    color: #78350f;
+  }
+  .blank-slot {
+    display: inline-block;
+    min-width: 130px;
+    height: 34px;
+    border-bottom: 3px dashed #d97706;
+    vertical-align: middle;
+    text-align: center;
+    font-weight: bold;
+    color: #1d4ed8;
+    padding: 0 8px;
+  }
+  .words-pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 15px;
+  }
+  .word-btn {
+    background: #f59e0b;
+    color: white;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(245, 158, 11, 0.3);
+  }
+  .word-btn.used {
+    background: #d1d5db;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* Μήνυμα Επιβράβευσης & Reset */
+  .feedback-banner {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 16px;
+    display: none;
+  }
+  .feedback-banner.show { display: block; }
+  .feedback-banner.win { background: #dcfce7; color: #166534; }
+  .btn-retry {
+    margin-top: 15px;
+    background: #e2e8f0;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-weight: bold;
+    color: #475569;
+    cursor: pointer;
+  }
+  .btn-retry:hover { background: #cbd5e0; }
+
+  @media (max-width: 650px) {
+    .tabs-grid { grid-template-columns: 1fr; }
+    .buckets-container { grid-template-columns: 1fr; }
+    .match-grid { grid-template-columns: 1fr; }
+    .quiz-answers { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Κίτρινο Badge Τάξης -->
+  <div class="badge-class">Πληροφορική Γ' Δημοτικού</div>
+
+  <!-- Τίτλος & Υπότιτλος -->
+  <h1 class="main-title">Μάθημα 10ο: Τα εξαρτήματα και οι συσκευές του υπολογιστή</h1>
+  <p class="sub-title">Έξι διασκεδαστικά παιχνίδια για το υλικό και τις συσκευές</p>
+
+  <!-- Κουμπί Λήψης Αρχείου HTML -->
+  <div class="download-strip">
+    <button class="btn-download" onclick="downloadHTML()">💾 Λήψη αρχείου HTML (για προβολή offline)</button>
+  </div>
+
+  <!-- Σκούρο Πλαίσιο Πλοήγησης με 6 Tabs (Ακριβές Στυλ) -->
+  <div class="nav-container">
+    <div class="tabs-grid">
+      <button class="tab-btn active" onclick="openTab(1)">1. Είσοδος ή Έξοδος;</button>
+      <button class="tab-btn" onclick="openTab(2)">2. Ταίριασμα Συσκευών</button>
+      <button class="tab-btn" onclick="openTab(3)">3. Σωστό / Λάθος</button>
+      <button class="tab-btn" onclick="openTab(4)">4. Κεντρική Μονάδα</button>
+      <button class="tab-btn" onclick="openTab(5)">5. Πού συνδέεται;</button>
+      <button class="tab-btn" onclick="openTab(6)">6. Το Μυστικό του Η/Υ</button>
+    </div>
+  </div>
+
+  <!-- ΛΕΥΚΗ ΚΑΡΤΑ ΠΕΡΙΕΧΟΜΕΝΟΥ ΔΡΑΣΤΗΡΙΟΤΗΤΑΣ -->
+  <div class="activity-card">
+
+    <!-- 1. ΕΙΣΟΔΟΣ Ή ΕΞΟΔΟΣ (ΤΑΞΙΝΟΜΗΣΗ ΣΕ 2 ΚΟΥΤΙΑ) -->
+    <div id="tab1" class="tab-content">
+      <div class="act-header">
+        <h2>Συσκευή Εισόδου ή Εξόδου;</h2>
+        <p>Πάτησε πρώτα μία συσκευή και μετά το κουτί στο οποίο ανήκει!</p>
+      </div>
+
+      <div class="items-to-pick" id="pick-pool-1">
+        <div class="pick-chip" data-type="in" onclick="selectChip(this)">⌨️ Πληκτρολόγιο</div>
+        <div class="pick-chip" data-type="out" onclick="selectChip(this)">🖥️ Οθόνη</div>
+        <div class="pick-chip" data-type="in" onclick="selectChip(this)">🖱️ Ποντίκι</div>
+        <div class="pick-chip" data-type="out" onclick="selectChip(this)">🔊 Ηχεία</div>
+        <div class="pick-chip" data-type="in" onclick="selectChip(this)">🎙️ Μικρόφωνο</div>
+        <div class="pick-chip" data-type="out" onclick="selectChip(this)">🖨️ Εκτυπωτής</div>
+      </div>
+
+      <div class="buckets-container">
+        <div class="bucket" onclick="dropToBucket('in')">
+          <div class="bucket-icon">📥</div>
+          <div class="bucket-title">Συσκευές ΕΙΣΟΔΟΥ</div>
+          <p style="font-size: 13px; color: #15803d; margin-bottom: 8px;">(Δίνουμε πληροφορίες στον Η/Υ)</p>
+          <div class="bucket-content" id="bucket-in"></div>
+        </div>
+
+        <div class="bucket blue" onclick="dropToBucket('out')">
+          <div class="bucket-icon">📤</div>
+          <div class="bucket-title">Συσκευές ΕΞΟΔΟΥ</div>
+          <p style="font-size: 13px; color: #0284c7; margin-bottom: 8px;">(Παίρνουμε εικόνα ή ήχο)</p>
+          <div class="bucket-content" id="bucket-out"></div>
+        </div>
+      </div>
+
+      <div class="feedback-banner" id="fb1">🎉 Μπράβο! Ταξινόμησες σωστά όλες τις συσκευές!</div>
+      <button class="btn-retry" onclick="resetTab1()">🔄 Παίξε πάλι</button>
+    </div>
+
+    <!-- 2. ΤΑΙΡΙΑΣΜΑ ΣΥΣΚΕΥΗΣ & ΧΡΗΣΗΣ -->
+    <div id="tab2" class="tab-content" style="display:none;">
+      <div class="act-header">
+        <h2>Ταίριαξε τη συσκευή με αυτό που κάνει</h2>
+        <p>Κάνε κλικ σε μία συσκευή αριστερά και μετά στη σωστή δουλειά δεξιά!</p>
+      </div>
+
+      <div class="match-grid">
+        <div class="match-col">
+          <div class="match-card" data-pair="1" onclick="pickMatch(this, 'left')">⌨️ Πληκτρολόγιο</div>
+          <div class="match-card" data-pair="2" onclick="pickMatch(this, 'left')">🖱️ Ποντίκι</div>
+          <div class="match-card" data-pair="3" onclick="pickMatch(this, 'left')">🖨️ Εκτυπωτής</div>
+          <div class="match-card" data-pair="4" onclick="pickMatch(this, 'left')">🎧 Ακουστικά</div>
+        </div>
+        <div class="match-col">
+          <div class="match-card" data-pair="3" onclick="pickMatch(this, 'right')">📄 Τυπώνει στο χαρτί</div>
+          <div class="match-card" data-pair="1" onclick="pickMatch(this, 'right')">✍️ Γράφω γράμματα & αριθμούς</div>
+          <div class="match-card" data-pair="4" onclick="pickMatch(this, 'right')">🎵 Ακούω μόνο εγώ μουσική</div>
+          <div class="match-card" data-pair="2" onclick="pickMatch(this, 'right')">🎯 Κάνω κλικ και δείχνω</div>
+        </div>
+      </div>
+
+      <div class="feedback-banner" id="fb2">🌟 Τέλεια! Βρήκες όλα τα ζευγάρια!</div>
+      <button class="btn-retry" onclick="resetTab2()">🔄 Παίξε πάλι</button>
+    </div>
+
+    <!-- 3. ΣΩΣΤΟ Ή ΛΑΘΟΣ -->
+    <div id="tab3" class="tab-content" style="display:none;">
+      <div class="act-header">
+        <h2>Σωστό ή Λάθος;</h2>
+        <p>Διάβασε την απλή πρόταση και πάτησε 👍 Σωστό ή 👎 Λάθος:</p>
+      </div>
+
+      <div class="tf-question">
+        <div class="tf-text">1. Υλικό (Hardware) είναι όλα τα μέρη του Η/Υ που μπορούμε να αγγίξουμε.</div>
+        <div class="tf-buttons">
+          <button class="tf-btn true-btn" onclick="checkTF(this, true, true)">👍 Σωστό</button>
+          <button class="tf-btn false-btn" onclick="checkTF(this, false, true)">👎 Λάθος</button>
+        </div>
+      </div>
+
+      <div class="tf-question">
+        <div class="tf-text">2. Ο άνθρωπος που δουλεύει στον υπολογιστή ονομάζεται «χρήστης».</div>
+        <div class="tf-buttons">
+          <button class="tf-btn true-btn" onclick="checkTF(this, true, true)">👍 Σωστό</button>
+          <button class="tf-btn false-btn" onclick="checkTF(this, false, true)">👎 Λάθος</button>
+        </div>
+      </div>
+
+      <div class="tf-question">
+        <div class="tf-text">3. Η οθόνη και τα ηχεία βρίσκονται μέσα στην κεντρική μονάδα.</div>
+        <div class="tf-buttons">
+          <button class="tf-btn true-btn" onclick="checkTF(this, true, false)">👍 Σωστό</button>
+          <button class="tf-btn false-btn" onclick="checkTF(this, false, false)">👎 Λάθος</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. ΚΕΝΤΡΙΚΗ ΜΟΝΑΔΑ -->
+    <div id="tab4" class="tab-content" style="display:none;">
+      <div class="act-header">
+        <h2>Τι κρύβεται στην Κεντρική Μονάδα;</h2>
+        <p>Διάλεξε το σωστό εξάρτημα για κάθε περιγραφή:</p>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-q">1. Είναι το «μυαλό» του υπολογιστή που κάνει όλους τους υπολογισμούς:</div>
+        <div class="quiz-answers">
+          <button class="quiz-btn" onclick="checkQuiz(this, true)">🧠 Επεξεργαστής</button>
+          <button class="quiz-btn" onclick="checkQuiz(this, false)">🖱️ Ποντίκι</button>
+          <button class="quiz-btn" onclick="checkQuiz(this, false)">🔊 Ηχείο</button>
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-q">2. Αποθηκεύει <u>μόνιμα</u> τα αρχεία και τις ζωγραφιές μας:</div>
+        <div class="quiz-answers">
+          <button class="quiz-btn" onclick="checkQuiz(this, false)">🖥️ Οθόνη</button>
+          <button class="quiz-btn" onclick="checkQuiz(this, true)">💾 Δίσκος Αποθήκευσης</button>
+          <button class="quiz-btn" onclick="checkQuiz(this, false)">🎙️ Μικρόφωνο</button>
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-q">3. Όταν κλείνουμε τον υπολογιστή, ό,τι έχει μέσα της <u>σβήνεται</u>:</div>
+        <div class="quiz-answers">
+          <button class="quiz-btn" onclick="checkQuiz(this, true)">⚡ Μνήμη</button>
+          <button class="quiz-btn" onclick="checkQuiz(this, false)">🖨️ Εκτυπωτής</button>
+          <button class="quiz-btn" onclick="checkQuiz(this, false)">⌨️ Πληκτρολόγιο</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. ΠΟΥ ΣΥΝΔΕΕΤΑΙ; (ΘΥΡΕΣ & ΚΑΛΩΔΙΑ) -->
+    <div id="tab5" class="tab-content" style="display:none;">
+      <div class="act-header">
+        <h2>Πού συνδέεται το κάθε καλώδιο;</h2>
+        <p>Κάθε καλώδιο ταιριάζει μόνο στη δική του θύρα! Βρες το σωστό:</p>
+      </div>
+
+      <div class="ports-grid">
+        <div class="port-box">
+          <div class="port-title">🔌 Θύρα USB</div>
+          <p style="font-size:13px; color:#6b21a8; margin-bottom:10px;">Ποιο συνδέουμε εδώ;</p>
+          <button class="cable-opt" onclick="checkPort(this, true)">💾 Μνήμη Flash (Στικάκι)</button>
+          <button class="cable-opt" onclick="checkPort(this, false)">📺 Μεγάλη Οθόνη</button>
+        </div>
+
+        <div class="port-box">
+          <div class="port-title">🎧 Θύρα Ακουστικών</div>
+          <p style="font-size:13px; color:#6b21a8; margin-bottom:10px;">Ποιο συνδέουμε εδώ;</p>
+          <button class="cable-opt" onclick="checkPort(this, false)">🖱️ Ποντίκι</button>
+          <button class="cable-opt" onclick="checkPort(this, true)">🎵 Ακουστικά με καρφί</button>
+        </div>
+
+        <div class="port-box">
+          <div class="port-title">🌐 Θύρα Δικτύου</div>
+          <p style="font-size:13px; color:#6b21a8; margin-bottom:10px;">Ποιο συνδέουμε εδώ;</p>
+          <button class="cable-opt" onclick="checkPort(this, true)">🌍 Καλώδιο για Διαδίκτυο</button>
+          <button class="cable-opt" onclick="checkPort(this, false)">🎙️ Μικρόφωνο</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. ΤΟ ΜΥΣΤΙΚΟ ΤΟΥ ΥΠΟΛΟΓΙΣΤΗ (ΣΥΜΠΛΗΡΩΣΗ) -->
+    <div id="tab6" class="tab-content" style="display:none;">
+      <div class="act-header">
+        <h2>Συμπλήρωσε τις λέξεις που λείπουν</h2>
+        <p>Πάτησε την κατάλληλη λέξη από κάτω για να μπει στη σωστή θέση:</p>
+      </div>
+
+      <div class="fill-sentence">
+        Όλες οι συσκευές που συνδέονται στην κεντρική μονάδα ονομάζονται 
+        <span class="blank-slot" id="slot1">_____</span> συσκευές.
+      </div>
+
+      <div class="fill-sentence">
+        Ο άνθρωπος που χρησιμοποιεί τον υπολογιστή ονομάζεται 
+        <span class="blank-slot" id="slot2">_____</span>.
+      </div>
+
+      <div class="words-pool">
+        <button class="word-btn" id="w1" onclick="fillBlank('slot1', 'w1', 'περιφερειακές')">περιφερειακές</button>
+        <button class="word-btn" id="w2" onclick="fillBlank('slot2', 'w2', 'χρήστης')">χρήστης</button>
+        <button class="word-btn" id="w3" onclick="alert('Αυτή η λέξη δεν ταιριάζει! Δοκίμασε άλλη.')">τηλεόραση</button>
+      </div>
+
+      <div class="feedback-banner" id="fb6">🏆 Άριστα! Ολοκλήρωσες όλες τις δραστηριότητες με επιτυχία!</div>
+      <button class="btn-retry" onclick="resetTab6()">🔄 Ξεκίνα από την αρχή</button>
+    </div>
+
+  </div>
+
+<script>
+  // Αλλαγή Tabs
+  function openTab(num) {
+    document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+      btn.classList.toggle('active', idx === num - 1);
+    });
+    document.querySelectorAll('.tab-content').forEach((content, idx) => {
+      content.style.display = (idx === num - 1) ? 'block' : 'none';
+    });
+  }
+
+  // 1. Λειτουργία Ταξινόμησης σε Κουτιά
+  let currentChip = null;
+  function selectChip(el) {
+    document.querySelectorAll('.pick-chip').forEach(c => c.classList.remove('selected'));
+    currentChip = el;
+    el.classList.add('selected');
+  }
+
+  function dropToBucket(bucketType) {
+    if (!currentChip) return;
+    const itemType = currentChip.getAttribute('data-type');
+    if (itemType === bucketType) {
+      const tag = document.createElement('div');
+      tag.className = 'placed-tag ' + (bucketType === 'out' ? 'blue' : '');
+      tag.textContent = currentChip.textContent;
+      document.getElementById('bucket-' + bucketType).appendChild(tag);
+      currentChip.remove();
+      currentChip = null;
+
+      if (document.querySelectorAll('#pick-pool-1 .pick-chip').length === 0) {
+        const fb = document.getElementById('fb1');
+        fb.className = 'feedback-banner win show';
+      }
+    } else {
+      alert('⚠️ Δεν ταιριάζει σε αυτό το κουτί! Σκέψου: δίνουμε ή παίρνουμε πληροφορία;');
+    }
+  }
+
+  function resetTab1() {
+    location.reload();
+  }
+
+  // 2. Λειτουργία Ταιριάσματος Καρτών
+  let selectedLeft = null;
+  let selectedRight = null;
+  let matchedCount = 0;
+
+  function pickMatch(card, side) {
+    if (card.classList.contains('matched')) return;
+
+    if (side === 'left') {
+      document.querySelectorAll('.match-col:first-child .match-card').forEach(c => c.classList.remove('selected'));
+      selectedLeft = card;
+      card.classList.add('selected');
+    } else {
+      document.querySelectorAll('.match-col:last-child .match-card').forEach(c => c.classList.remove('selected'));
+      selectedRight = card;
+      card.classList.add('selected');
+    }
+
+    if (selectedLeft && selectedRight) {
+      if (selectedLeft.getAttribute('data-pair') === selectedRight.getAttribute('data-pair')) {
+        selectedLeft.className = 'match-card matched';
+        selectedRight.className = 'match-card matched';
+        selectedLeft = null;
+        selectedRight = null;
+        matchedCount++;
+        if (matchedCount === 4) {
+          document.getElementById('fb2').className = 'feedback-banner win show';
+        }
+      } else {
+        setTimeout(() => {
+          if (selectedLeft) selectedLeft.classList.remove('selected');
+          if (selectedRight) selectedRight.classList.remove('selected');
+          selectedLeft = null;
+          selectedRight = null;
+        }, 500);
+      }
+    }
+  }
+
+  function resetTab2() {
+    matchedCount = 0;
+    document.querySelectorAll('.match-card').forEach(c => c.className = 'match-card');
+    document.getElementById('fb2').className = 'feedback-banner';
+  }
+
+  // 3. Σωστό / Λάθος
+  function checkTF(btn, chosen, correct) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('correct', 'wrong'));
+    if (chosen === correct) {
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('wrong');
+    }
+  }
+
+  // 4. Κουίζ Κεντρικής Μονάδας
+  function checkQuiz(btn, isCorrect) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.quiz-btn').forEach(b => b.classList.remove('correct', 'wrong'));
+    if (isCorrect) {
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('wrong');
+    }
+  }
+
+  // 5. Θύρες & Καλώδια
+  function checkPort(btn, isCorrect) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.cable-opt').forEach(b => b.classList.remove('correct', 'wrong'));
+    if (isCorrect) {
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('wrong');
+    }
+  }
+
+  // 6. Συμπλήρωση Κενών
+  let filled = 0;
+  function fillBlank(slotId, btnId, text) {
+    const slot = document.getElementById(slotId);
+    const btn = document.getElementById(btnId);
+    if (!slot.dataset.filled) {
+      slot.textContent = text;
+      slot.dataset.filled = "true";
+      slot.style.borderBottomStyle = "solid";
+      slot.style.color = "#15803d";
+      btn.classList.add('used');
+      btn.onclick = null;
+      filled++;
+      if (filled === 2) {
+        document.getElementById('fb6').className = 'feedback-banner win show';
+      }
+    }
+  }
+
+  function resetTab6() {
+    filled = 0;
+    document.getElementById('slot1').textContent = "_____";
+    delete document.getElementById('slot1').dataset.filled;
+    document.getElementById('slot2').textContent = "_____";
+    delete document.getElementById('slot2').dataset.filled;
+    const w1 = document.getElementById('w1');
+    const w2 = document.getElementById('w2');
+    w1.className = 'word-btn';
+    w2.className = 'word-btn';
+    w1.onclick = () => fillBlank('slot1', 'w1', 'περιφερειακές');
+    w2.onclick = () => fillBlank('slot2', 'w2', 'χρήστης');
+    document.getElementById('fb6').className = 'feedback-banner';
+  }
+
+  // Λήψη του αρχείου HTML
+  function downloadHTML() {
+    const docHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+    const blob = new Blob([docHtml], { type: 'text/html;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'Pliroforiki_G_Dimotikou_Mathima10.html';
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+</script>
+
+</body>
+</html>
