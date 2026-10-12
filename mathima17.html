@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μάθημα 17: Περιπέτειες στο Πληκτρολόγιο - Γ' Δημοτικού</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;800&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Fredoka', cursive, sans-serif;
+      user-select: none;
+    }
+    .font-comfortaa {
+      font-family: 'Comfortaa', cursive, sans-serif;
+    }
+    .key-cap {
+      box-shadow: 0 4px 0 #94a3b8, 0 6px 10px rgba(0,0,0,0.08);
+      transition: all 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .key-cap:active, .key-pressed {
+      transform: translateY(3px) scale(0.97);
+      box-shadow: 0 1px 0 #64748b, 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .key-target {
+      animation: keyPulse 1.2s infinite alternate;
+      border-color: #f59e0b !important;
+      background-color: #fef3c7 !important;
+      color: #b45309 !important;
+    }
+    @keyframes keyPulse {
+      from { transform: scale(1); box-shadow: 0 0 8px rgba(245, 158, 11, 0.5); }
+      to { transform: scale(1.08); box-shadow: 0 0 18px rgba(245, 158, 11, 0.9); }
+    }
+    .hop-anim {
+      animation: frogHop 0.5s ease-out;
+    }
+    @keyframes frogHop {
+      0% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.15) rotate(5deg); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    .confetti-particle {
+      position: absolute;
+      pointer-events: none;
+      animation: confettiFall 1.2s forwards ease-out;
+    }
+    @keyframes confettiFall {
+      0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+      100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; }
+    }
+    /* Hide scrollbar for tabs */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-sky-100 via-indigo-50 to-pink-50 min-h-screen text-slate-800 flex flex-col justify-between">
+
+  <header class="bg-white/95 backdrop-blur shadow-md border-b-4 border-indigo-300 sticky top-0 z-50 px-3 py-2">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-2xl shadow-inner shadow-indigo-400">
+          ⌨️
+        </div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-black text-indigo-700 leading-tight">
+            Μάθημα 17: Περισσότερα εργαλεία στο πληκτρολόγιο
+          </h1>
+          <p class="text-xs sm:text-sm font-bold text-sky-600">
+            Πληροφορική Γ' Δημοτικού • Πληκτρολόγησε με το δικό σου πληκτρολόγιο!
+          </p>
+        </div>
+      </div>
+
+      <!-- Score & Stars -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 bg-amber-100 border-2 border-amber-400 px-4 py-1.5 rounded-full shadow-sm">
+          <span class="text-2xl animate-bounce">⭐</span>
+          <div class="text-left">
+            <span class="text-[10px] uppercase font-black text-amber-800 block leading-none">Αστερια</span>
+            <span id="starCounter" class="text-lg font-black text-amber-600">0</span>
+          </div>
+        </div>
+        <button onclick="resetWholeApp()" title="Επανεκκίνηση όλων" class="text-slate-400 hover:text-rose-500 p-2 rounded-xl text-lg hover:bg-slate-100 transition-colors">
+          🔄
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Activities Bar -->
+    <div class="max-w-6xl mx-auto mt-2 overflow-x-auto pb-1 flex gap-2 no-scrollbar" id="navTabs">
+      <!-- Tabs injected via JavaScript -->
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-5xl w-full mx-auto p-3 sm:p-5 flex flex-col items-center justify-center relative">
+    
+    <!-- Floating Feedback Toast -->
+    <div id="feedbackToast" class="hidden fixed top-24 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-2xl text-white font-black text-lg shadow-2xl flex items-center gap-3 transition-all">
+      <span id="toastIcon" class="text-3xl">🎉</span>
+      <span id="toastMsg">Μπράβο!</span>
+    </div>
+
+    <!-- Central Game Card -->
+    <div id="mainCard" class="w-full bg-white rounded-3xl shadow-xl border-4 border-indigo-200 p-5 sm:p-7 min-h-[520px] flex flex-col justify-between relative overflow-hidden">
+      
+      <!-- Top Card Header: Activity Title & Round Indicators -->
+      <div class="border-b-2 border-slate-100 pb-3 mb-4 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span id="actIcon" class="text-3xl">🚀</span>
+          <div>
+            <h2 id="actTitle" class="text-lg sm:text-xl font-extrabold text-indigo-900">Δραστηριότητα</h2>
+            <p id="actSubtitle" class="text-xs sm:text-sm font-semibold text-slate-500">Θεωρία Μαθήματος 17</p>
+          </div>
+        </div>
+
+        <!-- Round progress pills -->
+        <div class="flex items-center gap-1.5" id="roundPills">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+
+      <!-- Active Stage Container -->
+      <div id="stageContainer" class="flex-grow flex flex-col items-center justify-center text-center w-full my-2">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- Interactive Keyboard Helper Guide (Visual Representation) -->
+      <div class="mt-4 pt-3 border-t-2 border-slate-100 flex flex-col items-center w-full">
+        <div class="text-[11px] font-bold text-slate-500 mb-1 flex items-center gap-1">
+          <span>💡 Βοηθός Πληκτρολογίου:</span>
+          <span id="keyboardHint" class="text-indigo-600 font-extrabold">Πάτησε τα πλήκτρα στο φυσικό σου πληκτρολόγιο</span>
+        </div>
+        
+        <div class="w-full max-w-2xl bg-slate-100 p-2 sm:p-2.5 rounded-2xl border-2 border-slate-300 shadow-inner flex flex-col gap-1 text-[10px] sm:text-xs font-bold text-slate-700 select-none">
+          <!-- Row 1: Numbers -->
+          <div class="flex gap-1 justify-center">
+            <div id="key-tilde" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">` ~</div>
+            <div id="key-1" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">1 <span class="text-rose-500">!</span></div>
+            <div id="key-2" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">2 <span class="text-rose-500">@</span></div>
+            <div id="key-3" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">3 #</div>
+            <div id="key-4" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">4 $</div>
+            <div id="key-5" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">5 <span class="text-rose-500">%</span></div>
+            <div id="key-6" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">6 ^</div>
+            <div id="key-7" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">7 &</div>
+            <div id="key-8" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">8 *</div>
+            <div id="key-9" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">9 <span class="text-rose-500">(</span></div>
+            <div id="key-0" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">0 )</div>
+            <div id="key-backspace" class="key-cap bg-rose-200 text-rose-900 py-1 px-2 rounded flex-[2] text-center font-extrabold">⌫ Backspace</div>
+          </div>
+          <!-- Row 2: Tab & QWERTY -->
+          <div class="flex gap-1 justify-center">
+            <div id="key-tab" class="key-cap bg-emerald-200 text-emerald-900 py-1 px-2 rounded flex-[1.6] text-center font-extrabold">Tab ⇥</div>
+            <div id="key-q" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">Q ;</div>
+            <div id="key-w" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">W ς</div>
+            <div id="key-e" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">E Ε</div>
+            <div id="key-r" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">R Ρ</div>
+            <div id="key-t" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">T Τ</div>
+            <div id="key-y" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">Y Υ</div>
+            <div id="key-u" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">U Θ</div>
+            <div id="key-i" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">I Ι</div>
+            <div id="key-o" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">O Ο</div>
+            <div id="key-p" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">P Π</div>
+          </div>
+          <!-- Row 3: Caps, Home Row, Tonos, Enter -->
+          <div class="flex gap-1 justify-center">
+            <div id="key-caps" class="key-cap bg-slate-200 text-slate-800 py-1 px-2 rounded flex-[1.8] text-center">Caps Lock</div>
+            <div id="key-a" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">A Α</div>
+            <div id="key-s" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">S Σ</div>
+            <div id="key-d" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">D Δ</div>
+            <div id="key-f" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">F Φ</div>
+            <div id="key-g" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">G Γ</div>
+            <div id="key-h" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">H Η</div>
+            <div id="key-j" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">J Ξ</div>
+            <div id="key-k" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">K Κ</div>
+            <div id="key-l" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">L Λ</div>
+            <div id="key-tonos" class="key-cap bg-amber-200 text-amber-900 py-1 px-1.5 rounded flex-1 text-center font-extrabold">´ Τόνος</div>
+            <div id="key-enter" class="key-cap bg-emerald-400 text-emerald-950 py-1 px-2 rounded flex-[2] text-center font-black">↵ Enter</div>
+          </div>
+          <!-- Row 4: Shift, Bottom Row -->
+          <div class="flex gap-1 justify-center">
+            <div id="key-shift-left" class="key-cap bg-purple-200 text-purple-900 py-1 px-2 rounded flex-[2.2] text-center font-extrabold">⇧ Shift</div>
+            <div id="key-z" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">Z Ζ</div>
+            <div id="key-x" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">X Χ</div>
+            <div id="key-c" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">C Ψ</div>
+            <div id="key-v" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">V Ω</div>
+            <div id="key-b" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">B Β</div>
+            <div id="key-n" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">N Ν</div>
+            <div id="key-m" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">M Μ</div>
+            <div id="key-comma" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">, <</div>
+            <div id="key-dot" class="key-cap bg-white py-1 px-1.5 rounded flex-1 text-center">. ></div>
+            <div id="key-shift-right" class="key-cap bg-purple-200 text-purple-900 py-1 px-2 rounded flex-[2.4] text-center font-extrabold">⇧ Shift</div>
+          </div>
+          <!-- Row 5: Alt, Space, AltGr -->
+          <div class="flex gap-1 justify-center">
+            <div id="key-ctrl" class="key-cap bg-slate-200 py-1 px-2 rounded flex-1 text-center">Ctrl</div>
+            <div id="key-alt" class="key-cap bg-sky-300 text-sky-950 py-1 px-2 rounded flex-[1.4] text-center font-extrabold">Alt</div>
+            <div id="key-space" class="key-cap bg-white hover:bg-amber-50 text-slate-700 py-1 px-4 rounded flex-[6] text-center font-bold">␣ Space (Διάστημα)</div>
+            <div id="key-altgr" class="key-cap bg-sky-200 py-1 px-2 rounded flex-[1.4] text-center">Alt Gr</div>
+            <div id="key-ctrl-right" class="key-cap bg-slate-200 py-1 px-2 rounded flex-1 text-center">Ctrl</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Buttons: Navigation Back & Next -->
+      <div class="mt-4 pt-3 border-t-2 border-slate-100 flex items-center justify-between gap-3">
+        <button id="prevActBtn" onclick="changeActivity(-1)" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2.5 rounded-2xl flex items-center gap-1.5 text-sm sm:text-base transition-colors">
+          ⬅️ Προηγούμενο
+        </button>
+        <span id="actProgressSummary" class="text-xs sm:text-sm font-extrabold bg-indigo-100 text-indigo-800 px-4 py-1.5 rounded-full">
+          Δραστηριότητα 1 από 8
+        </span>
+        <button id="nextActBtn" onclick="changeActivity(1)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-6 py-2.5 rounded-2xl flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all text-sm sm:text-base">
+          Επόμενο ➡️
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // Audio synthesizer using Web Audio API
+    let audioContext = null;
+
+    function getAudioCtx() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+      return audioContext;
+    }
+
+    function playSound(type) {
+      try {
+        const ctx = getAudioCtx();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'key') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(480, now);
+          osc.frequency.exponentialRampToValueAtTime(320, now + 0.05);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.linearRampToValueAtTime(0.001, now + 0.05);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        } else if (type === 'correct') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.setValueAtTime(554.37, now + 0.08); // C#5
+          osc.frequency.setValueAtTime(659.25, now + 0.16); // E5
+          osc.frequency.setValueAtTime(880, now + 0.24);    // A5
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.linearRampToValueAtTime(0.001, now + 0.45);
+          osc.start(now);
+          osc.stop(now + 0.45);
+        } else if (type === 'hop') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(260, now);
+          osc.frequency.exponentialRampToValueAtTime(700, now + 0.14);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'oops') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.linearRampToValueAtTime(140, now + 0.18);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } else if (type === 'fanfare') {
+          [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.type = 'triangle';
+            o.frequency.setValueAtTime(freq, now + idx * 0.1);
+            g.connect(ctx.destination);
+            o.connect(g);
+            g.gain.setValueAtTime(0.2, now + idx * 0.1);
+            g.gain.linearRampToValueAtTime(0.001, now + idx * 0.1 + 0.35);
+            o.start(now + idx * 0.1);
+            o.stop(now + idx * 0.1 + 0.35);
+          });
+        }
+      } catch (e) {
+        console.warn('Audio not available', e);
+      }
+    }
+
+    let earnedStars = 0;
+    const completedRoundsMap = {};
+
+    function awardStar(uniqueId) {
+      if (!completedRoundsMap[uniqueId]) {
+        completedRoundsMap[uniqueId] = true;
+        earnedStars++;
+        document.getElementById('starCounter').textContent = earnedStars;
+        spawnConfetti();
+        playSound('correct');
+      }
+    }
+
+    function spawnConfetti() {
+      const card = document.getElementById('mainCard');
+      const emojis = ['⭐', '🎉', '🌟', '🎈', '✨', '🏆'];
+      for (let i = 0; i < 20; i++) {
+        const p = document.createElement('div');
+        p.className = 'confetti-particle text-xl sm:text-2xl';
+        p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        p.style.left = '50%';
+        p.style.top = '40%';
+        const dx = (Math.random() - 0.5) * 450 + 'px';
+        const dy = (Math.random() - 0.5) * 350 + 'px';
+        const rot = (Math.random() * 720 - 360) + 'deg';
+        p.style.setProperty('--dx', dx);
+        p.style.setProperty('--dy', dy);
+        p.style.setProperty('--rot', rot);
+        card.appendChild(p);
+        setTimeout(() => p.remove(), 1200);
+      }
+    }
+
+    function showToast(message, isSuccess = true) {
+      const toast = document.getElementById('feedbackToast');
+      const msg = document.getElementById('toastMsg');
+      const icon = document.getElementById('toastIcon');
+      msg.textContent = message;
+      icon.textContent = isSuccess ? '🌟' : '💡';
+      toast.className = `fixed top-24 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-2xl text-white font-black text-base sm:text-lg shadow-2xl flex items-center gap-3 transition-all ${
+        isSuccess ? 'bg-emerald-500' : 'bg-amber-500'
+      }`;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2200);
+    }
+
+    const activitiesData = [
+      {
+        id: 0,
+        title: "1. Ο Μαγικός Διακόπτης Γλωσσών",
+        icon: "🌍",
+        desc: "Χρησιμοποίησε Alt + Shift για να αλλάξεις γλώσσα από Ελληνικά σε Αγγλικά και αντίστροφα!",
+        rounds: [
+          {
+            prompt: "Γράψε τη λέξη στα Ελληνικά και μετά στα Αγγλικά:",
+            subprompt: "Πρώτα γράψε «σχολείο» και μετά πάτησε Alt + Shift και γράψε «school»",
+            targetGreek: "σχολείο",
+            targetEnglish: "school",
+            highlightKeys: ['key-alt', 'key-shift-left']
+          },
+          {
+            prompt: "Αλλαγή Γλώσσας: Ζωάκια!",
+            subprompt: "Πρώτα γράψε «γάτα» (Ελληνικά) και μετά «cat» (Αγγλικά)",
+            targetGreek: "γάτα",
+            targetEnglish: "cat",
+            highlightKeys: ['key-alt', 'key-shift-left']
+          },
+          {
+            prompt: "Αλλαγή Γλώσσας: Φύση!",
+            subprompt: "Πρώτα γράψε «ήλιος» (Ελληνικά) και μετά «sun» (Αγγλικά)",
+            targetGreek: "ήλιος",
+            targetEnglish: "sun",
+            highlightKeys: ['key-alt', 'key-shift-left']
+          }
+        ]
+      },
+      {
+        id: 1,
+        title: "2. Το Κλειδί των Κεφαλαίων (Shift + Γράμμα)",
+        icon: "🔤",
+        desc: "Κράτα πατημένο το Shift με το ένα χεράκι και πάτα το πρώτο γράμμα για να γίνει ΚΕΦΑΛΑΙΟ!",
+        rounds: [
+          {
+            target: "Μαρία",
+            hint: "Κράτα πατημένο το Shift και πάτα το 'Μ'. Άφησε το Shift και γράψε 'αρία'.",
+            firstChar: "Μ",
+            highlightKeys: ['key-shift-left', 'key-m']
+          },
+          {
+            target: "Νίκος",
+            hint: "Κράτα πατημένο το Shift και πάτα το 'Ν'. Μετά γράψε 'ίκος'.",
+            firstChar: "Ν",
+            highlightKeys: ['key-shift-left', 'key-n']
+          },
+          {
+            target: "Αθήνα",
+            hint: "Shift + 'Α' για την πρωτεύουσα της Ελλάδας!",
+            firstChar: "Α",
+            highlightKeys: ['key-shift-left', 'key-a']
+          },
+          {
+            target: "Ελλάδα",
+            hint: "Shift + 'Ε' για την πατρίδα μας!",
+            firstChar: "Ε",
+            highlightKeys: ['key-shift-left', 'key-e']
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "3. Κυνηγοί Συμβόλων (Shift + Αριθμός)",
+        icon: "🔣",
+        desc: "Όπως στο βιβλίο (σελ. 71): Κράτα το Shift και πάτα τον αριθμό για να εμφανιστεί το σύμβολο!",
+        rounds: [
+          {
+            symbol: "!",
+            keyCombo: "Shift + 1",
+            name: "Θαυμαστικό (!)",
+            highlightKeys: ['key-shift-left', 'key-1']
+          },
+          {
+            symbol: "@",
+            keyCombo: "Shift + 2",
+            name: "Παπάκι (@)",
+            highlightKeys: ['key-shift-left', 'key-2']
+          },
+          {
+            symbol: "%",
+            keyCombo: "Shift + 5",
+            name: "Επί τοις εκατό (%)",
+            highlightKeys: ['key-shift-left', 'key-5']
+          },
+          {
+            symbol: "(",
+            keyCombo: "Shift + 9",
+            name: "Άνοιγμα Παρένθεσης (()",
+            highlightKeys: ['key-shift-left', 'key-9']
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "4. Το Μυστικό του Τόνου (Τόνος + Φωνήεν)",
+        icon: "✍️",
+        desc: "1ο Βήμα: Πατάμε το πλήκτρο του τόνου (δίπλα στο L). 2ο Βήμα: Πατάμε το φωνήεν!",
+        rounds: [
+          {
+            target: "μαμά",
+            stressLetter: "ά",
+            hint: "Γράψε 'μαμ' και μετά πάτα το πλήκτρο του τόνου (;) και αμέσως το 'α'!",
+            highlightKeys: ['key-tonos', 'key-a']
+          },
+          {
+            target: "νερό",
+            stressLetter: "ό",
+            hint: "Γράψε 'νερ', πάτα το πλήκτρο του τόνου (;) και μετά το 'ο'!",
+            highlightKeys: ['key-tonos', 'key-o']
+          },
+          {
+            target: "μήλο",
+            stressLetter: "ή",
+            hint: "Πάτα 'μ', μετά τόνο (;), μετά 'η' και μετά 'λο'!",
+            highlightKeys: ['key-tonos', 'key-h']
+          },
+          {
+            target: "καλημέρα",
+            stressLetter: "έ",
+            hint: "Γράψε 'καλημ', πάτα τόνο (;) και μετά 'ε' και 'ρα'!",
+            highlightKeys: ['key-tonos', 'key-e']
+          }
+        ]
+      },
+      {
+        id: 4,
+        title: "5. Το Άλμα του Βατράχου (Πλήκτρο Tab ⇥)",
+        icon: "🐸",
+        desc: "Πάτα το πλήκτρο Tab ⇥ στο πληκτρολόγιό σου για να πηδήξει ο βάτραχος στο επόμενο πεδίο!",
+        rounds: [
+          {
+            prompt: "Συμπλήρωσε τα στοιχεία σου πατώντας Tab ανάμεσα στα κουτάκια!",
+            fields: [
+              { id: 'f_name', label: '1. Όνομα', placeholder: 'π.χ. Γιώργος' },
+              { id: 'f_surname', label: '2. Επίθετο', placeholder: 'π.χ. Παπαδόπουλος' },
+              { id: 'f_class', label: '3. Τάξη', placeholder: 'π.χ. Γ Δημοτικού' },
+              { id: 'f_fav', label: '4. Αγαπημένο Μάθημα', placeholder: 'π.χ. Πληροφορική' }
+            ],
+            highlightKeys: ['key-tab']
+          }
+        ]
+      },
+      {
+        id: 5,
+        title: "6. Σβήνω και Διορθώνω (Backspace ⌫)",
+        icon: "🧼",
+        desc: "Χρησιμοποίησε το πλήκτρο Backspace (πάνω από το Enter) για να σβήσεις τα περιττά γράμματα!",
+        rounds: [
+          {
+            wrongText: "καλλλημέρα",
+            target: "καλημέρα",
+            explanation: "Η λέξη έχει πολλά 'λ'! Κάνε κλικ μετά τα περιττά 'λ' και πάτα Backspace ⌫ για να μείνει μόνο ένα!",
+            highlightKeys: ['key-backspace']
+          },
+          {
+            wrongText: "μολύυυβι",
+            target: "μολύβι",
+            explanation: "Έχει πάρα πολλά 'υ'! Σβήσε τα δύο έξτρα με το Backspace ⌫!",
+            highlightKeys: ['key-backspace']
+          },
+          {
+            wrongText: "υπολογισστήής",
+            target: "υπολογιστής",
+            explanation: "Διόρθωσε τη λέξη σβήνοντας τα διπλά γράμματα!",
+            highlightKeys: ['key-backspace']
+          }
+        ]
+      },
+      {
+        id: 6,
+        title: "7. Δίνω Χώρο στις Λέξεις (Spacebar - Διάστημα)",
+        icon: "␣",
+        desc: "Οι λέξεις κόλλησαν μεταξύ τους! Πάτα το μεγάλο μακρύ πλήκτρο Spacebar για να βάλεις κενό!",
+        rounds: [
+          {
+            squished: "τοσχολείομας",
+            target: "το σχολείο μας",
+            hint: "Γράψε τη φράση πατώντας το Spacebar ανάμεσα στις λέξεις:",
+            highlightKeys: ['key-space']
+          },
+          {
+            squished: "οήλιοςλάμπει",
+            target: "ο ήλιος λάμπει",
+            hint: "Βάλε κενό μετά το 'ο' και μετά το 'ήλιος':",
+            highlightKeys: ['key-space']
+          },
+          {
+            squished: "αγαπώτουςυπολογιστές",
+            target: "αγαπώ τους υπολογιστές",
+            hint: "Βάλε κενό ανάμεσα στις λέξεις:",
+            highlightKeys: ['key-space']
+          }
+        ]
+      },
+      {
+        id: 7,
+        title: "8. Ο Μικρός Συγγραφέας (Enter & Τελική Δοκιμασία)",
+        icon: "🏆",
+        desc: "Συνδύασε όλα όσα έμαθες: Κεφαλαία, τόνους, κενά, σύμβολα και Enter για νέα γραμμή!",
+        rounds: [
+          {
+            title: "Αποστολή Α': Νέα Γραμμή",
+            instruction: "Γράψε στην 1η γραμμή «Γεια σας!» και πάτα Enter ↵ για να αλλάξεις γραμμή και να γράψεις «Είμαι μαθητής»",
+            lines: ["Γεια σας!", "Είμαι μαθητής"],
+            highlightKeys: ['key-enter', 'key-shift-left', 'key-1']
+          },
+          {
+            title: "Αποστολή Β': Ποίημα",
+            instruction: "Γράψε δύο σειρές με Enter ανάμεσά τους:\n1η γραμμή: «Το σχολείο άνοιξε»\n2η γραμμή: «Καλή χρονιά!»",
+            lines: ["Το σχολείο άνοιξε", "Καλή χρονιά!"],
+            highlightKeys: ['key-enter', 'key-shift-left', 'key-1']
+          },
+          {
+            title: "Αποστολή Γ': Ολοκληρωμένο Μήνυμα",
+            instruction: "Γράψε:\n1η γραμμή: «Μάθημα 17»\n2η γραμμή: «Έμαθα το πληκτρολόγιο!»",
+            lines: ["Μάθημα 17", "Έμαθα το πληκτρολόγιο!"],
+            highlightKeys: ['key-enter', 'key-shift-left']
+          }
+        ]
+      }
+    ];
+
+    let currentActivityIndex = 0;
+    let currentRoundIndex = 0;
+
+    function buildTabs() {
+      const bar = document.getElementById('navTabs');
+      bar.innerHTML = '';
+      activitiesData.forEach((act, idx) => {
+        const btn = document.createElement('button');
+        const isActive = idx === currentActivityIndex;
+        btn.className = `whitespace-nowrap px-3 py-1.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all ${
+          isActive 
+            ? 'bg-indigo-600 text-white shadow-md scale-105' 
+            : 'bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200'
+        }`;
+        btn.innerHTML = `<span>${act.icon}</span> <span>Δραστηριότητα ${idx + 1}</span>`;
+        btn.onclick = () => {
+          playSound('key');
+          currentActivityIndex = idx;
+          currentRoundIndex = 0;
+          renderActivity();
+        };
+        bar.appendChild(btn);
+      });
+    }
+
+    function highlightKeyboardKeys(keyIdList = []) {
+      // Clear previous targets
+      document.querySelectorAll('.key-target').forEach(el => el.classList.remove('key-target'));
+      if (!keyIdList) return;
+      keyIdList.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('key-target');
+      });
+    }
+
+    function renderRoundPills(totalRounds, activeRound) {
+      const container = document.getElementById('roundPills');
+      container.innerHTML = '';
+      for (let i = 0; i < totalRounds; i++) {
+        const pill = document.createElement('div');
+        const isDone = i < activeRound;
+        const isCurrent = i === activeRound;
+        pill.className = `w-7 h-7 rounded-full flex items-center justify-center text-xs font-black transition-all ${
+          isDone ? 'bg-emerald-500 text-white' :
+          isCurrent ? 'bg-indigo-600 text-white ring-4 ring-indigo-200 scale-110' :
+          'bg-slate-200 text-slate-600'
+        }`;
+        pill.innerHTML = isDone ? '✓' : (i + 1);
+        container.appendChild(pill);
+      }
+    }
+
+    function renderActivity() {
+      buildTabs();
+      const act = activitiesData[currentActivityIndex];
+      const stage = document.getElementById('stageContainer');
+      const roundCount = act.rounds.length;
+
+      document.getElementById('actIcon').textContent = act.icon;
+      document.getElementById('actTitle').textContent = act.title;
+      document.getElementById('actSubtitle').textContent = act.desc;
+      document.getElementById('actProgressSummary').textContent = `Δραστηριότητα ${currentActivityIndex + 1} από ${activitiesData.length} (Γύρος ${currentRoundIndex + 1} από ${roundCount})`;
+
+      renderRoundPills(roundCount, currentRoundIndex);
+
+      // Disable/Enable Footer buttons
+      document.getElementById('prevActBtn').disabled = currentActivityIndex === 0;
+      document.getElementById('prevActBtn').classList.toggle('opacity-50', currentActivityIndex === 0);
+      document.getElementById('nextActBtn').disabled = currentActivityIndex === activitiesData.length - 1;
+      document.getElementById('nextActBtn').classList.toggle('opacity-50', currentActivityIndex === activitiesData.length - 1);
+
+      // Dispatch to activity specific screen
+      switch (currentActivityIndex) {
+        case 0: renderAct1(stage, act.rounds[currentRoundIndex]); break;
+        case 1: renderAct2(stage, act.rounds[currentRoundIndex]); break;
+        case 2: renderAct3(stage, act.rounds[currentRoundIndex]); break;
+        case 3: renderAct4(stage, act.rounds[currentRoundIndex]); break;
+        case 4: renderAct5(stage, act.rounds[currentRoundIndex]); break;
+        case 5: renderAct6(stage, act.rounds[currentRoundIndex]); break;
+        case 6: renderAct7(stage, act.rounds[currentRoundIndex]); break;
+        case 7: renderAct8(stage, act.rounds[currentRoundIndex]); break;
+      }
+    }
+
+    function changeActivity(delta) {
+      playSound('key');
+      const nextIdx = currentActivityIndex + delta;
+      if (nextIdx >= 0 && nextIdx < activitiesData.length) {
+        currentActivityIndex = nextIdx;
+        currentRoundIndex = 0;
+        renderActivity();
+      }
+    }
+
+    function nextRoundOrActivity() {
+      const act = activitiesData[currentActivityIndex];
+      if (currentRoundIndex < act.rounds.length - 1) {
+        currentRoundIndex++;
+        renderActivity();
+      } else {
+        // Activity completed
+        showToast(`🎉 Συγχαρητήρια! Ολοκλήρωσες τη Δραστηριότητα ${currentActivityIndex + 1}!`);
+        playSound('fanfare');
+        if (currentActivityIndex < activitiesData.length - 1) {
+          setTimeout(() => {
+            currentActivityIndex++;
+            currentRoundIndex = 0;
+            renderActivity();
+          }, 1500);
+        }
+      }
+    }
+
+    // --------------------------------------------------------------------------
+    // ΔΡΑΣΤΗΡΙΟΤΗΤΑ 1: Alt + Shift (Εναλλαγή Ελληνικά / Αγγλικά)
+    // --------------------------------------------------------------------------
+    function renderAct1(container, round) {
+      highlightKeyboardKeys(round.highlightKeys);
+      container.innerHTML = `
+        <div class="max-w-xl w-full flex flex-col items-center gap-4">
+          <div class="bg-indigo-50 border-2 border-indigo-200 p-3 sm:p-4 rounded-2xl w-full text-center">
+            <span class="text-xs font-black text-indigo-700 uppercase tracking-wider block mb-1">Αποστολη Γυρου</span>
+            <p class="text-base sm:text-lg font-bold text-slate-800">${round.subprompt}</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+            <!-- Greek Box -->
+            <div class="bg-sky-50 border-2 border-sky-300 p-4 rounded-2xl text-left flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-extrabold text-sky-800">1. ΕΛΛΗΝΙΚΑ 🇬🇷</span>
+                  <span id="act1GrCheck" class="text-sm">⏳</span>
+                </div>
+                <p class="text-xs text-slate-600 mb-2">Πληκτρολόγησε: <strong class="text-sky-700 text-base">«${round.targetGreek}»</strong></p>
+              </div>
+              <input type="text" id="act1GreekInput" placeholder="Γράψε εδώ..." autocomplete="off"
+                class="w-full px-3 py-2 rounded-xl border-2 border-sky-300 focus:border-sky-500 focus:outline-none text-lg font-bold bg-white text-slate-800">
+            </div>
+
+            <!-- English Box -->
+            <div class="bg-rose-50 border-2 border-rose-300 p-4 rounded-2xl text-left flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-extrabold text-rose-800">2. ΑΓΓΛΙΚΑ 🇬🇧 (Alt + Shift)</span>
+                  <span id="act1EnCheck" class="text-sm">⏳</span>
+                </div>
+                <p class="text-xs text-slate-600 mb-2">Πληκτρολόγησε: <strong class="text-rose-700 text-base">«${round.targetEnglish}»</strong></p>
+              </div>
+              <input type="text" id="act1EnglishInput" placeholder="Write here..." autocomplete="off"
+                class="w-full px-3 py-2 rounded-xl border-2 border-rose-300 focus:border-rose-500 focus:outline-none text-lg font-bold bg-white text-slate-800">
+            </div>
+          </div>
+
+          <div class="text-xs font-bold text-slate-500 bg-amber-50 border border-amber-200 px-4 py-2 rounded-xl w-full text-center">
+            💡 <strong>Πώς αλλάζω γλώσσα:</strong> Κράτα πατημένο το <strong>Alt</strong> και πάτα το <strong>Shift</strong> στο πληκτρολόγιό σου!
+          </div>
+
+          <button id="act1SubmitBtn" onclick="checkAct1Round()" class="key-cap bg-emerald-500 hover:bg-emerald-600 text-white font-black px-8 py-3 rounded-2xl text-base shadow-md mt-1">
+            Έλεγχος Απάντησης ✨
+          </button>
+        </div>
+      `;
+
+      setTimeout(() => {
+        const grInput = document.getElementById('act1GreekInput');
+        if (grInput) grInput.focus();
+      }, 100);
+    }
+
+    function checkAct1Round() {
+      const round = activitiesData[0].rounds[currentRoundIndex];
+      const grVal = document.getElementById('act1GreekInput').value.trim();
+      const enVal = document.getElementById('act1EnglishInput').value.trim().toLowerCase();
+      const grCheck = document.getElementById('act1GrCheck');
+      const enCheck = document.getElementById('act1EnCheck');
+
+      const isGrCorrect = (grVal === round.targetGreek);
+      const isEnCorrect = (enVal === round.targetEnglish);
+
+      grCheck.textContent = isGrCorrect ? '✅' : '❌';
+      enCheck.textContent = isEnCorrect ? '✅' : '❌';
+
+      if (isGrCorrect && isEnCorrect) {
+        awardStar(`act1_r${currentRoundIndex}`);
+        showToast('Μπράβο! Άλλαξες επιτυχώς γλώσσα με το Alt+Shift!');
+        setTimeout(nextRoundOrActivity, 1200);
+      } else {
+        playSound('oops');
+        if (!isGrCorrect && !isEnCorrect) {
+          showToast('Έλεγξε και τις δύο λέξεις προσεκτικά!', false);
+        } else if (!isGrCorrect) {
+          showToast(`Στα Ελληνικά θέλουμε ακριβώς: «${round.targetGreek}»`, false);
+        } else {
+          showToast(`Στα Αγγλικά άλλαξε γλώσσα με Alt+Shift και γράψε: «${round.targetEnglish}»`, false);
+        }
+      }
+    }
+
+    // --------------------------------------------------------------------------
+    // ΔΡΑΣΤΗΡΙΟΤΗΤΑ 2: Shift + Γράμμα (Κεφαλαία)
+    // --------------------------------------------------------------------------
+    function renderAct2(container, round) {
+      highlightKeyboardKeys(round.highlightKeys);
+      container.innerHTML = `
+        <div class="max-w-lg w-full flex flex-col items-center gap-4">
+          <div class="bg-purple-50 border-2 border-purple-200 p-4 rounded-2xl w-full text-center">
+            <span class="text-xs font-black text-purple-700 uppercase tracking-wider block mb-1">Αποστολη Κεφαλαιου</span>
+            <p class="text-slate-700 text-sm mb-2">${round.hint}</p>
+            <div class="text-3xl font-extrabold text-purple-900 tracking-wider">
+              Ζητούμενη λέξη: <span class="bg-purple-200 px-3 py-1 rounded-xl text-purple-950 font-mono">${round.target}</span>
+            </div>
+          </div>
+
+          <div class="w-full flex flex-col items-center gap-2">
+            <label class="text-xs font-extrabold text-slate-600">Πληκτρολόγησε με το πληκτρολόγιό σου:</label>
+            <input type="text" id="act2Input" placeholder="Πληκτρολόγησε εδώ..." autocomplete="off"
+              class="w-full max-w-md px-4 py-3 rounded-2xl border-3 border-purple-300 focus:border-purple-600 focus:outline-none text-2xl font-bold text-center tracking-widest text-slate-800 shadow-inner">
+            <p id="act2LiveHint" class="text-xs font-bold text-amber-600 h-5"></p>
+          </div>
+
+          <button onclick="checkAct2Round()" class="key-cap bg-purple-600 hover:bg-purple-700 text-white font-black px-8 py-3 rounded-2xl text-base shadow-md">
+            Έλεγχος Κεφαλαίου 🔤
+          </button>
+        </div>
+      `;
+
+      const input = document.getElementById('act2Input');
+      input.focus();
+      input.addEventListener('input', (e) => {
+        playSound('key');
+        const val = e.target.value;
+        const hintEl = document.getElementById('act2LiveHint');
+        if (val.length > 0) {
+          if (val[0] !== round.firstChar) {
+            hintEl.textContent = `Προσοχή! Το 1ο γράμμα πρέπει να είναι κεφαλαίο: ${round.firstChar}!`;
+          } else {
+            hintEl.textContent = 'Μπράβο! Το πρώτο γράμμα είναι κεφαλαίο!';
+          }
+        } else {
+          hintEl.textContent = '';
+        }
+      });
+    }
+
+    function checkAct2Round() {
+      const round = activitiesData[1].rounds[currentRoundIndex];
+      const val = document.getElementById('act2Input').value.trim();
+
+      if (val === round.target) {
+        awardStar(`act2_r${currentRoundIndex}`);
+        showToast(`Τέλεια! Έγραψες σωστά το ${round.target} με κεφαλαίο!`);
+        setTimeout(nextRoundOrActivity, 1200);
+      } else {
+        playSound('oops');
+        if (val.toLowerCase() === round.target.toLowerCase() && val[0] !== round.firstChar) {
+          showToast(`Ξέχασες το κεφαλαίο! Κράτα πατημένο το Shift και πάτα ${round.firstChar}!`, false);
+        } else {
+          showToast(`Πρόσεξε τα γράμματα! Θέλουμε ακριβώς: «${round.target}»`, false);
+        }
+      }
+    }
+
+    // --------------------------------------------------------------------------
+    // ΔΡΑΣΤΗΡΙΟΤΗΤΑ 3: Shift + Αριθμός (Σύμβολα)
+    // --------------------------------------------------------------------------
+    function renderAct3(container, round) {
+      highlightKeyboardKeys(round.highlightKeys);
+      container.innerHTML = `
+        <div class="max-w-lg w-full flex flex-col items-center gap-4">
+          <div class="bg-amber-50 border-2 border-amber-300 p-4 rounded-2xl w-full text-center">
+            <span class="text-xs font-black text-amber-800 uppercase tracking-wider block mb-1">Αποστολη Συμβολου</span>
+            <p class="text-sm text-slate-700">Όπως στη σελίδα 71 του βιβλίου:</p>
+            <div class="my-2">
+              <span class="text-slate-600 text-sm">Πάτησε τον συνδυασμό:</span>
+              <div class="text-2xl font-black text-amber-900 bg-amber-200 px-4 py-1.5 rounded-2xl inline-block shadow-sm">
+                ${round.keyCombo}
+              </div>
+            </div>
+            <p class="text-xs text-slate-500 font-bold">Για να εμφανιστεί το σύμβολο: <span class="text-base text-indigo-700 font-extrabold">${round.name}</span></p>
+          </div>
+
+          <!-- Goal vs Input preview -->
+          <div class="flex items-center justify-center gap-4 w-full">
+            <div class="bg-slate-100 border-2 border-slate-300 w-24 h-24 rounded-2xl flex flex-col items-center justify-center shadow-inner">
+              <span class="text-[10px] text-slate-500 font-bold uppercase">Στοχος</span>
+              <span class="text-5xl font-black text-purple-700 font-mono">${round.symbol}</span>
+            </div>
+
+            <div class="text-2xl font-black text-slate-400">=</div>
+
+            <div class="bg-white border-3 border-indigo-400 w-24 h-24 rounded-2xl flex flex-col items-center justify-center shadow-md">
+              <span class="text-[10px] text-indigo-500 font-bold uppercase">Εγραψες</span>
+              <input type="text" id="act3Input" maxlength="1" autocomplete="off"
+                class="w-full text-center text-5xl font-black text-indigo-900 bg-transparent focus:outline-none font-mono">
+            </div>
+          </div>
+
+          <div class="text-xs font-bold text-slate-600 bg-indigo-50 border border-indigo-200 px-4 py-2 rounded-xl text-center">
+            🎯 <strong>Οδηγία:</strong> Κάνε κλικ στο δεξί κουτί, κράτα πατημένο το <strong>Shift</strong> στο πληκτρολόγιό σου και πάτα το <strong>${round.keyCombo.replace('Shift + ', '')}</strong>!
+          </div>
+
+          <button onclick="checkAct3Round()" class="key-cap bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-8 py-3 rounded-2xl text-base shadow-md">
+            Έλεγχος Συμβόλου ⭐
+          </button>
+        </div>
+      `;
+
+      const input = document.getElementById('act3Input');
+      input.focus();
+      input.addEventListener('input', () => playSound('key'));
+    }
+
+    function checkAct3Round() {
+      const round = activitiesData[2].rounds[currentRoundIndex];
+      const val = document.getElementById('act3Input').value;
+
+      if (val === round.symbol) {
+        awardStar(`act3_r${currentRoundIndex}`);
+        showToast(`Μπράβο! Πληκτρολόγησες το σύμβολο ${round.symbol}!`);
+        setTimeout(nextRoundOrActivity, 1200);
+      } else {
+        playSound('oops');
+        showToast(`Όχι αυτό! Κράτα πατημένο το Shift και πάτα ${round.keyCombo.replace('Shift + ', '')}!`, false);
+      }
+    }
+
+    // --------------------------------------------------------------------------
+    // ΔΡΑΣΤΗΡΙΟΤΗΤΑ 4: Τόνος + Φωνήεν
+    // --------------------------------------------------------------------------
+    function renderAct4(container, round) {
+      highlightKeyboardKeys(round.highlightKeys);
+      container.innerHTML = `
+        <div class="max-w-lg w-full flex flex-col items-center gap-4">
+          <div class="bg-amber-50 border-2 border-amber-300 p-4 rounded-2xl w-full text-center">
+            <span class="text-xs font-black text-amber-800 uppercase tracking-wider block mb-1">Πληκτρολογηση με Τονο</span>
+            <p class="text-slate-700 text-sm mb-1">${round.hint}</p>
+            <div class="text-3xl font-extrabold text-indigo-900 mt-2">
+              Γράψε τη λέξη: <span class="bg-indigo-100 text-indigo-800 px-4 py-1 rounded-2xl font-mono">${round.target}</span>
+            </div>
+            <p class="text-xs text-amber-700 mt-1 font-bold">Πρόσεξε τον τόνο στο γράμμα: «${round.stressLetter}»!</p>
+          </div>
+
+          <div class="w-full flex flex-col items-center gap-2">
+            <input type="text" id="act4Input" placeholder="Γράψε εδώ με τόνο..." autocomplete="off"
+              class="w-full max-w-md px-4 py-3 rounded-2xl border-3 border-amber-400 focus:border-amber-600 focus:outline-none text-2xl font-bold text-center tracking-wider text-slate-800 shadow-inner">
+          </div>
+
+          <div class="text-xs text-slate-600 bg-sky-50 border border-sky-200 px-4 py-2 rounded-xl text-center">
+            💡 <strong>Μυστικό:</strong> Πρώτα πατάμε το κουμπί του τόνου (;) <em>(δεν εμφανίζεται τίποτα στην οθόνη ακόμα)</em> και μετά πατάμε το φωνήεν!
+          </div>
+
+          <button onclick="checkAct4Round()" class="key-cap bg-amber-500 hover:bg-amber-600 text-slate-900 font-black px-8 py-3 rounded-2xl text-base shadow-md">
+            Έλεγχος Τόνου ✍️
+          </button>
+        </div>
+      `;
+
+      const input = document.getElementById('act4Input');
+      input.focus();
+      input.addEventListener('input', () => playSound('key'));
+    }
+
+    function checkAct4Round() {
+      const round = activitiesData[3].rounds[currentRoundIndex];
+      const val = document.getElementById('act4Input').value.trim();
+
+      if (val === round.target) {
+        awardStar(`act4_r${currentRoundIndex}`);
+        showToast(`Υπέροχα! Έβαλες σωστά τον τόνο στη λέξη «${round.target}»!`);
+        setTimeout(nextRoundOrActivity, 1200);
+      } else {
+        playSound('oops');
+        if (val.replace(/[\u0300-\u036f]/g, "") === round.target.replace(/[\u0300-\u036f]/g, "")) {
+          showToast(`Ξέχασες τον τόνο! Πάτα πρώτα το πλήκτρο του τόνου (;) και μετά το φωνήεν!`, false);
+        } else {
+          showToast(`Πρόσεξε τα γράμματα! Θέλουμε: «${round.target}»`, false);
+        }
+      }
+    }
+
+    // --------------------------------------------------------------------------
+    // ΔΡΑΣΤΗΡΙΟΤΗΤΑ 5: Το Άλμα του Βατράχου (Tab ⇥)
+    // --------------------------------------------------------------------------
+    let currentFocusedFieldIdx = 0;
+
+    function renderAct5(container, round) {
+      highlightKeyboardKeys(round.highlightKeys);
+      currentFocusedFieldIdx = 0;
+
+      container.innerHTML = `
+        <div class="max-w-xl w-full flex flex-col items-center gap-4">
+          <div class="bg-emerald-50 border-2 border-emerald-300 p-3 sm:p-4 rounded-2xl w-full text-center">
+            <span class="text-xs font-black text-emerald-800 uppercase tracking-wider block mb-1">Φορμα Μαθητη</span>
+            <p class="text-slate-700 text-sm">${round.prompt}</p>
+          </div>
+
+          <!-- Lilypads Track with Frog -->
+          <div class="w-full bg-sky-100/70 border-3 border-sky-300 rounded-3xl p-3 relative flex items-center justify-around shadow-inner">
+            <div id="frogPond" class="flex justify-around items-center w-full">
+              ${round.fields.map((f, i) => `
+                <div class="flex flex-col items-center relative flex-1">
+                  <div id="lilypad-${i}" class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl transition-all border-2 ${
+                    i === 0 ? 'bg-emerald-200 border-emerald-500 scale-110 shadow-lg' : 'bg-white border-slate-300'
+                  }">
+                    ${i === 0 ? '<span id="theFrog" class="hop-anim">🐸</span>' : '🪷'}
+                  </div>
+                  <span class="text-[10px] font-bold text-slate-700 mt-1 text-center">${f.label.split('.')[1]}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Form inputs -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+            ${round.fields.map((f, i) => `
+              <div class="text-left bg-white p-2.5 rounded-2xl border-2 transition-all ${i === 0 ? 'border-emerald-500 ring-2 ring-emerald-200' : 'border-slate-200'}" id="fieldWrapper-${i}">
+                <label class="text-xs font-black text-slate-600 block mb-1">${f.label}</label>
+                <input type="text" id="${f.id}" placeholder="${f.placeholder}" autocomplete="off"
+                  data-idx="${i}"
+                  class="w-full px-3 py-1.5 rounded-xl border border-slate-300 focus:outline-none text-sm font-bold text-slate-800">
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="text-xs text-emerald-800 bg-emerald-100 border border-emerald-300 px-4 py-2 rounded-xl text-center w-full">
+            🐸 <strong>Πάτα το πλήκτρο Tab ⇥</strong> στο πληκτρολόγιό σου για να κάνει άλμα ο βάτραχος στο επόμενο νούφαρο!
+          </div>
+
+          <button onclick="checkAct5Form()" class="key-cap bg-emerald-600 hover:bg-emerald-700 text-white font-black px-8 py-3 rounded-2xl text-base shadow-md">
+            Έλεγχος Φόρμας 🐸
+          </button>
+        </div>
+      `;
+
+      // Set focus to first input
+      setTimeout(() => {
+        const first = document.getElementById(round.fields[0].id);
+        if (first) first.focus();
+      }, 100);
+
+      // Listen for tab movement across inputs
+      round.fields.forEach((f, idx) => {
+        const el = document.getElementById(f.id);
+        if (!el) return;
+        el.addEventListener('focus', () => {
+          playSound('hop');
+          moveFrogTo(idx, round.fields.length);
+        });
+        el.addEventListener('input', () => playSound('key'));
+      });
+    }
+
+    function moveFrogTo(idx, total) {
+      currentFocusedFieldIdx = idx;
+      for (let i = 0; i < total; i++) {
+        const lily = document.getElementById(`lilypad-${i}`);
+        const wrap = document.getElementById(`fieldWrapper-${i}`);
+        if (lily) {
+          if (i === idx) {
+            lily.className = 'w-14 h-14 rounded-2xl flex items-center justify-center text-2xl transition-all border-2 bg-emerald-200 border-emerald-500 scale-110 shadow-lg';
+            lily.innerHTML = '<span id="theFrog" class="hop-anim">🐸</span>';
+          } else {
+            lily.className = 'w-14 h-14 rounded-2xl flex items-center justify-center text-2xl transition-all border-2 bg-white border-slate-300';
+            lily.innerHTML = '🪷';
+          }
+        }
+        if (wrap) {
+          if (i === idx) {
+            wrap.className = 'text-left bg-white p-2.5 rounded-2xl border-2 transition-all border-emerald-500 ring-2 ring-emerald-200';
+          } else {
+            wrap.className = 'text-left bg-white p-2.5 rounded-2xl border-2 transition-all border-slate-200';
+          }
+        }
+      }
+    }
+
+    function checkAct5Form() {
+      const round = activitiesData[4].rounds[0];
+      const filled = round.fields.filter(f => {
+        const val = document.getElementById(f.id).value.trim();
+        return val.length > 0;
+      });
+
+      if (filled.length >= 3) {
+        awardStar('act5_tab');
+        showToast('Μπράβο! Ο βάτραχος έκανε όλα τα άλματα με το Tab!');
+        setTimeout(nextRoundOrActivity, 1400);
+      } else {
+        playSound('oops');
+        showToast('Συμπλήρωσε τουλάχιστον 3 πεδία χρησιμοποιώντας το Tab!', false);
+      }
+    }
+
+    // --------------------------------------------------------------------------
+    // ΔΡΑΣΤΗΡΙΟΤΗΤΑ 6: Backspace ⌫ (Σβήσιμο)
+    // --------------------------------------------------------------------------
+    function renderAct6(container, round) {
+      highlightKeyboardKeys(round.highlightKeys);
+      container.innerHTML = `
+        <div class="max-w-lg w-full flex flex-col items-center gap-4">
+          <div class="bg-rose-50 border-2 border-rose-200 p-4 rounded-2xl w-full text-center">
+            <span class="text-xs font-black text-rose-700 uppercase tracking-wider block mb-1">Διορθωση Λαθους</span>
+            <p class="text-slate-700 text-sm mb-2">${round.explanation}</p>
+            <div class="text-xl font-bold text-slate-800">
+              Σωστή λέξη: <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-xl font-mono">${round.target}</span>
+            </div>
+          </div>
+
+          <div class="w-full flex flex-col items-center gap-2">
+            <label class="text-xs font-bold text-slate-600">Χρησιμοποίησε το Backspace ⌫ για να σβήσεις τα λάθη:</label>
+            <input type="text" id="act6Input" value="${round.wrongText}" autocomplete="off"
+              class="w-full max-w-md px-4 py-3 rounded-2xl border-3 border-rose-300 focus:border-rose-500 focus:outline-none text-2xl font-bold text-center tracking-wider text-rose-900 bg-rose-50/50 shadow-inner">
+          </div>
+
+          <div class="text-xs text-slate-500 bg-amber-50 border border-amber-200 px-4 py-2 rounded-xl text-center">
+            🧼 <strong>Συμβουλή:</strong> Βάλε τον κέρσορα αμέσως μετά από το λάθος γράμμα και πάτησε <strong>Backspace ⌫</strong> στο πληκτρολόγιο!
+          </div>
+
+          <button onclick="checkAct6Round()" class="key-cap bg-rose-500 hover:bg-rose-600 text-white font-black px-8 py-3 rounded-2xl text-base shadow-md">
+            Έλεγχος Διόρθωσης 🧼
+          </button>
+        </div>
+      `;
+
+      const input = document.getElementById('act6Input');
+      input.focus();
+      input.setSelectionRange(input.value.length, input.value.length);
+      input.addEventListener('input', () => playSound('key'));
+    }
+
+    function checkAct6Round() {
+      const round = activitiesData[5].rounds[currentRoundIndex];
+      const val = document.getElementById('act6Input').value.trim();
+
+      if (val === round.target) {
+        awardStar(`act6_r${currentRoundIndex}`);
+        showToast(`Τέλεια! Διόρθωσες τη λέξη σε «${round.target}»!`);
+        setTimeout(nextRoundOrActivity, 1200);
+      } else {
+        playSound('oops');
+        showToast(`Σβήσε προσεκτικά τα περιττά γράμματα ώστε να μείνει: «${round.target}»`, false);
+      }
+    }
+
+    // --------------------------------------------------------------------------
+    // ΔΡΑΣΤΗΡΙΟΤΗΤΑ 7: Spacebar (Διάστημα)
+    // --------------------------------------------------------------------------
+    function renderAct7(container, round) {
+      highlightKeyboardKeys(round.highlightKeys);
+      container.innerHTML = `
+        <div class="max-w-lg w-full flex flex-col items-center gap-4">
+          <div class="bg-sky-50 border-2 border-sky-300 p-4 rounded-2xl w-full text-center">
+            <span class="text-xs font-black text-sky-800 uppercase tracking-wider block mb-1">Κολλημενες Λεξεις!</span>
+            <p class="text-slate-700 text-sm mb-2">${round.hint}</p>
+            <div class="text-2xl font-black text-rose-600 bg-rose-100 py-1 px-3 rounded-xl inline-block line-through decoration-rose-500 font-mono">
+              ${round.squished}
+            </div>
+            <div class="text-sm font-bold text-slate-700 mt-2">
+              Πρέπει να γίνει: <span class="text-indigo-700 font-extrabold">«${round.target}»</span>
+            </div>
+          </div>
+
+          <div class="w-full flex flex-col items-center gap-2">
+            <input type="text" id="act7Input" placeholder="Γράψε με κενά (Spacebar)..." autocomplete="off"
+              class="w-full max-w-md px-4 py-3 rounded-2xl border-3 border-sky-400 focus:border-sky-600 focus:outline-none text-xl sm:text-2xl font-bold text-center tracking-wide text-slate-800 shadow-inner">
+          </div>
+
+          <div class="text-xs text-sky-800 bg-sky-100 border border-sky-300 px-4 py-2 rounded-xl text-center">
+            ␣ <strong>Spacebar:</strong> Πάτα το μακρύ πλήκτρο στο κάτω μέρος μία φορά ανάμεσα σε κάθε λέξη!
+          </div>
+
+          <button onclick="checkAct7Round()" class="key-cap bg-sky-500 hover:bg-sky-600 text-white font-black px-8 py-3 rounded-2xl text-base shadow-md">
+            Έλεγχος Κενών ␣
+          </button>
+        </div>
+      `;
+
+      const input = document.getElementById('act7Input');
+      input.focus();
+      input.addEventListener('input', () => playSound('key'));
+    }
+
+    function checkAct7Round() {
+      const round = activitiesData[6].rounds[currentRoundIndex];
+      const val = document.getElementById('act7Input').value.trim();
+
+      if (val === round.target) {
+        awardStar(`act7_r${currentRoundIndex}`);
+        showToast(`Μπράβο! Έβαλες σωστά τα κενά με το Spacebar!`);
+        setTimeout(nextRoundOrActivity, 1200);
+      } else {
+        playSound('oops');
+        if (val.replace(/\s+/g, '') === round.squished) {
+          showToast(`Σχεδόν έτοιμο! Έλεγξε αν έβαλες ακριβώς 1 κενό ανάμεσα στις λέξεις!`, false);
+        } else {
+          showToast(`Γράψε προσεκτικά τη φράση: «${round.target}»`, false);
+        }
+      }
+    }
+
+    // --------------------------------------------------------------------------
+    // ΔΡΑΣΤΗΡΙΟΤΗΤΑ 8: Enter & Τελική Δοκιμασία (Ο Μικρός Συγγραφέας)
+    // --------------------------------------------------------------------------
+    function renderAct8(container, round) {
+      highlightKeyboardKeys(round.highlightKeys);
+      container.innerHTML = `
+        <div class="max-w-xl w-full flex flex-col items-center gap-4">
+          <div class="bg-indigo-50 border-2 border-indigo-200 p-4 rounded-2xl w-full text-center">
+            <span class="text-xs font-black text-indigo-700 uppercase tracking-wider block mb-1">${round.title}</span>
+            <p class="text-slate-700 text-sm whitespace-pre-line font-bold">${round.instruction}</p>
+          </div>
+
+          <!-- Goal reference notebook -->
+          <div class="bg-amber-100/70 border-2 border-amber-300 p-3 rounded-2xl w-full text-left font-mono text-sm sm:text-base text-amber-950 shadow-inner">
+            <div class="text-[10px] uppercase font-black text-amber-700 mb-1">Προτυπο Κειμενο:</div>
+            ${round.lines.map((line, i) => `<div>${i + 1}η γραμμή: <strong>${line}</strong></div>`).join('')}
+          </div>
+
+          <!-- Textarea for multi-line writing -->
+          <div class="w-full flex flex-col items-center">
+            <label class="text-xs font-extrabold text-slate-600 self-start mb-1">Γράψε στο παρακάτω πλαίσιο (πάτα Enter ↵ για να αλλάξεις γραμμή):</label>
+            <textarea id="act8Textarea" rows="3" placeholder="1η γραμμή... [πάτα Enter]&#10;2η γραμμή..."
+              class="w-full px-4 py-3 rounded-2xl border-3 border-indigo-300 focus:border-indigo-600 focus:outline-none text-base sm:text-lg font-bold text-slate-800 shadow-inner resize-none font-mono"></textarea>
+          </div>
+
+          <div class="text-xs text-indigo-800 bg-indigo-100 border border-indigo-200 px-4 py-2 rounded-xl text-center w-full">
+            ↵ <strong>Πλήκτρο Enter:</strong> Σε πάει στην αμέσως επόμενη γραμμή (νέα παράγραφος)!
+          </div>
+
+          <button onclick="checkAct8Round()" class="key-cap bg-emerald-600 hover:bg-emerald-700 text-white font-black px-8 py-3 rounded-2xl text-base shadow-md">
+            Υποβολή Κειμένου 🏆
+          </button>
+        </div>
+      `;
+
+      const tx = document.getElementById('act8Textarea');
+      tx.focus();
+      tx.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          playSound('hop');
+        } else {
+          playSound('key');
+        }
+      });
+    }
+
+    function checkAct8Round() {
+      const round = activitiesData[7].rounds[currentRoundIndex];
+      const text = document.getElementById('act8Textarea').value;
+      const userLines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+      const isLine1Valid = userLines[0] === round.lines[0];
+      const isLine2Valid = userLines[1] === round.lines[1];
+
+      if (isLine1Valid && isLine2Valid && userLines.length >= 2) {
+        awardStar(`act8_r${currentRoundIndex}`);
+        showToast('Συγχαρητήρια! Χρησιμοποίησες τέλεια το πλήκτρο Enter!');
+        setTimeout(nextRoundOrActivity, 1400);
+      } else {
+        playSound('oops');
+        if (userLines.length < 2) {
+          showToast('Πάτησε το πλήκτρο Enter ↵ για να γράψεις στη 2η γραμμή!', false);
+        } else {
+          showToast('Έλεγξε τα γράμματα, τα κεφαλαία και τα σύμβολα σε κάθε γραμμή!', false);
+        }
+      }
+    }
+
+    // Reset app state
+    function resetWholeApp() {
+      earnedStars = 0;
+      document.getElementById('starCounter').textContent = '0';
+      for (const k in completedRoundsMap) delete completedRoundsMap[k];
+      currentActivityIndex = 0;
+      currentRoundIndex = 0;
+      renderActivity();
+      showToast('Όλες οι δραστηριότητες μηδενίστηκαν! Καλή διασκέδαση!');
+    }
+
+    // Start on window load
+    window.onload = function() {
+      renderActivity();
+    };
+  </script>
+</body>
+</html>
