@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Παιχνιδοχώρα Πληροφορικής Γ' Δημοτικού - Μάθημα 11</title>
+<style>
+  :root {
+    --bg-main: #E8F5E9;
+    --primary: #43A047;
+    --primary-dark: #2E7D32;
+    --accent: #FF6F00;
+    --card: #FFFFFF;
+    --text: #263238;
+  }
+
+  * { box-sizing: border-box; user-select: none; }
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comfortaa', sans-serif;
+    background: linear-gradient(135deg, #E0F7FA 0%, #E8F5E9 100%);
+    color: var(--text);
+    margin: 0;
+    padding: 12px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header {
+    text-align: center;
+    background: #ffffff;
+    padding: 16px 24px;
+    border-radius: 24px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    max-width: 920px;
+    width: 100%;
+    margin-bottom: 16px;
+    border: 4px solid #81C784;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #1B5E20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  header p {
+    margin: 6px 0 0 0;
+    font-size: 1.05rem;
+    color: #555;
+  }
+
+  /* Navigation Bar - Gamified Missions */
+  .mission-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    max-width: 940px;
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  .m-btn {
+    background: white;
+    border: 3px solid #B0BEC5;
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 0.95rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: #37474F;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  }
+  .m-btn:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+  }
+  .m-btn.active {
+    background: #FFB300;
+    color: #000;
+    border-color: #E65100;
+    transform: scale(1.08);
+    box-shadow: 0 6px 14px rgba(255, 179, 0, 0.45);
+  }
+
+  /* Main Container */
+  .act-card {
+    background: var(--card);
+    border-radius: 24px;
+    border: 4px solid #AED581;
+    padding: 24px;
+    width: 100%;
+    max-width: 920px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    display: none;
+    animation: popIn 0.35s ease;
+  }
+  .act-card.active { display: block; }
+
+  @keyframes popIn {
+    0% { opacity: 0; transform: scale(0.96); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  .act-title {
+    background: #F1F8E9;
+    border-left: 8px solid #4CAF50;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #2E7D32;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .game-desc {
+    font-size: 1.05rem;
+    margin-bottom: 16px;
+    line-height: 1.5;
+    background: #FFFDE7;
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 2px dashed #FBC02D;
+  }
+
+  /* Interactive Elements */
+  .stage-box {
+    background: #FAFAFA;
+    border: 2px solid #EEEEEE;
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .btn-game {
+    font-size: 1.15rem;
+    font-weight: bold;
+    padding: 14px 22px;
+    margin: 8px;
+    border-radius: 16px;
+    border: 3px solid #CFD8DC;
+    background: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  }
+  .btn-game:hover {
+    background: #F5F5F5;
+    transform: translateY(-2px);
+  }
+  .btn-game.good {
+    background: #C8E6C9 !important;
+    border-color: #2E7D32 !important;
+    color: #1B5E20 !important;
+    animation: bounce 0.4s;
+  }
+  .btn-game.bad {
+    background: #FFCDD2 !important;
+    border-color: #C62828 !important;
+    color: #B71C1C !important;
+    animation: shake 0.3s;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  /* Drag & Drop Canvas / Boxes */
+  .drop-zone-container {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin: 16px 0;
+  }
+  .drop-box {
+    flex: 1;
+    min-width: 250px;
+    min-height: 180px;
+    border: 3px dashed #90CAF9;
+    border-radius: 20px;
+    padding: 12px;
+    background: #E3F2FD;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .drop-box.hardware {
+    border-color: #FF8A65;
+    background: #FBE9E7;
+  }
+  .drop-box h3 {
+    margin: 4px 0 10px 0;
+    color: #0277BD;
+    font-size: 1.15rem;
+  }
+  .drop-box.hardware h3 {
+    color: #D84315;
+  }
+
+  .item-pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    background: #ECEFF1;
+    padding: 12px;
+    border-radius: 16px;
+    min-height: 60px;
+  }
+  .drag-badge {
+    background: white;
+    border: 2px solid #78909C;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 1.05rem;
+    font-weight: bold;
+    cursor: grab;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  }
+  .drag-badge:active { cursor: grabbing; opacity: 0.6; }
+
+  /* Scratch Canvas */
+  .canvas-scratch {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height: 240px;
+    background: #E1F5FE;
+    border: 3px solid #0288D1;
+    border-radius: 18px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+  .scratch-cat {
+    position: absolute;
+    left: 20px;
+    top: 60px;
+    font-size: 4rem;
+    transition: all 0.5s ease;
+  }
+
+  /* Mystery Scratch card */
+  .scratch-card {
+    background: #ECEFF1;
+    border: 3px dashed #78909C;
+    border-radius: 18px;
+    padding: 24px;
+    text-align: center;
+    font-size: 1.4rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    color: #546E7A;
+  }
+  .scratch-card.revealed {
+    background: #FFF9C4;
+    border-color: #FBC02D;
+    color: #E65100;
+    font-size: 1.6rem;
+  }
+
+  .dialog-bubble {
+    position: relative;
+    background: #E8EAF6;
+    border-radius: 16px;
+    padding: 12px 18px;
+    margin: 10px 0;
+    border: 2px solid #9FA8DA;
+    font-size: 1.05rem;
+  }
+
+  .celebrate {
+    text-align: center;
+    font-size: 1.25rem;
+    color: #2E7D32;
+    font-weight: bold;
+    min-height: 35px;
+    margin-top: 10px;
+  }
+
+  .stars {
+    font-size: 1.6rem;
+    letter-spacing: 4px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎮 Το Μαγικό Εργαστήρι Εφαρμογών! 💻</h1>
+  <p>Πληροφορική Γ΄ Δημοτικού • Μάθημα 11: Οι εφαρμογές του υπολογιστή</p>
+</header>
+
+<!-- Πλοήγηση με 8 Πρωτότυπες Αποστολές -->
+<div class="mission-nav">
+  <button class="m-btn active" onclick="goMission(1)">1. 🧲 Μαγνητικό Καλάθι</button>
+  <button class="m-btn" onclick="goMission(2)">2. 🩺 Το Ιατρείο του Υπολογιστή</button>
+  <button class="m-btn" onclick="goMission(3)">3. 📱 Το «Έξυπνο» Κινητό</button>
+  <button class="m-btn" onclick="goMission(4)">4. 🐱 Scratch: Ζωντάνεψε τη Γάτα!</button>
+  <button class="m-btn" onclick="goMission(5)">5. 🖨️ Η Αλυσίδα του Εκτυπωτή</button>
+  <button class="m-btn" onclick="goMission(6)">6. 🗃️ Ο Σκληρός Δίσκος & η Ντουλάπα</button>
+  <button class="m-btn" onclick="goMission(7)">7. 🔍 Το Μυστικό Εικονίδιο</button>
+  <button class="m-btn" onclick="goMission(8)">8. 🏆 Ο Μέγας Τροχός των Εφαρμογών</button>
+</div>
+
+<!-- ================= 1. ΤΟ ΜΑΓΝΗΤΙΚΟ ΚΑΛΑΘΙ (DRAG & DROP) ================= -->
+<div class="act-card active" id="act1">
+  <div class="act-title">🧲 Αποστολή 1: Το Μαγνητικό Καλάθι (Υλικό vs Λογισμικό)</div>
+  <div class="game-desc">
+    <b>Οδηγία:</b> Κάνε κλικ σε ένα αντικείμενο από το κουτί και μετά κάνε κλικ στο σωστό καλάθι: 
+    <b>🖐️ Υλικό (πιάνεται)</b> ή <b>✨ Λογισμικό (προγράμματα/εφαρμογές)</b>!
+  </div>
+
+  <div class="item-pool" id="pool1">
+    <div class="drag-badge" onclick="selectItem(this, 'hard')">🖱️ Ποντίκι</div>
+    <div class="drag-badge" onclick="selectItem(this, 'soft')">🎨 Tux Paint</div>
+    <div class="drag-badge" onclick="selectItem(this, 'hard')">⌨️ Πληκτρολόγιο</div>
+    <div class="drag-badge" onclick="selectItem(this, 'soft')">🐱 Scratch</div>
+    <div class="drag-badge" onclick="selectItem(this, 'hard')">🖥️ Οθόνη</div>
+    <div class="drag-badge" onclick="selectItem(this, 'soft')">🌐 Google Chrome</div>
+  </div>
+
+  <div class="drop-zone-container">
+    <div class="drop-box hardware" onclick="dropInto('hard')">
+      <h3>🖐️ Καλάθι ΥΛΙΚΟΥ (Hardware)</h3>
+      <p style="font-size:0.85rem; color:#888;">(Ό,τι μπορώ να αγγίξω με τα χέρια)</p>
+      <div id="box-hard"></div>
+    </div>
+    <div class="drop-box" onclick="dropInto('soft')">
+      <h3>✨ Καλάθι ΛΟΓΙΣΜΙΚΟΥ (Software)</h3>
+      <p style="font-size:0.85rem; color:#888;">(Προγράμματα & Εφαρμογές)</p>
+      <div id="box-soft"></div>
+    </div>
+  </div>
+  <div class="celebrate" id="fb1"></div>
+</div>
+
+<!-- ================= 2. ΤΟ ΙΑΤΡΕΙΟ ΤΟΥ ΥΠΟΛΟΓΙΣΤΗ ================= -->
+<div class="act-card" id="act2">
+  <div class="act-title">🩺 Αποστολή 2: Το Ιατρείο του Υπολογιστή («Γιατρέ μου, τι μου λείπει;»)</div>
+  <div class="game-desc">
+    <b>Σενάριο:</b> Ο υπολογιστής ήρθε στο εργαστήριο γιατί «κάτι δεν πάει καλά». Βρες τι χρειάζεται κάθε φορά για να γίνει καλά!
+  </div>
+
+  <div class="stage-box" id="doc-case1">
+    <div class="dialog-bubble">
+      💻 <b>Υπολογιστής:</b> «Έχω πανίσχυρο επεξεργαστή, φωτεινή οθόνη και ωραίο ποντίκι... αλλά όταν με ανοίγουν, δεν μπορώ να γράψω ούτε μία λεξούλα!»
+    </div>
+    <p><b>Τι φάρμακο χρειάζεται ο ασθενής;</b></p>
+    <button class="btn-game" onclick="cureDoc(this, false, 'doc-fb1')">🔌 Να του αλλάξουμε πρίζα</button>
+    <button class="btn-game" onclick="cureDoc(this, true, 'doc-fb1')">📝 Να του εγκαταστήσουμε πρόγραμμα κειμενογράφου (Λογισμικό)!</button>
+    <div class="celebrate" id="doc-fb1"></div>
+  </div>
+
+  <div class="stage-box" id="doc-case2">
+    <div class="dialog-bubble">
+      💻 <b>Υπολογιστής:</b> «Έχω μέσα το πιο τέλειο πρόγραμμα ζωγραφικής στον κόσμο! Όμως δεν έχω οθόνη για να δουν τα παιδιά τα χρώματα!»
+    </div>
+    <p><b>Τι του λείπει τώρα;</b></p>
+    <button class="btn-game" onclick="cureDoc(this, true, 'doc-fb2')">🖥️ Του λείπει το Υλικό (η Οθόνη)!</button>
+    <button class="btn-game" onclick="cureDoc(this, false, 'doc-fb2')">🎨 Κι άλλο πρόγραμμα ζωγραφικής</button>
+    <div class="celebrate" id="doc-fb2"></div>
+  </div>
+</div>
+
+<!-- ================= 3. ΤΟ «ΕΞΥΠΝΟ» ΚΙΝΗΤΟ ================= -->
+<div class="act-card" id="act3">
+  <div class="act-title">📱 Αποστολή 3: Ο Ελεγκτής του Smartphone</div>
+  <div class="game-desc">
+    <b>Πρόκληση:</b> Και τα έξυπνα κινητά και τα τάμπλετ είναι ψηφιακές συσκευές με εφαρμογές (apps)! Πάτα το σωστό κουμπί στην οθόνη του κινητού!
+  </div>
+
+  <div class="stage-box" style="text-align: center;">
+    <p style="font-size:1.2rem;">🎯 <b>Κατάσταση 1:</b> Ένα χαριτωμένο γατάκι κάνει τούμπες στην αυλή! Θέλεις να το βγάλεις φωτογραφία. Ποιο κουμπί πατάς;</p>
+    <button class="btn-game" onclick="phoneClick(this, true, 'pfb1')">📷 Κάμερα (Camera App)</button>
+    <button class="btn-game" onclick="phoneClick(this, false, 'pfb1')">🧮 Αριθμομηχανή</button>
+    <button class="btn-game" onclick="phoneClick(this, false, 'pfb1')">🎵 Μουσική</button>
+    <div class="celebrate" id="pfb1"></div>
+  </div>
+
+  <div class="stage-box" style="text-align: center;">
+    <p style="font-size:1.2rem;">🎯 <b>Κατάσταση 2:</b> Θέλεις να μιλήσεις με τη γιαγιά για να της πεις χρόνια πολλά! Ποια εφαρμογή θα ανοίξεις;</p>
+    <button class="btn-game" onclick="phoneClick(this, false, 'pfb2')">🗺️ Χάρτες</button>
+    <button class="btn-game" onclick="phoneClick(this, true, 'pfb2')">📞 Τηλέφωνο / Κλήσεις</button>
+    <button class="btn-game" onclick="phoneClick(this, false, 'pfb2')">🌦️ Καιρός</button>
+    <div class="celebrate" id="pfb2"></div>
+  </div>
+</div>
+
+<!-- ================= 4. SCRATCH: ΖΩΝΤΑΝΕΨΕ ΤΗ ΓΑΤΑ ================= -->
+<div class="act-card" id="act4">
+  <div class="act-title">🐱 Αποστολή 4: Γίνε Προγραμματιστής στο Scratch!</div>
+  <div class="game-desc">
+    <b>Διαδραστικό πείραμα:</b> Οι εφαρμογές φτιάχνονται από εντολές! Πάτα τα πλακίδια για να προγραμματίσεις τη γάτα να περπατήσει!
+  </div>
+
+  <div class="canvas-scratch">
+    <div class="scratch-cat" id="catSprite">🐱</div>
+  </div>
+
+  <div style="text-align: center; margin-top: 15px;">
+    <button class="btn-game" style="background:#FFF9C4; border-color:#FBC02D;" onclick="moveCat(40)">
+      🧩 Εντολή: «Κινήσου 10 βήματα δεξιά!»
+    </button>
+    <button class="btn-game" style="background:#E1BEE7; border-color:#8E24AA;" onclick="catSay()">
+      💬 Εντολή: «Πες ΓΕΙΑ!»
+    </button>
+    <button class="btn-game" style="background:#FFCCBC; border-color:#D84315;" onclick="resetCat()">
+      🔄 Επιστροφή στην Αρχή
+    </button>
+  </div>
+  <div class="celebrate" id="catFeedback">💡 Κάθε φορά που πατάς το κουμπί, ο υπολογιστής εκτελεί το πρόγραμμα που του δίνεις!</div>
+</div>
+
+<!-- ================= 5. Η ΑΛΥΣΙΔΑ ΤΟΥ ΕΚΤΥΠΩΤΗ ================= -->
+<div class="act-card" id="act5">
+  <div class="act-title">🖨️ Αποστολή 5: Το Μυστήριο της Εκτύπωσης</div>
+  <div class="game-desc">
+    <b>Πώς τυπώνεται μια ζωγραφιά;</b> Βάλε τα 3 βήματα στη σωστή σειρά για να δουλέψουν μαζί το λογισμικό και το υλικό!
+  </div>
+
+  <div class="stage-box">
+    <p><b>Βήμα 1: Τι κάνουμε πρώτα;</b></p>
+    <button class="btn-game" onclick="stepChain(this, 1, 'cfb1')">🎨 Ζωγραφίζουμε στο πρόγραμμα Tux Paint (Λογισμικό)</button>
+    <button class="btn-game" onclick="stepChain(this, 0, 'cfb1')">📄 Παίρνουμε το χαρτί από το πάτωμα</button>
+    <div class="celebrate" id="cfb1"></div>
+  </div>
+
+  <div class="stage-box">
+    <p><b>Βήμα 2: Τι γίνεται μόλις πατήσουμε «Εκτύπωση»;</b></p>
+    <button class="btn-game" onclick="stepChain(this, 1, 'cfb2')">💻 Μία ειδική εφαρμογή στέλνει οδηγίες στον εκτυπωτή</button>
+    <button class="btn-game" onclick="stepChain(this, 0, 'cfb2')">✨ Γίνεται μαγικά χωρίς καμία εντολή</button>
+    <div class="celebrate" id="cfb2"></div>
+  </div>
+
+  <div class="stage-box">
+    <p><b>Βήμα 3: Ποιος βγάζει τελικά το χαρτί στα χέρια μας;</b></p>
+    <button class="btn-game" onclick="stepChain(this, 1, 'cfb3')">🖨️ Η συσκευή του εκτυπωτή (Υλικό)!</button>
+    <button class="btn-game" onclick="stepChain(this, 0, 'cfb3')">🖱️ Το καλώδιο του ποντικιού</button>
+    <div class="celebrate" id="cfb3"></div>
+  </div>
+</div>
+
+<!-- ================= 6. ΣΚΛΗΡΟΣ ΔΙΣΚΟΣ & ΝΤΟΥΛΑΠΑ ================= -->
+<div class="act-card" id="act6">
+  <div class="act-title">🗃️ Αποστολή 6: Η Μαγική Ντουλάπα του Υπολογιστή</div>
+  <div class="game-desc">
+    <b>Παρομοίωση:</b> Όταν κλείνουμε το σχολείο, βάζουμε τα βιβλία μας στην τσάντα ή στη ντουλάπα. Όταν κλείνει ο υπολογιστής, πού φυλάει όλες τις εφαρμογές;
+  </div>
+
+  <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
+    <div style="text-align:center;">
+      <div style="font-size:4rem;">🚪</div>
+      <p><b>Η Ντουλάπα στο σπίτι</b><br>Φυλάει ρούχα & παιχνίδια</p>
+    </div>
+    <div style="font-size:3rem; align-self:center;">➡️</div>
+    <div style="text-align:center;">
+      <div style="font-size:4rem;">💾</div>
+      <p><b>Ο Δίσκος Αποθήκευσης</b><br>Φυλάει εφαρμογές & ζωγραφιές!</p>
+    </div>
+  </div>
+
+  <div class="stage-box" style="text-align:center; margin-top:15px;">
+    <p><b>Ερώτηση Αστραπή:</b> Αν σβήσουμε τον υπολογιστή από το ρεύμα, οι εφαρμογές χάνονται ή μένουν μέσα στο δίσκο;</p>
+    <button class="btn-game" onclick="diskAnswer(this, true)">🛡️ Μένουν ασφαλείς μέσα στο Σκληρό Δίσκο!</button>
+    <button class="btn-game" onclick="diskAnswer(this, false)">💨 Χάνονται για πάντα στον αέρα!</button>
+    <div class="celebrate" id="diskFb"></div>
+  </div>
+</div>
+
+<!-- ================= 7. ΤΟ ΜΥΣΤΙΚΟ ΕΙΚΟΝΙΔΙΟ (ΞΥΣΤΟ) ================= -->
+<div class="act-card" id="act7">
+  <div class="act-title">🔍 Αποστολή 7: Το Μυστικό Εικονίδιο (Κάνε κλικ για να αποκαλυφθεί!)</div>
+  <div class="game-desc">
+    <b>Παιχνίδι εξερεύνησης:</b> Κάνε κλικ πάνω στις γκρίζες κάρτες για να «ξύσεις» το μυστικό και να βρεις ποια εφαρμογή κρύβεται πίσω από το εικονίδιο!
+  </div>
+
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:15px;">
+    <div class="scratch-card" onclick="revealCard(this, '🎨 Tux Paint!<br>(Εφαρμογή Ζωγραφικής)')">
+      ❓ Κάρτα 1<br><small>(Πάτα εδώ για αποκάλυψη)</small>
+    </div>
+    <div class="scratch-card" onclick="revealCard(this, '⌨️ LibreOffice Writer!<br>(Εφαρμογή Κειμένου)')">
+      ❓ Κάρτα 2<br><small>(Πάτα εδώ για αποκάλυψη)</small>
+    </div>
+    <div class="scratch-card" onclick="revealCard(this, '🌐 Firefox / Chrome!<br>(Εφαρμογή Διαδικτύου)')">
+      ❓ Κάρτα 3<br><small>(Πάτα εδώ για αποκάλυψη)</small>
+    </div>
+  </div>
+  <div class="celebrate" id="scratchFb"></div>
+</div>
+
+<!-- ================= 8. Ο ΜΕΓΑΣ ΤΡΟΧΟΣ ΤΩΝ ΕΦΑΡΜΟΓΩΝ ================= -->
+<div class="act-card" id="act8">
+  <div class="act-title">🏆 Αποστολή 8: Ο Σούπερ Τροχός των Εφαρμογών!</div>
+  <div class="game-desc">
+    <b>Τελική Πρόκληση:</b> Πάτησε το κουμπί για να γυρίσει ο τροχός! Σε όποια αποστολή σταματήσει, διάλεξε την απάντηση για να κερδίσεις το Χρυσό Αστέρι!
+  </div>
+
+  <div style="text-align:center;">
+    <button class="btn-game" style="background:#FFD54F; font-size:1.3rem;" onclick="spinWheel()">
+      🎡 ΓΥΡΙΣΕ ΤΟΝ ΤΡΟΧΟ!
+    </button>
+    <div id="wheelQuestion" style="margin:20px 0; font-size:1.3rem; font-weight:bold; min-height:50px;"></div>
+    <div id="wheelOptions"></div>
+    <div class="celebrate" id="wheelFb"></div>
+  </div>
+</div>
+
+<script>
+  // Navigation
+  function goMission(num) {
+    document.querySelectorAll('.act-card').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.m-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('act' + num).classList.add('active');
+    document.querySelectorAll('.m-btn')[num - 1].classList.add('active');
+  }
+
+  // Mission 1: Drag & Drop click simulation
+  let selectedBadge = null;
+  let selectedType = null;
+  let countCorrect = 0;
+
+  function selectItem(el, type) {
+    document.querySelectorAll('.drag-badge').forEach(b => b.style.outline = 'none');
+    selectedBadge = el;
+    selectedType = type;
+    el.style.outline = '4px solid #FF9800';
+  }
+
+  function dropInto(targetType) {
+    if (!selectedBadge) {
+      alert("Κάνε πρώτα κλικ σε ένα αντικείμενο από το κουτί!");
+      return;
+    }
+    if (selectedType === targetType) {
+      const dest = targetType === 'hard' ? document.getElementById('box-hard') : document.getElementById('box-soft');
+      selectedBadge.style.outline = 'none';
+      selectedBadge.style.cursor = 'default';
+      selectedBadge.onclick = null;
+      dest.appendChild(selectedBadge);
+      selectedBadge = null;
+      countCorrect++;
+      document.getElementById('fb1').innerHTML = '🌟 Μπράβο! Το έβαλες στο σωστό καλάθι! 👏';
+      if (countCorrect === 6) {
+        document.getElementById('fb1').innerHTML = '🎉 ΤΕΛΕΙΑ! Τα ταξινόμησες όλα σωστά! Κέρδισες 3 αστέρια! ⭐⭐⭐';
+      }
+    } else {
+      document.getElementById('fb1').innerHTML = '🤔 Ωχ, δοκίμασε στο άλλο καλάθι! Σκέψου αν πιάνεται με τα χέρια ή όχι!';
+    }
+  }
+
+  // Mission 2: Doctor
+  function cureDoc(btn, isOk, fbId) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.btn-game').forEach(b => b.className = 'btn-game');
+    const fb = document.getElementById(fbId);
+    if (isOk) {
+      btn.classList.add('good');
+      fb.innerHTML = '🩺 Μπράβο γιατρέ μου! Ο υπολογιστής έγινε αμέσως καλά! ✨';
+    } else {
+      btn.classList.add('bad');
+      fb.innerHTML = '🤔 Όχι ακριβώς... σκέψου τι πραγματικά χρειάζεται!';
+    }
+  }
+
+  // Mission 3: Phone
+  function phoneClick(btn, isOk, fbId) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.btn-game').forEach(b => b.className = 'btn-game');
+    const fb = document.getElementById(fbId);
+    if (isOk) {
+      btn.classList.add('good');
+      fb.innerHTML = '🎉 Ναι! Αυτή είναι η σωστή εφαρμογή για το κινητό! 📱';
+    } else {
+      btn.classList.add('bad');
+      fb.innerHTML = '❌ Όχι αυτή... ψάξε μια πιο κατάλληλη εφαρμογή!';
+    }
+  }
+
+  // Mission 4: Scratch Cat
+  let catPos = 20;
+  function moveCat(dx) {
+    catPos += dx;
+    if (catPos > 480) catPos = 20;
+    const cat = document.getElementById('catSprite');
+    cat.style.left = catPos + 'px';
+    document.getElementById('catFeedback').innerHTML = '🎉 Η γάτα κινήθηκε! Μόλις εκτέλεσες μια εντολή λογισμικού! 🐱🐾';
+  }
+  function catSay() {
+    const cat = document.getElementById('catSprite');
+    cat.innerHTML = '🐱💭 "Μιάου! Είμαι ένα πρόγραμμα!"';
+    setTimeout(() => { cat.innerHTML = '🐱'; }, 2500);
+    document.getElementById('catFeedback').innerHTML = '🌟 Η γάτα μίλησε! Ο προγραμματισμός έχει πολλή πλάκα!';
+  }
+  function resetCat() {
+    catPos = 20;
+    const cat = document.getElementById('catSprite');
+    cat.style.left = catPos + 'px';
+    cat.innerHTML = '🐱';
+    document.getElementById('catFeedback').innerHTML = 'Επιστροφή στη γραμμή εκκίνησης!';
+  }
+
+  // Mission 5: Printer Chain
+  function stepChain(btn, isOk, fbId) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.btn-game').forEach(b => b.className = 'btn-game');
+    const fb = document.getElementById(fbId);
+    if (isOk === 1) {
+      btn.classList.add('good');
+      fb.innerHTML = '✅ Σωστό βήμα! Προχωράμε στην αλυσίδα!';
+    } else {
+      btn.classList.add('bad');
+      fb.innerHTML = '❌ Ξανασκέψου το... τι λογική σειρά έχει;';
+    }
+  }
+
+  // Mission 6: Hard Disk
+  function diskAnswer(btn, isOk) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.btn-game').forEach(b => b.className = 'btn-game');
+    const fb = document.getElementById('diskFb');
+    if (isOk) {
+      btn.classList.add('good');
+      fb.innerHTML = '🏆 Ακριβώς! Ο δίσκος είναι η μόνιμη αποθήκη του υπολογιστή μας! 💾';
+    } else {
+      btn.classList.add('bad');
+      fb.innerHTML = '❌ Μην ανησυχείς, δεν χάνονται! Ο δίσκος τα κρατάει ασφαλή!';
+    }
+  }
+
+  // Mission 7: Scratch card
+  let revealedCount = 0;
+  function revealCard(el, text) {
+    if (!el.classList.contains('revealed')) {
+      el.classList.add('revealed');
+      el.innerHTML = text;
+      revealedCount++;
+      if (revealedCount === 3) {
+        document.getElementById('scratchFb').innerHTML = '🎉 Ανακάλυψες όλα τα κρυμμένα εικονίδια! Είσαι φοβερός ντετέκτιβ! 🕵️‍♂️⭐';
+      }
+    }
+  }
+
+  // Mission 8: Wheel
+  const wheelData = [
+    {
+      q: "Θέλεις να φτιάξεις μια ζωγραφιά για τη μαμά. Ποια εφαρμογή ανοίγεις;",
+      opts: ["Tux Paint (Ζωγραφική)", "Υπολογιστή τσέπης", "Φυλλομετρητή"],
+      ans: 0
+    },
+    {
+      q: "Πώς λέγονται τα προγράμματα του υπολογιστή με μία άλλη λέξη;",
+      opts: ["Καλώδια", "Λογισμικό (Software)", "Ποντίκια"],
+      ans: 1
+    },
+    {
+      q: "Όταν ο υπολογιστής έχει ΚΑΙ συσκευές (υλικό) ΚΑΙ εφαρμογές (λογισμικό), λέγεται:",
+      opts: ["Υπολογιστικό Σύστημα", "Μόνο τηλεόραση", "Μπλοκ ζωγραφικής"],
+      ans: 0
+    }
+  ];
+
+  function spinWheel() {
+    const qDiv = document.getElementById('wheelQuestion');
+    const optDiv = document.getElementById('wheelOptions');
+    const fb = document.getElementById('wheelFb');
+    fb.innerHTML = '';
+    optDiv.innerHTML = '';
+    qDiv.innerHTML = '🌀 Ο τροχός γυρίζει...';
+
+    setTimeout(() => {
+      const rand = Math.floor(Math.random() * wheelData.length);
+      const item = wheelData[rand];
+      qDiv.innerHTML = '🎯 ' + item.q;
+
+      item.opts.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-game';
+        btn.innerText = opt;
+        btn.onclick = function() {
+          if (idx === item.ans) {
+            btn.classList.add('good');
+            fb.innerHTML = '🌟 ΜΠΡΑΒΟ! Κέρδισες το Μεγάλο Χρυσό Έπαθλο της Πληροφορικής! 🏆🥇';
+          } else {
+            btn.classList.add('bad');
+            fb.innerHTML = '🤔 Δοκίμασε ξανά στον επόμενο γύρο!';
+          }
+        };
+        optDiv.appendChild(btn);
+      });
+    }, 700);
+  }
+</script>
+
+</body>
+</html>
