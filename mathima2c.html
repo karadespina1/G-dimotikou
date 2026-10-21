@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μάθημα 2: Αλήθεια ή ψέματα; - Πληροφορική Γ΄ Δημοτικού</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #eff6ff;
+      --accent: #f59e0b;
+      --success: #16a34a;
+      --success-light: #dcfce7;
+      --danger: #dc2626;
+      --danger-light: #fee2e2;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem;
+    }
+
+    .app-wrapper {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Textbook Header Style */
+    header.unit-header {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.25rem 1.75rem;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .unit-tag {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .lesson-title {
+      font-family: 'Comfortaa', cursive;
+      font-size: 1.8rem;
+      color: var(--text-main);
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .lesson-badge {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-family: 'Comfortaa', cursive;
+      font-size: 1.2rem;
+      font-weight: 800;
+      padding: 8px 16px;
+      border-radius: 14px;
+      border: 2px solid #bfdbfe;
+    }
+
+    .progress-bar-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .track {
+      width: 100%;
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 50px;
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #10b981);
+      width: 12.5%;
+      border-radius: 50px;
+      transition: width 0.4s ease;
+    }
+
+    /* Jump Navigator */
+    .jump-nav {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 4px 0;
+      scrollbar-width: thin;
+    }
+
+    .jump-btn {
+      flex: 1;
+      min-width: 42px;
+      padding: 6px 10px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: white;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .jump-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .jump-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .jump-btn.completed {
+      background: var(--success-light);
+      border-color: #86efac;
+      color: #15803d;
+    }
+
+    /* Main Activity Card */
+    main.activity-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.75rem;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      min-height: 480px;
+    }
+
+    .card-title-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .activity-icon-badge {
+      width: 44px;
+      height: 44px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      border: 1px solid #bfdbfe;
+    }
+
+    .card-title-text h1 {
+      font-family: 'Comfortaa', cursive;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .card-title-text p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Sub-level Indicator */
+    .level-pills-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f1f5f9;
+      padding: 6px 12px;
+      border-radius: 12px;
+      width: fit-content;
+    }
+
+    .level-pills-row span {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .lvl-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      transition: all 0.3s;
+    }
+
+    .lvl-dot.active {
+      background: var(--primary);
+      transform: scale(1.3);
+    }
+
+    .lvl-dot.done {
+      background: var(--success);
+    }
+
+    /* Content Stage Area */
+    .stage-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      flex: 1;
+    }
+
+    .task-instruction-box {
+      background: #f8fafc;
+      border-left: 4px solid var(--primary);
+      padding: 1rem 1.25rem;
+      border-radius: 0 12px 12px 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.5;
+    }
+
+    /* Interactive Grids */
+    .choices-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .choice-card {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .choice-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(37, 99, 235, 0.1);
+    }
+
+    .choice-card.correct {
+      border-color: var(--success) !important;
+      background: var(--success-light) !important;
+    }
+
+    .choice-card.wrong {
+      border-color: var(--danger) !important;
+      background: var(--danger-light) !important;
+    }
+
+    .avatar-frame {
+      width: 110px;
+      height: 110px;
+      background: #f8fafc;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #e2e8f0;
+      overflow: hidden;
+    }
+
+    .choice-name {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--text-main);
+    }
+
+    .choice-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* True / False Decision Block */
+    .tf-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1rem;
+      background: #f8fafc;
+      border: 2px solid var(--border);
+      border-radius: 16px;
+    }
+
+    .tf-portrait-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .tf-statement-bubble {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1rem 1.4rem;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+      max-width: 480px;
+      text-align: center;
+    }
+
+    .tf-actions {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .tf-btn {
+      flex: 1;
+      padding: 0.9rem;
+      border-radius: 14px;
+      border: 2px solid transparent;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 1.05rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-alitheia {
+      background: var(--success-light);
+      border-color: #86efac;
+      color: #166534;
+    }
+    .btn-alitheia:hover { background: #bbf7d0; transform: translateY(-2px); }
+
+    .btn-psemata {
+      background: var(--danger-light);
+      border-color: #fca5a5;
+      color: #991b1b;
+    }
+    .btn-psemata:hover { background: #fecaca; transform: translateY(-2px); }
+
+    /* Drag & Drop Sorting */
+    .drag-arena {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      width: 100%;
+    }
+
+    .draggable-card {
+      background: white;
+      border: 2px solid var(--primary);
+      border-radius: 14px;
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #1e293b;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.12);
+      cursor: grab;
+      text-align: center;
+      max-width: 520px;
+      user-select: none;
+    }
+    .draggable-card:active { cursor: grabbing; }
+
+    .drop-targets-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      width: 100%;
+    }
+
+    .drop-zone {
+      border: 2px dashed #94a3b8;
+      border-radius: 16px;
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #f8fafc;
+      text-align: center;
+    }
+
+    .drop-zone.zone-true { border-color: #86efac; background: #f0fdf4; }
+    .drop-zone.zone-true:hover { border-color: var(--success); background: #dcfce7; }
+
+    .drop-zone.zone-false { border-color: #fca5a5; background: #fef2f2; }
+    .drop-zone.zone-false:hover { border-color: var(--danger); background: #fee2e2; }
+
+    /* Canvas Match Connector */
+    .canvas-match-wrap {
+      position: relative;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      padding: 1rem 0;
+    }
+
+    #matchCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .match-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 2;
+    }
+
+    .match-node {
+      background: white;
+      border: 2px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+
+    .match-node:hover { border-color: var(--primary); background: #f8faff; }
+    .match-node.selected { border-color: var(--primary); background: var(--primary-light); }
+    .match-node.connected { border-color: var(--success); background: var(--success-light); color: #166534; cursor: default; }
+
+    /* Puzzle Sentence Block */
+    .sentence-puzzle-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      background: #f8fafc;
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      width: 100%;
+    }
+
+    .sentence-display {
+      font-size: 1.2rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .puzzle-blank {
+      border: 2px dashed var(--primary);
+      background: white;
+      border-radius: 10px;
+      padding: 6px 14px;
+      min-width: 120px;
+      text-align: center;
+      color: var(--primary);
+    }
+    .puzzle-blank.filled {
+      border-style: solid;
+      background: var(--primary-light);
+    }
+
+    .puzzle-tokens {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .puzzle-token {
+      background: white;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 8px 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .puzzle-token:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      background: #eff6ff;
+    }
+
+    /* Feedback & Auto-advance Bar */
+    .feedback-banner {
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      animation: popIn 0.3s ease;
+    }
+    .feedback-banner.show { display: flex; }
+    .feedback-banner.ok { background: var(--success-light); color: #166534; border: 1px solid #86efac; }
+    .feedback-banner.err { background: var(--danger-light); color: #991b1b; border: 1px solid #fca5a5; }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .auto-indicator {
+      font-size: 0.8rem;
+      background: rgba(0,0,0,0.06);
+      padding: 4px 8px;
+      border-radius: 20px;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-backdrop.show { display: flex; }
+
+    .modal-box {
+      background: white;
+      border-radius: 24px;
+      padding: 2.2rem;
+      max-width: 480px;
+      text-align: center;
+      border: 2px solid #bfdbfe;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    }
+    .modal-box h2 {
+      font-family: 'Comfortaa', cursive;
+      font-size: 1.8rem;
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+    }
+
+    .btn-modal {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 24px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 1.25rem;
+    }
+    .btn-modal:hover { background: var(--primary-dark); }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+      padding: 1rem 0;
+    }
+
+    @media (max-width: 640px) {
+      .header-top { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .canvas-match-wrap { grid-template-columns: 1fr; gap: 1.5rem; }
+      .drop-targets-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-wrapper">
+
+    <header class="unit-header">
+      <div class="header-top">
+        <div>
+          <div class="unit-tag">ΕΝΟΤΗΤΑ 1 · ΑΛΓΟΡΙΘΜΙΚΗ – ΠΡΟΓΡΑΜΜΑΤΙΣΜΟΣ – ΡΟΜΠΟΤΙΚΗ</div>
+          <div class="lesson-title">Αλήθεια ή ψέματα;</div>
+        </div>
+        <div class="lesson-badge">Μ2</div>
+      </div>
+
+      <div class="progress-bar-container">
+        <div class="progress-meta">
+          <span id="actProgressText">Δραστηριότητα 1 από 8</span>
+          <span id="starsCountText">⭐ 0 / 24</span>
+        </div>
+        <div class="track">
+          <div class="fill" id="progressBarFill"></div>
+        </div>
+      </div>
+
+      <div class="jump-nav" id="jumpNavTrack"></div>
+    </header>
+
+    <main class="activity-card">
+      <div class="card-title-row">
+        <div class="activity-icon-badge" id="actIconBadge">🔍</div>
+        <div class="card-title-text" style="flex: 1;">
+          <h1 id="actTitleHeading">Τίτλος Δραστηριότητας</h1>
+          <p id="actSubtitleHeading">Επίπεδο 1 από 3</p>
+        </div>
+        <div class="level-pills-row">
+          <span>ΕΠΙΠΕΔΟ</span>
+          <div class="lvl-dot active" id="dot1"></div>
+          <div class="lvl-dot" id="dot2"></div>
+          <div class="lvl-dot" id="dot3"></div>
+        </div>
+      </div>
+
+      <div class="stage-content">
+        <div class="task-instruction-box" id="taskInstructionBox"></div>
+
+        <div id="dynamicStageArea"></div>
+
+        <div class="feedback-banner" id="feedbackBanner">
+          <span id="feedbackMessage"></span>
+          <span class="auto-indicator" id="autoIndicator"></span>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      Πληροφορική Γ΄ Δημοτικού • Μάθημα 2: Αλήθεια ή ψέματα; • Εκπαιδευτικές δραστηριότητες με άμεση απόκριση
+    </footer>
+
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal-box">
+      <div style="font-size: 3.5rem; margin-bottom: 8px;">🎉🏆🌟</div>
+      <h2>Εξαιρετική Δουλειά!</h2>
+      <p style="font-size: 1.05rem; color: #475569;">
+        Ολοκλήρωσες και τα <strong>24 επίπεδα</strong> του 2ου μαθήματος!<br>
+        Κατανοείς απόλυτα πώς λειτουργούν οι λογικές εκφράσεις (Αλήθεια / Ψέματα) στον προγραμματισμό και στις αποφάσεις.
+      </p>
+      <button class="btn-modal" onclick="restartLesson()">Επανάληψη από την αρχή</button>
+    </div>
+  </div>
+
+  <script>
+    const svgDrawings = {
+      ypatia: `
+        <svg viewBox="0 0 100 110" width="90" height="90">
+          <circle cx="50" cy="50" r="46" fill="#ffedd5"/>
+          <ellipse cx="50" cy="98" rx="26" ry="18" fill="#ea580c"/>
+          <circle cx="50" cy="45" r="24" fill="#fed7aa"/>
+          <path d="M26,45 C26,20 74,20 74,45 C74,28 26,28 26,45 Z" fill="#78350f"/>
+          <path d="M24,46 C24,65 30,72 30,72" stroke="#78350f" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M76,46 C76,65 70,72 70,72" stroke="#78350f" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <circle cx="42" cy="46" r="8" stroke="#dc2626" stroke-width="3" fill="none"/>
+          <circle cx="58" cy="46" r="8" stroke="#dc2626" stroke-width="3" fill="none"/>
+          <line x1="50" y1="46" x2="50" y2="46" stroke="#dc2626" stroke-width="3"/>
+          <circle cx="42" cy="46" r="2.5" fill="#0f172a"/>
+          <circle cx="58" cy="46" r="2.5" fill="#0f172a"/>
+          <path d="M46,57 Q50,60 54,57" stroke="#b91c1c" stroke-width="2" fill="none"/>
+          <path d="M28,38 Q50,14 72,38" stroke="#334155" stroke-width="5" fill="none"/>
+          <rect x="23" y="34" width="7" height="15" rx="3" fill="#1e293b"/>
+          <rect x="70" y="34" width="7" height="15" rx="3" fill="#1e293b"/>
+        </svg>
+      `,
+      heron: `
+        <svg viewBox="0 0 100 110" width="90" height="90">
+          <circle cx="50" cy="50" r="46" fill="#e0f2fe"/>
+          <rect x="28" y="82" width="44" height="25" rx="6" fill="#0284c7"/>
+          <line x1="28" y1="90" x2="72" y2="90" stroke="white" stroke-width="3"/>
+          <line x1="28" y1="98" x2="72" y2="98" stroke="white" stroke-width="3"/>
+          <circle cx="50" cy="44" r="23" fill="#fde68a"/>
+          <path d="M27,38 Q33,12 50,15 Q67,12 73,38 Q58,24 50,28 Q42,24 27,38 Z" fill="#ea580c"/>
+          <circle cx="42" cy="44" r="2.5" fill="#0f172a"/>
+          <circle cx="58" cy="44" r="2.5" fill="#0f172a"/>
+          <path d="M44,53 Q50,57 56,53" stroke="#b45309" stroke-width="2" fill="none"/>
+        </svg>
+      `,
+      talos: `
+        <svg viewBox="0 0 100 110" width="90" height="90">
+          <circle cx="50" cy="50" r="46" fill="#fef3c7"/>
+          <rect x="30" y="70" width="40" height="30" rx="8" fill="#f59e0b" stroke="#b45309" stroke-width="3"/>
+          <circle cx="50" cy="85" r="6" fill="#fef08a" stroke="#b45309" stroke-width="2"/>
+          <rect x="34" y="30" width="32" height="30" rx="6" fill="#f59e0b" stroke="#b45309" stroke-width="3"/>
+          <circle cx="43" cy="43" r="4" fill="#38bdf8"/>
+          <circle cx="57" cy="43" r="4" fill="#38bdf8"/>
+          <line x1="42" y1="52" x2="58" y2="52" stroke="#b45309" stroke-width="2"/>
+          <line x1="50" y1="30" x2="50" y2="18" stroke="#b45309" stroke-width="3"/>
+          <circle cx="50" cy="16" r="4" fill="#ef4444"/>
+        </svg>
+      `,
+      stella: `
+        <svg viewBox="0 0 100 110" width="90" height="90">
+          <circle cx="50" cy="50" r="46" fill="#fef9c3"/>
+          <path d="M34,80 L66,80 L72,105 L28,105 Z" fill="#eab308"/>
+          <rect x="36" y="66" width="28" height="18" fill="white" rx="4"/>
+          <circle cx="50" cy="74" r="3" fill="#f59e0b"/>
+          <circle cx="50" cy="38" r="20" fill="#fed7aa"/>
+          <path d="M28,36 Q50,14 72,36 Q74,56 70,62 Q30,62 28,36 Z" fill="#0284c7"/>
+          <circle cx="44" cy="39" r="2.5" fill="#0f172a"/>
+          <circle cx="56" cy="39" r="2.5" fill="#0f172a"/>
+        </svg>
+      `,
+      anna: `
+        <svg viewBox="0 0 100 110" width="90" height="90">
+          <circle cx="50" cy="50" r="46" fill="#eff6ff"/>
+          <path d="M32,74 L68,74 L74,106 L26,106 Z" fill="#2563eb"/>
+          <circle cx="50" cy="40" r="20" fill="#fde68a"/>
+          <path d="M24,40 C18,12 82,12 76,40 C84,65 70,72 70,72 C70,72 30,72 30,72 C30,72 16,65 24,40 Z" fill="#ea580c"/>
+          <circle cx="43" cy="40" r="2.5" fill="#0f172a"/>
+          <circle cx="57" cy="40" r="2.5" fill="#0f172a"/>
+        </svg>
+      `,
+      ardit: `
+        <svg viewBox="0 0 100 110" width="90" height="90">
+          <circle cx="50" cy="50" r="46" fill="#f0fdf4"/>
+          <rect x="32" y="70" width="36" height="25" fill="#16a34a" rx="4"/>
+          <circle cx="50" cy="40" r="21" fill="#d97706"/>
+          <path d="M26,38 C26,16 74,16 74,38 C68,22 32,22 26,38 Z" fill="#1c1917"/>
+          <circle cx="43" cy="40" r="2.5" fill="#0f172a"/>
+          <circle cx="57" cy="40" r="2.5" fill="#0f172a"/>
+          <path d="M44,50 Q50,56 56,50" stroke="white" stroke-width="2.5" fill="none"/>
+        </svg>
+      `,
+      nikol: `
+        <svg viewBox="0 0 100 110" width="90" height="90">
+          <circle cx="50" cy="50" r="46" fill="#fef2f2"/>
+          <path d="M32,72 L68,72 L74,106 L26,106 Z" fill="#dc2626"/>
+          <circle cx="50" cy="40" r="20" fill="#b45309"/>
+          <circle cx="26" cy="25" r="9" fill="#1c1917"/>
+          <circle cx="74" cy="25" r="9" fill="#1c1917"/>
+          <path d="M28,36 C28,14 72,14 72,36 Z" fill="#1c1917"/>
+          <circle cx="43" cy="40" r="2.5" fill="#0f172a"/>
+          <circle cx="57" cy="40" r="2.5" fill="#0f172a"/>
+        </svg>
+      `,
+      giorgos: `
+        <svg viewBox="0 0 100 110" width="90" height="90">
+          <circle cx="50" cy="50" r="46" fill="#fdf4ff"/>
+          <rect x="32" y="70" width="36" height="24" fill="#9333ea" rx="4"/>
+          <rect x="36" y="94" width="12" height="14" fill="#78350f" rx="2"/>
+          <rect x="52" y="94" width="12" height="14" fill="#78350f" rx="2"/>
+          <circle cx="50" cy="40" r="20" fill="#fde68a"/>
+          <path d="M28,36 Q50,14 72,36 Q62,20 50,22 Q38,20 28,36 Z" fill="#dc2626"/>
+          <circle cx="43" cy="40" r="2.5" fill="#0f172a"/>
+          <circle cx="57" cy="40" r="2.5" fill="#0f172a"/>
+        </svg>
+      `,
+      hlias: `
+        <svg viewBox="0 0 100 110" width="90" height="90">
+          <circle cx="50" cy="50" r="46" fill="#f0f9ff"/>
+          <rect x="32" y="70" width="36" height="26" fill="#38bdf8" rx="4"/>
+          <path d="M32,70 L46,84 L32,96 Z" fill="#facc15"/>
+          <path d="M68,70 L54,84 L68,96 Z" fill="#facc15"/>
+          <circle cx="50" cy="40" r="20" fill="#fde68a"/>
+          <path d="M28,36 C28,14 72,14 72,36 Z" fill="#0f172a"/>
+          <circle cx="43" cy="40" r="2.5" fill="#0f172a"/>
+          <circle cx="57" cy="40" r="2.5" fill="#0f172a"/>
+        </svg>
+      `,
+      athina: `
+        <svg viewBox="0 0 100 110" width="90" height="90">
+          <circle cx="50" cy="50" r="46" fill="#f8fafc"/>
+          <path d="M30,64 L70,64 L76,106 L24,106 Z" fill="#e2e8f0"/>
+          <circle cx="50" cy="42" r="19" fill="#fed7aa"/>
+          <path d="M30,38 L70,38 L66,16 L34,16 Z" fill="#f59e0b"/>
+          <circle cx="24" cy="85" r="14" fill="#ca8a04" stroke="#854d0e" stroke-width="2"/>
+          <circle cx="78" cy="74" r="9" fill="#78350f"/>
+          <circle cx="75" cy="72" r="2.5" fill="#facc15"/>
+          <circle cx="81" cy="72" r="2.5" fill="#facc15"/>
+        </svg>
+      `,
+      zeus: `
+        <svg viewBox="0 0 100 110" width="90" height="90">
+          <circle cx="50" cy="50" r="46" fill="#faf5ff"/>
+          <path d="M30,64 L70,64 L76,106 L24,106 Z" fill="#7e22ce"/>
+          <circle cx="50" cy="40" r="19" fill="#fed7aa"/>
+          <path d="M28,36 C28,12 72,12 72,36 Z" fill="#e2e8f0"/>
+          <path d="M34,46 Q50,68 66,46 Z" fill="#cbd5e1"/>
+          <polygon points="78,38 86,52 81,55 90,70 75,56 80,53 72,40" fill="#facc15" stroke="#b45309" stroke-width="1.5"/>
+        </svg>
+      `,
+      poseidon: `
+        <svg viewBox="0 0 100 110" width="90" height="90">
+          <circle cx="50" cy="50" r="46" fill="#f0f9ff"/>
+          <path d="M30,64 L70,64 L76,106 L24,106 Z" fill="#0284c7"/>
+          <circle cx="50" cy="40" r="19" fill="#fed7aa"/>
+          <path d="M28,36 C28,12 72,12 72,36 Z" fill="#94a3b8"/>
+          <path d="M34,46 Q50,68 66,46 Z" fill="#94a3b8"/>
+          <line x1="82" y1="35" x2="82" y2="105" stroke="#d97706" stroke-width="3.5"/>
+          <path d="M74,38 L74,50 Q82,54 90,50 L90,38" stroke="#f59e0b" stroke-width="2.5" fill="none"/>
+          <line x1="82" y1="30" x2="82" y2="50" stroke="#f59e0b" stroke-width="2.5"/>
+        </svg>
+      `
+    };
+
+    const activitiesData = [
+      {
+        id: 1,
+        title: "Ήρωες του Βιβλίου (Υπατία & Ήρωνας)",
+        icon: "👦",
+        type: "cards-choice",
+        levels: [
+          {
+            prompt: "Κανόνας σελίδας 15: «Φοράει κόκκινα γυαλιά, έχει ακουστικά στον λαιμό και μπλε παντελόνι». Ποια είναι;",
+            targetId: "ypatia",
+            options: [
+              { id: 'ypatia', name: "Υπατία", desc: "Γυαλιά & ακουστικά", svg: svgDrawings.ypatia },
+              { id: 'heron', name: "Ήρωνας", desc: "Κόκκινα μαλλιά & ρίγες", svg: svgDrawings.heron },
+              { id: 'talos', name: "Τάλως", desc: "Χρυσό ρομπότ", svg: svgDrawings.talos }
+            ],
+            why: "Μπράβο! Είναι η Υπατία! Η πρόταση «Φοράει γυαλιά» είναι ΑΛΗΘΕΙΑ!"
+          },
+          {
+            prompt: "Πρόταση: «Έχει κόκκινα μαλλιά, μπλε ριγέ μπλούζα και καφέ παντελόνι». Ποιος είναι;",
+            targetId: "heron",
+            options: [
+              { id: 'heron', name: "Ήρωνας", desc: "Κόκκινα μαλλιά & ρίγες", svg: svgDrawings.heron },
+              { id: 'ypatia', name: "Υπατία", desc: "Γυαλιά & πορτοκαλί φούτερ", svg: svgDrawings.ypatia }
+            ],
+            why: "Σωστά! Η περιγραφή ταιριάζει απόλυτα στον Ήρωνα!"
+          },
+          {
+            prompt: "Πρόταση: «Είναι το πρώτο μυθικό ρομπότ που έφτιαξε ο θεός Ήφαιστος». Ποιος είναι;",
+            targetId: "talos",
+            options: [
+              { id: 'talos', name: "Τάλως", desc: "Μυθικό ανθρωπόμορφο ρομπότ", svg: svgDrawings.talos },
+              { id: 'heron', name: "Ήρωνας", desc: "Μαθητής", svg: svgDrawings.heron }
+            ],
+            why: "Εξαιρετικά! Ο Τάλως είναι το μυθικό χάλκινο ρομπότ!"
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Ταξινόμηση: Αλήθεια ή Ψέματα;",
+        icon: "⚖️",
+        type: "drag-sorting",
+        levels: [
+          {
+            prompt: "Έλεγξε την πρόταση για τον Ήρωνα: Σύρε την κάρτα ή κάνε κλικ στο σωστό πλαίσιο:",
+            statement: "«Ο Ήρωνας έχει κόκκινα μαλλιά!»",
+            isTrue: true,
+            why: "ΑΛΗΘΕΙΑ! Ο Ήρωνας έχει όντως κόκκινα μαλλιά!"
+          },
+          {
+            prompt: "Έλεγξε την πρόταση για την Υπατία:",
+            statement: "«Η Υπατία ΔΕΝ φοράει γυαλιά!»",
+            isTrue: false,
+            why: "ΨΕΜΑ! Η Υπατία φοράει κόκκινα γυαλιά, άρα η πρόταση είναι ψευδής!"
+          },
+          {
+            prompt: "Έλεγξε την πρόταση για τον Τάλω:",
+            statement: "«Ο Τάλως είναι ένα μυθικό ρομπότ.»",
+            isTrue: true,
+            why: "ΑΛΗΘΕΙΑ! Ο Τάλως κατασκευάστηκε από τον Ήφαιστο!"
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "Σύνδεση με Γραμμές (Αντιστοίχιση)",
+        icon: "🔗",
+        type: "line-match",
+        levels: [
+          {
+            prompt: "Σύνδεσε κάθε ήρωα με το χαρακτηριστικό που είναι ΑΛΗΘΕΙΑ:",
+            pairs: [
+              { leftId: 'yp', leftText: "Υπατία", rightId: 'yp-r', rightText: "Φοράει γυαλιά" },
+              { leftId: 'hr', leftText: "Ήρωνας", rightId: 'hr-r', rightText: "Κόκκινα μαλλιά" },
+              { leftId: 'tl', leftText: "Τάλως", rightId: 'tl-r', rightText: "Ρομπότ Ήφαιστου" }
+            ],
+            why: "Μπράβο! Όλες οι συνδέσεις είναι σωστές!"
+          },
+          {
+            prompt: "Σύνδεσε τα παιδιά της σελίδας 15 με τα ρούχα τους:",
+            pairs: [
+              { leftId: 'st', leftText: "Στέλλα", rightId: 'st-r', rightText: "Κίτρινη φούστα" },
+              { leftId: 'an', leftText: "Άννα", rightId: 'an-r', rightText: "Μπλε φόρεμα" },
+              { leftId: 'ar', leftText: "Αρντίτ", rightId: 'ar-r', rightText: "Πράσινη μπλούζα" }
+            ],
+            why: "Τέλεια! Αντιστοίχισες όλα τα παιδιά σωστά!"
+          },
+          {
+            prompt: "Σύνδεσε τους θεούς με τα σύμβολά τους (σελ. 17):",
+            pairs: [
+              { leftId: 'di', leftText: "Δίας", rightId: 'di-r', rightText: "Κεραυνός" },
+              { leftId: 'po', leftText: "Ποσειδώνας", rightId: 'po-r', rightText: "Τρίαινα" },
+              { leftId: 'at', leftText: "Αθηνά", rightId: 'at-r', rightText: "Κουκουβάγια" }
+            ],
+            why: "Εξαιρετικά! Γνωρίζεις άριστα τη μυθολογία!"
+          }
+        ]
+      },
+      {
+        id: 4,
+        title: "Παζλ Λογικών Προτάσεων",
+        icon: "🧩",
+        type: "sentence-puzzle",
+        levels: [
+          {
+            prompt: "Συμπλήρωσε το κενό του κανόνα (σελ. 16) κάνοντας κλικ στο σωστό κομμάτι:",
+            sentenceStart: "Αν φοράει μπλε φόρεμα, τότε είναι η",
+            missingCorrect: "Άννα",
+            tokens: ["Άννα", "Στέλλα", "Ήρωνας"],
+            why: "Σωστά! «Αν φοράει μπλε φόρεμα, τότε είναι η Άννα!»"
+          },
+          {
+            prompt: "Συμπλήρωσε τον κανόνα για τον Γιώργο:",
+            sentenceStart: "Αν έχει κόκκινα μαλλιά και φοράει κοντό παντελόνι, τότε είναι ο",
+            missingCorrect: "Γιώργος",
+            tokens: ["Γιώργος", "Ηλίας", "Αρντίτ"],
+            why: "Ακριβώς! «...τότε είναι ο Γιώργος!»"
+          },
+          {
+            prompt: "Συμπλήρωσε τον κανόνα για τη θεά της σοφίας:",
+            sentenceStart: "Αν έχει σύμβολο την κουκουβάγια, τότε είναι η",
+            missingCorrect: "Αθηνά",
+            tokens: ["Αθηνά", "Άρτεμις", "Ήρα"],
+            why: "Μπράβο! Το παζλ της απόφασης είναι σωστό!"
+          }
+        ]
+      },
+      {
+        id: 5,
+        title: "Τα 8 Παιδιά της Τάξης (Εικόνα)",
+        icon: "👧",
+        type: "cards-choice",
+        levels: [
+          {
+            prompt: "Σελίδα 16: «Έχει κόκκινα σγουρά μαλλιά και φοράει μπλε φόρεμα». Ποιο κορίτσι είναι;",
+            targetId: "anna",
+            options: [
+              { id: 'anna', name: "Άννα", desc: "Μπλε φόρεμα", svg: svgDrawings.anna },
+              { id: 'stella', name: "Στέλλα", desc: "Κίτρινη φούστα", svg: svgDrawings.stella },
+              { id: 'nikol', name: "Νικόλ", desc: "Κόκκινο φόρεμα", svg: svgDrawings.nikol }
+            ],
+            why: "Σωστά! Είναι η Άννα!"
+          },
+          {
+            prompt: "Πρόταση: «Φοράει πράσινη μπλούζα και πράσινο σορτσάκι». Ποιος είναι;",
+            targetId: "ardit",
+            options: [
+              { id: 'ardit', name: "Αρντίτ", desc: "Πράσινη εμφάνιση", svg: svgDrawings.ardit },
+              { id: 'giorgos', name: "Γιώργος", desc: "Μωβ μπλούζα", svg: svgDrawings.giorgos }
+            ],
+            why: "Μπράβο! Είναι ο Αρντίτ!"
+          },
+          {
+            prompt: "Πρόταση: «Φοράει γαλάζιο πουκάμισο, κίτρινο γιλέκο και καφέ μακρύ παντελόνι». Ποιος είναι;",
+            targetId: "hlias",
+            options: [
+              { id: 'hlias', name: "Ηλίας", desc: "Κίτρινο γιλέκο & πουκάμισο", svg: svgDrawings.hlias },
+              { id: 'ardit', name: "Αρντίτ", desc: "Πράσινη μπλούζα", svg: svgDrawings.ardit }
+            ],
+            why: "Εξαιρετικά! Είναι ο Ηλίας!"
+          }
+        ]
+      },
+      {
+        id: 6,
+        title: "Έλεγχος Άρνησης: Πρόσεξε το «ΔΕΝ»",
+        icon: "🚫",
+        type: "true-false-check",
+        levels: [
+          {
+            prompt: "Κοίτα τον Γιώργο (φοράει κοντό παντελονάκι). Αποφάσισε αν η πρόταση είναι Αλήθεια ή Ψέμα:",
+            personSvg: svgDrawings.giorgos,
+            personName: "Γιώργος",
+            statement: "«Ο Γιώργος ΔΕΝ φοράει κοντό παντελόνι!»",
+            isTrue: false,
+            why: "ΨΕΜΑ! Ο Γιώργος ΦΟΡΑΕΙ κοντό παντελόνι, άρα η άρνηση είναι ψευδής!"
+          },
+          {
+            prompt: "Κοίτα τη Νικόλ (φοράει κόκκινο φόρεμα):",
+            personSvg: svgDrawings.nikol,
+            personName: "Νικόλ",
+            statement: "«Η Νικόλ ΔΕΝ έχει κόκκινο φόρεμα!»",
+            isTrue: false,
+            why: "ΨΕΜΑ! Η Νικόλ έχει κόκκινο φόρεμα!"
+          },
+          {
+            prompt: "Κοίτα τη Στέλλα (φοράει κίτρινη φούστα):",
+            personSvg: svgDrawings.stella,
+            personName: "Στέλλα",
+            statement: "«Η Στέλλα ΔΕΝ φοράει παντελόνι!»",
+            isTrue: true,
+            why: "ΑΛΗΘΕΙΑ! Η Στέλλα φοράει φούστα, άρα είναι αλήθεια ότι δεν φοράει παντελόνι!"
+          }
+        ]
+      },
+      {
+        id: 7,
+        title: "Θεοί του Ολύμπου (Σύμβολα)",
+        icon: "🏛️",
+        type: "cards-choice",
+        levels: [
+          {
+            prompt: "Σελίδα 17: «Κρατάει την τρίαινα και είναι ο θεός της θάλασσας». Ποιος είναι;",
+            targetId: "poseidon",
+            options: [
+              { id: 'poseidon', name: "Ποσειδώνας", desc: "Θεός Θάλασσας & Τρίαινα", svg: svgDrawings.poseidon },
+              { id: 'zeus', name: "Δίας", desc: "Κεραυνός", svg: svgDrawings.zeus },
+              { id: 'athina', name: "Αθηνά", desc: "Κουκουβάγια", svg: svgDrawings.athina }
+            ],
+            why: "Μπράβο! Είναι ο Ποσειδώνας!"
+          },
+          {
+            prompt: "Πρόταση: «Είναι ο βασιλιάς των θεών και κρατάει τον κεραυνό». Ποιος είναι;",
+            targetId: "zeus",
+            options: [
+              { id: 'zeus', name: "Δίας", desc: "Βασιλιάς του Ολύμπου", svg: svgDrawings.zeus },
+              { id: 'poseidon', name: "Ποσειδώνας", desc: "Τρίαινα", svg: svgDrawings.poseidon }
+            ],
+            why: "Σωστά! Είναι ο Δίας!"
+          },
+          {
+            prompt: "Πρόταση: «Είναι η θεά της σοφίας με σύμβολο την κουκουβάγια και την ασπίδα». Ποια είναι;",
+            targetId: "athina",
+            options: [
+              { id: 'athina', name: "Αθηνά", desc: "Θεά της Σοφίας", svg: svgDrawings.athina },
+              { id: 'zeus', name: "Δίας", desc: "Κεραυνός", svg: svgDrawings.zeus }
+            ],
+            why: "Εξαιρετικά! Είναι η Αθηνά!"
+          }
+        ]
+      },
+      {
+        id: 8,
+        title: "Σύνθετος Ντετέκτιβ Λογικής",
+        icon: "🕵️",
+        type: "cards-choice",
+        levels: [
+          {
+            prompt: "Μυστήριο: «ΔΕΝ φοράει φόρεμα, έχει σκούρα μαλλιά και φοράει πράσινη μπλούζα». Ποιος είναι;",
+            targetId: "ardit",
+            options: [
+              { id: 'ardit', name: "Αρντίτ", desc: "Πράσινη μπλούζα", svg: svgDrawings.ardit },
+              { id: 'anna', name: "Άννα", desc: "Μπλε φόρεμα", svg: svgDrawings.anna },
+              { id: 'stella', name: "Στέλλα", desc: "Κίτρινη φούστα", svg: svgDrawings.stella }
+            ],
+            why: "Μπράβο! Είναι ο Αρντίτ!"
+          },
+          {
+            prompt: "Μυστήριο: «Φοράει κόκκινο φόρεμα και έχει σκούρα μαλλιά με δύο κοτσιδάκια». Ποια είναι;",
+            targetId: "nikol",
+            options: [
+              { id: 'nikol', name: "Νικόλ", desc: "Κόκκινο φόρεμα", svg: svgDrawings.nikol },
+              { id: 'anna', name: "Άννα", desc: "Μπλε φόρεμα", svg: svgDrawings.anna }
+            ],
+            why: "Σωστά! Είναι η Νικόλ!"
+          },
+          {
+            prompt: "Μυστήριο: «ΔΕΝ φοράει γυαλιά, έχει μαύρα μαλλιά και φοράει κίτρινο γιλέκο». Ποιος είναι;",
+            targetId: "hlias",
+            options: [
+              { id: 'hlias', name: "Ηλίας", desc: "Κίτρινο γιλέκο & πουκάμισο", svg: svgDrawings.hlias },
+              { id: 'heron', name: "Ήρωνας", desc: "Ριγέ μπλούζα", svg: svgDrawings.heron }
+            ],
+            why: "Συγχαρητήρια! Έλυσες όλα τα μυστήρια του Μαθήματος 2!"
+          }
+        ]
+      }
+    ];
+
+    let currentActIndex = 0;
+    let currentLvlIndex = 0;
+    let score = 0;
+    let isAdvancing = false;
+    let completedActs = new Set();
+    let solvedLevels = new Set();
+
+    let matchSelectedLeft = null;
+    let matchPairsConnected = [];
+
+    const jumpNavTrack = document.getElementById('jumpNavTrack');
+    const actProgressText = document.getElementById('actProgressText');
+    const starsCountText = document.getElementById('starsCountText');
+    const progressBarFill = document.getElementById('progressBarFill');
+    const actIconBadge = document.getElementById('actIconBadge');
+    const actTitleHeading = document.getElementById('actTitleHeading');
+    const actSubtitleHeading = document.getElementById('actSubtitleHeading');
+    const taskInstructionBox = document.getElementById('taskInstructionBox');
+    const dynamicStageArea = document.getElementById('dynamicStageArea');
+    const feedbackBanner = document.getElementById('feedbackBanner');
+    const feedbackMessage = document.getElementById('feedbackMessage');
+    const autoIndicator = document.getElementById('autoIndicator');
+    const modalBackdrop = document.getElementById('modalBackdrop');
+
+    function initNav() {
+      jumpNavTrack.innerHTML = "";
+      activitiesData.forEach((act, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "jump-btn" + (idx === currentActIndex ? " active" : "");
+        btn.id = "jumpBtn" + idx;
+        btn.innerText = `Δ${act.id}`;
+        btn.title = act.title;
+        btn.onclick = () => jumpToAct(idx);
+        jumpNavTrack.appendChild(btn);
+      });
+    }
+
+    function jumpToAct(idx) {
+      if (isAdvancing) return;
+      currentActIndex = idx;
+      currentLvlIndex = 0;
+      updateUI();
+    }
+
+    function updateUI() {
+      isAdvancing = false;
+      matchSelectedLeft = null;
+      matchPairsConnected = [];
+
+      const act = activitiesData[currentActIndex];
+      const lvl = act.levels[currentLvlIndex];
+
+      activitiesData.forEach((_, i) => {
+        const b = document.getElementById('jumpBtn' + i);
+        if (b) {
+          b.className = "jump-btn";
+          if (i === currentActIndex) b.classList.add("active");
+          if (completedActs.has(i)) b.classList.add("completed");
+        }
+      });
+
+      actProgressText.innerText = `Δραστηριότητα ${act.id} από 8: ${act.title}`;
+      starsCountText.innerText = `⭐ ${score} / 24`;
+      const overallLvl = (currentActIndex * 3) + currentLvlIndex + 1;
+      progressBarFill.style.width = `${(overallLvl / 24) * 100}%`;
+
+      actIconBadge.innerText = act.icon;
+      actTitleHeading.innerText = act.title;
+      actSubtitleHeading.innerText = `Επίπεδο ${currentLvlIndex + 1} από 3`;
+
+      for (let i = 1; i <= 3; i++) {
+        const dot = document.getElementById('dot' + i);
+        dot.className = 'lvl-dot';
+        if (i - 1 < currentLvlIndex) dot.classList.add('done');
+        else if (i - 1 === currentLvlIndex) dot.classList.add('active');
+      }
+
+      taskInstructionBox.innerHTML = lvl.prompt;
+      feedbackBanner.classList.remove('show', 'ok', 'err');
+      autoIndicator.innerText = "";
+
+      renderStageContent(act, lvl);
+    }
+
+    function renderStageContent(act, lvl) {
+      dynamicStageArea.innerHTML = "";
+
+      if (act.type === "cards-choice") {
+        renderCardsChoice(lvl);
+      } else if (act.type === "drag-sorting") {
+        renderDragSorting(lvl);
+      } else if (act.type === "line-match") {
+        renderLineMatch(lvl);
+      } else if (act.type === "sentence-puzzle") {
+        renderSentencePuzzle(lvl);
+      } else if (act.type === "true-false-check") {
+        renderTrueFalseCheck(lvl);
+      }
+    }
+
+    function renderCardsChoice(lvl) {
+      const grid = document.createElement('div');
+      grid.className = "choices-grid";
+
+      lvl.options.forEach(opt => {
+        const card = document.createElement('div');
+        card.className = "choice-card";
+        card.innerHTML = `
+          <div class="avatar-frame">${opt.svg}</div>
+          <div class="choice-name">${opt.name}</div>
+          <div class="choice-desc">${opt.desc}</div>
+        `;
+        card.onclick = () => {
+          if (isAdvancing) return;
+          if (opt.id === lvl.targetId) {
+            card.classList.add('correct');
+            handleSuccess(lvl.why);
+          } else {
+            card.classList.add('wrong');
+            showFeedback("❌ Παρατήρησε προσεκτικά τα ρούχα και τα χαρακτηριστικά!", false);
+            setTimeout(() => card.classList.remove('wrong'), 1000);
+          }
+        };
+        grid.appendChild(card);
+      });
+
+      dynamicStageArea.appendChild(grid);
+    }
+
+    function renderDragSorting(lvl) {
+      const arena = document.createElement('div');
+      arena.className = "drag-arena";
+
+      arena.innerHTML = `
+        <div class="draggable-card" id="dragItem" draggable="true">
+          ${lvl.statement}
+        </div>
+        <div class="drop-targets-row">
+          <div class="drop-zone zone-true" id="dropTrue" onclick="checkSorting(true, ${lvl.isTrue}, '${lvl.why}')">
+            <div style="font-size: 2.5rem;">✅</div>
+            <div style="font-size: 1.2rem; font-weight: 900; color: #166534;">ΑΛΗΘΕΙΑ</div>
+            <div style="font-size: 0.8rem; color: #15803d; font-weight: 700;">(Σύρε εδώ ή πάτησε)</div>
+          </div>
+          <div class="drop-zone zone-false" id="dropFalse" onclick="checkSorting(false, ${lvl.isTrue}, '${lvl.why}')">
+            <div style="font-size: 2.5rem;">❌</div>
+            <div style="font-size: 1.2rem; font-weight: 900; color: #991b1b;">ΨΕΜΑΤΑ</div>
+            <div style="font-size: 0.8rem; color: #b91c1c; font-weight: 700;">(Σύρε εδώ ή πάτησε)</div>
+          </div>
+        </div>
+      `;
+
+      dynamicStageArea.appendChild(arena);
+
+      const dragItem = document.getElementById('dragItem');
+      const dropTrue = document.getElementById('dropTrue');
+      const dropFalse = document.getElementById('dropFalse');
+
+      dragItem.ondragstart = (e) => e.dataTransfer.setData('text/plain', 'drag');
+
+      [dropTrue, dropFalse].forEach(zone => {
+        zone.ondragover = (e) => { e.preventDefault(); zone.style.transform = "scale(1.02)"; };
+        zone.ondragleave = () => { zone.style.transform = "scale(1)"; };
+      });
+
+      dropTrue.ondrop = (e) => {
+        e.preventDefault();
+        dropTrue.style.transform = "scale(1)";
+        checkSorting(true, lvl.isTrue, lvl.why);
+      };
+
+      dropFalse.ondrop = (e) => {
+        e.preventDefault();
+        dropFalse.style.transform = "scale(1)";
+        checkSorting(false, lvl.isTrue, lvl.why);
+      };
+    }
+
+    function checkSorting(chosen, isTrue, whyMsg) {
+      if (isAdvancing) return;
+      if (chosen === isTrue) {
+        handleSuccess(whyMsg);
+      } else {
+        showFeedback("❌ Σκέψου το ξανά! Εξέτασε αν ισχύει πραγματικά αυτό που λέει η πρόταση!", false);
+      }
+    }
+
+    function renderLineMatch(lvl) {
+      const wrap = document.createElement('div');
+      wrap.className = "canvas-match-wrap";
+      wrap.innerHTML = `<canvas id="matchCanvas"></canvas>`;
+
+      const colLeft = document.createElement('div');
+      colLeft.className = "match-col";
+
+      const colRight = document.createElement('div');
+      colRight.className = "match-col";
+
+      lvl.pairs.forEach(pair => {
+        const leftNode = document.createElement('div');
+        leftNode.className = "match-node";
+        leftNode.id = "left-" + pair.leftId;
+        leftNode.innerText = pair.leftText;
+        leftNode.onclick = () => selectLeftNode(pair.leftId, leftNode);
+        colLeft.appendChild(leftNode);
+
+        const rightNode = document.createElement('div');
+        rightNode.className = "match-node";
+        rightNode.id = "right-" + pair.rightId;
+        rightNode.innerText = pair.rightText;
+        rightNode.onclick = () => selectRightNode(pair.rightId, rightNode, lvl);
+        colRight.appendChild(rightNode);
+      });
+
+      wrap.appendChild(colLeft);
+      wrap.appendChild(colRight);
+      dynamicStageArea.appendChild(wrap);
+
+      setTimeout(resizeMatchCanvas, 60);
+    }
+
+    function resizeMatchCanvas() {
+      const canvas = document.getElementById('matchCanvas');
+      if (!canvas) return;
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+      drawCanvasLines();
+    }
+
+    window.addEventListener('resize', resizeMatchCanvas);
+
+    function selectLeftNode(id, el) {
+      if (isAdvancing || el.classList.contains('connected')) return;
+      document.querySelectorAll('.match-col:first-child .match-node').forEach(n => n.classList.remove('selected'));
+      el.classList.add('selected');
+      matchSelectedLeft = id;
+    }
+
+    function selectRightNode(rightId, el, lvl) {
+      if (isAdvancing || el.classList.contains('connected') || !matchSelectedLeft) return;
+
+      const expected = lvl.pairs.find(p => p.leftId === matchSelectedLeft);
+      if (expected && expected.rightId === rightId) {
+        const leftEl = document.getElementById("left-" + matchSelectedLeft);
+        leftEl.classList.remove('selected');
+        leftEl.classList.add('connected');
+        el.classList.add('connected');
+
+        matchPairsConnected.push({ leftEl, rightEl: el });
+        drawCanvasLines();
+        matchSelectedLeft = null;
+
+        if (matchPairsConnected.length === lvl.pairs.length) {
+          handleSuccess(lvl.why);
+        }
+      } else {
+        showFeedback("❌ Αυτό το ζευγάρι δεν ταιριάζει! Δοκίμασε ξανά!", false);
+      }
+    }
+
+    function drawCanvasLines() {
+      const canvas = document.getElementById('matchCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const wrapRect = canvas.parentElement.getBoundingClientRect();
+
+      matchPairsConnected.forEach(p => {
+        const r1 = p.leftEl.getBoundingClientRect();
+        const r2 = p.rightEl.getBoundingClientRect();
+
+        const x1 = r1.right - wrapRect.left;
+        const y1 = r1.top + r1.height / 2 - wrapRect.top;
+        const x2 = r2.left - wrapRect.left;
+        const y2 = r2.top + r2.height / 2 - wrapRect.top;
+
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.bezierCurveTo(x1 + 40, y1, x2 - 40, y2, x2, y2);
+        ctx.strokeStyle = "#16a34a";
+        ctx.lineWidth = 4;
+        ctx.lineCap = "round";
+        ctx.stroke();
+      });
+    }
+
+    function renderSentencePuzzle(lvl) {
+      const puzzleWrap = document.createElement('div');
+      puzzleWrap.className = "sentence-puzzle-wrap";
+
+      puzzleWrap.innerHTML = `
+        <div class="sentence-display">
+          <span>${lvl.sentenceStart}</span>
+          <div class="puzzle-blank" id="blankSlot">...</div>
+        </div>
+        <div style="font-size:0.85rem; font-weight:800; color:var(--text-muted);">Διάλεξε το σωστό κομμάτι:</div>
+        <div class="puzzle-tokens" id="tokensPool"></div>
+      `;
+
+      dynamicStageArea.appendChild(puzzleWrap);
+
+      const pool = document.getElementById('tokensPool');
+      const blank = document.getElementById('blankSlot');
+
+      lvl.tokens.forEach(tok => {
+        const t = document.createElement('div');
+        t.className = "puzzle-token";
+        t.innerText = tok;
+        t.onclick = () => {
+          if (isAdvancing) return;
+          blank.innerText = tok;
+          if (tok === lvl.missingCorrect) {
+            blank.classList.add('filled');
+            handleSuccess(lvl.why);
+          } else {
+            blank.classList.remove('filled');
+            showFeedback("❌ Αυτό το κομμάτι δεν ολοκληρώνει σωστά την πρόταση!", false);
+          }
+        };
+        pool.appendChild(t);
+      });
+    }
+
+    function renderTrueFalseCheck(lvl) {
+      const tfWrap = document.createElement('div');
+      tfWrap.className = "tf-container";
+
+      tfWrap.innerHTML = `
+        <div class="tf-portrait-wrap">
+          <div class="avatar-frame" style="width:110px; height:110px;">${lvl.personSvg}</div>
+          <div class="tf-statement-bubble">
+            <div style="font-size:0.8rem; color:var(--primary); font-weight:900; margin-bottom:4px;">ΠΡΟΣΩΠΟ: ${lvl.personName}</div>
+            ${lvl.statement}
+          </div>
+        </div>
+
+        <div class="tf-actions">
+          <button class="tf-btn btn-alitheia" onclick="checkTF(${lvl.isTrue}, true, '${lvl.why}')">
+            ✅ ΑΛΗΘΕΙΑ
+          </button>
+          <button class="tf-btn btn-psemata" onclick="checkTF(${lvl.isTrue}, false, '${lvl.why}')">
+            ❌ ΨΕΜΑΤΑ
+          </button>
+        </div>
+      `;
+
+      dynamicStageArea.appendChild(tfWrap);
+    }
+
+    function checkTF(expected, chosen, whyMsg) {
+      if (isAdvancing) return;
+      if (expected === chosen) {
+        handleSuccess(whyMsg);
+      } else {
+        showFeedback("❌ Πρόσεξε προσεκτικά αν υπάρχει η λέξη 'ΔΕΝ' και τι φοράει στην εικόνα!", false);
+      }
+    }
+
+    function handleSuccess(msg) {
+      const taskKey = `${currentActIndex}-${currentLvlIndex}`;
+      if (!solvedLevels.has(taskKey)) {
+        solvedLevels.add(taskKey);
+        score++;
+        starsCountText.innerText = `⭐ ${score} / 24`;
+      }
+      showFeedback("🌟 " + msg, true, true);
+      triggerAutoAdvance();
+    }
+
+    function showFeedback(text, isOk, hasTimer = false) {
+      feedbackBanner.className = "feedback-banner show " + (isOk ? "ok" : "err");
+      feedbackMessage.innerHTML = text;
+      if (!hasTimer) autoIndicator.innerText = "";
+    }
+
+    function triggerAutoAdvance() {
+      isAdvancing = true;
+      let left = 3;
+      autoIndicator.innerText = `Επόμενο σε ${left}... ⏳`;
+
+      const t = setInterval(() => {
+        left--;
+        if (left > 0) {
+          autoIndicator.innerText = `Επόμενο σε ${left}... ⏳`;
+        } else {
+          clearInterval(t);
+          advanceLevel();
+        }
+      }, 1000);
+    }
+
+    function advanceLevel() {
+      if (currentLvlIndex < 2) {
+        currentLvlIndex++;
+        updateUI();
+      } else {
+        completedActs.add(currentActIndex);
+        if (currentActIndex < activitiesData.length - 1) {
+          currentActIndex++;
+          currentLvlIndex = 0;
+          updateUI();
+        } else {
+          showModal();
+        }
+      }
+    }
+
+    function showModal() {
+      modalBackdrop.classList.add('show');
+    }
+
+    function restartLesson() {
+      modalBackdrop.classList.remove('show');
+      currentActIndex = 0;
+      currentLvlIndex = 0;
+      score = 0;
+      completedActs.clear();
+      solvedLevels.clear();
+      initNav();
+      updateUI();
+    }
+
+    initNav();
+    updateUI();
+  </script>
+</body>
+</html>
