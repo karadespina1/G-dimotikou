@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μάθημα 12: Η δικτύωση υπολογιστών και ψηφιακών συσκευών</title>
+  <style>
+    :root {
+      --primary: #0084FF;       /* Ζωηρό χαρούμενο μπλε */
+      --primary-dark: #0056B3;  /* Σκούρο μπλε */
+      --secondary: #00D2D3;     /* Φωτεινό τιρκουάζ/aqua */
+      --accent-yellow: #FFD32A; /* Χαρούμενο κίτρινο ήλιου */
+      --success: #10AC84;       /* Πράσινο επιτυχίας */
+      --danger: #FF4757;        /* Κόκκινο */
+      --bg: #EAF4FE;            /* Πολύ απαλό χαρούμενο γαλάζιο φόντο */
+      --card-bg: #FFFFFF;
+      --text: #1E272C;
+    }
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { margin: 0; background-color: var(--bg); color: var(--text); padding: 15px; }
+    
+    .header { text-align: center; margin-bottom: 20px; }
+    .header h1 { margin: 5px 0; color: var(--primary-dark); font-size: 1.8rem; }
+    .header p { margin: 0; color: #4B6584; font-size: 1.05rem; font-weight: 500; }
+    
+    .nav-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .nav-btn {
+      background: var(--card-bg);
+      border: 2px solid var(--primary);
+      border-radius: 20px;
+      padding: 8px 15px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-weight: bold;
+      color: var(--primary-dark);
+      transition: all 0.2s;
+      box-shadow: 0 2px 5px rgba(0,132,255,0.15);
+    }
+    .nav-btn.active {
+      background: linear-gradient(135deg, #0084FF, #00C6FF);
+      color: white;
+      border-color: #0084FF;
+      transform: scale(1.05);
+    }
+
+    .activity-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(0, 132, 255, 0.12);
+      padding: 22px;
+      min-height: 520px;
+      border: 3px solid #D6E8FB;
+    }
+    
+    .act-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #EBF3FC;
+      padding-bottom: 12px;
+      margin-bottom: 15px;
+    }
+    .act-title { font-size: 1.25rem; font-weight: bold; color: var(--primary); }
+    .level-badge { 
+      background: linear-gradient(135deg, #FFB142, #FF9F1A); 
+      color: white; 
+      padding: 5px 12px; 
+      border-radius: 15px; 
+      font-weight: bold; 
+      font-size: 0.9rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .instructions {
+      background: #E8F4FE;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      border-left: 5px solid var(--primary);
+      color: #1A365D;
+    }
+
+    .btn-action {
+      background: linear-gradient(135deg, #10AC84, #1DD1A1);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 22px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-block;
+      margin-top: 15px;
+      box-shadow: 0 3px 8px rgba(16, 172, 132, 0.25);
+      transition: all 0.2s;
+    }
+    .btn-action:hover { transform: translateY(-2px); opacity: 0.95; }
+    .feedback { margin-top: 15px; font-weight: bold; font-size: 1.1rem; min-height: 28px; }
+
+    /* Drag & Drop Styles */
+    .drag-items-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      min-height: 60px;
+      padding: 12px;
+      background: #F4F9FF;
+      border-radius: 12px;
+      border: 2px dashed #99C5FE;
+      margin-bottom: 20px;
+      justify-content: center;
+      align-items: center;
+    }
+    .draggable {
+      background: white;
+      border: 2px solid var(--primary);
+      border-radius: 10px;
+      padding: 9px 16px;
+      cursor: grab;
+      font-weight: bold;
+      color: var(--primary-dark);
+      user-select: none;
+      box-shadow: 0 3px 6px rgba(0, 132, 255, 0.15);
+      transition: transform 0.15s;
+    }
+    .draggable:active { cursor: grabbing; transform: scale(1.03); }
+
+    .net-canvas {
+      position: relative;
+      background: #F9FBFE;
+      border: 2px solid #D1E5FC;
+      border-radius: 12px;
+      padding: 20px;
+      min-height: 330px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .drop-zone {
+      min-width: 125px;
+      min-height: 48px;
+      border: 2px dashed #74B9FF;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      padding: 8px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: #636E72;
+    }
+    .drop-zone.filled {
+      border-style: solid;
+      border-color: var(--primary);
+      background: #E1F0FF;
+      color: var(--primary-dark);
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .option-card {
+      background: white;
+      border: 2px solid #D6E8FB;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(0, 132, 255, 0.05);
+    }
+    .option-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0, 132, 255, 0.15);
+    }
+
+    /* Activity 8 - Network Builder */
+    .creator-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+    .creator-controls select {
+      padding: 10px;
+      border: 2px solid #99C5FE;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: white;
+      color: var(--primary-dark);
+      font-weight: 500;
+    }
+    .creator-canvas-container {
+      position: relative;
+      width: 100%;
+      height: 420px;
+      border: 2px dashed #74B9FF;
+      border-radius: 14px;
+      background: #FFFFFF;
+      overflow: hidden;
+      touch-action: none;
+    }
+    .creator-svg-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .net-node {
+      position: absolute;
+      padding: 10px 18px;
+      border-radius: 12px;
+      cursor: move;
+      user-select: none;
+      font-weight: bold;
+      z-index: 2;
+      box-shadow: 0 4px 10px rgba(0, 132, 255, 0.16);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .net-node.type-device {
+      background: #E8F4FE;
+      border: 2px solid var(--primary);
+      color: var(--primary-dark);
+    }
+    .net-node.type-hub {
+      background: #FFF9E6;
+      border: 2px solid #FF9F1A;
+      color: #C26300;
+      border-radius: 25px;
+    }
+    .net-node.selected-for-link {
+      outline: 3px dashed var(--danger);
+    }
+    .del-node-btn {
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Μάθημα 12: Η δικτύωση υπολογιστών & ψηφιακών συσκευών</h1>
+    <p>Διαδραστικές Δραστηριότητες Πληροφορικής Γ' Δημοτικού</p>
+  </div>
+
+  <div class="nav-bar" id="navBar"></div>
+
+  <div class="activity-container" id="activityBox"></div>
+
+  <script>
+    let currentActivity = 0;
+    let activityLevel = [1, 1, 1, 1, 1, 1, 1, 1];
+
+    const activities = [
+      // 1. Ενσύρματη ή Ασύρματη Σύνδεση;
+      {
+        title: "1. Ενσύρματη ή Ασύρματη Σύνδεση;",
+        render: function(lvl) {
+          const questions = [
+            { caseText: "Στέλνω φωτογραφίες από το κινητό στο tablet χωρίς καθόλου καλώδιο (με Bluetooth).", correct: "Ασύρματη Σύνδεση" },
+            { caseText: "Στο εργαστήριο του σχολείου, όλοι οι υπολογιστές ενώνονται στο διαδίκτυο με μπλε καλώδιο δικτύου.", correct: "Ενσύρματη Σύνδεση" },
+            { caseText: "Συνδέω το laptop στο ίντερνετ μέσω Wi-Fi στο σαλόνι του σπιτιού μου.", correct: "Ασύρματη Σύνδεση" }
+          ];
+          const curr = questions[lvl - 1];
+
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Επίπεδο ${lvl}/3</span>
+            </div>
+            <div class="instructions">
+              Διάβασε την πρόταση και σκέψου: <strong>Γίνεται με καλώδιο (ενσύρματα) ή χωρίς καλώδιο (ασύρματα);</strong>
+            </div>
+            <p style="font-size:1.25rem; text-align:center; margin:35px 0; color:var(--primary-dark); font-weight:600;">
+              «${curr.caseText}»
+            </p>
+            <div class="options-grid">
+              <div class="option-card" onclick="checkAct1('Ενσύρματη Σύνδεση', '${curr.correct}', ${lvl})">
+                <h3 style="color:#0056B3; margin-bottom:5px;">🔌 Ενσύρματη Σύνδεση</h3>
+                <p style="color:#666; margin:0;">Σύνδεση με καλώδιο</p>
+              </div>
+              <div class="option-card" onclick="checkAct1('Ασύρματη Σύνδεση', '${curr.correct}', ${lvl})">
+                <h3 style="color:#0084FF; margin-bottom:5px;">📶 Ασύρματη Σύνδεση</h3>
+                <p style="color:#666; margin:0;">Σύνδεση χωρίς καλώδιο (Wi-Fi, Bluetooth)</p>
+              </div>
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 2. Τα Σήματα της Ασύρματης Τεχνολογίας
+      {
+        title: "2. Τα Σήματα των Δικτύων",
+        render: function(lvl) {
+          const signs = [
+            {
+              symbol: "📶 Wi-Fi",
+              desc: "Μας επιτρέπει να συνδεόμαστε ασύρματα στο διαδίκτυο στο σπίτι ή στο σχολείο.",
+              options: ["Wi-Fi", "Bluetooth", "Καλώδιο USB"],
+              correct: "Wi-Fi"
+            },
+            {
+              symbol: "ᛒ Bluetooth",
+              desc: "Ενώνει ασύρματα συσκευές σε κοντινή απόσταση (π.χ. κινητό με ασύρματα ακουστικά).",
+              options: ["Bluetooth", "5G", "Εκτυπωτής"],
+              correct: "Bluetooth"
+            },
+            {
+              symbol: "🚀 5G",
+              desc: "Ασύρματο δίκτυο 5ης γενιάς για πολύ γρήγορη σύνδεση στα κινητά τηλέφωνα.",
+              options: ["5G", "Wi-Fi", "Μνήμη Flash"],
+              correct: "5G"
+            }
+          ];
+          const curr = signs[lvl - 1];
+
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Επίπεδο ${lvl}/3</span>
+            </div>
+            <div class="instructions">
+              Αναγνώρισε το σήμα και τη χρήση της ασύρματης τεχνολογίας!
+            </div>
+            <div style="text-align:center; margin:25px 0;">
+              <span style="font-size:2.4rem; padding:12px 25px; background:#EAF4FE; border-radius:15px; border:2px solid #99C5FE; color:var(--primary-dark); font-weight:bold;">
+                ${curr.symbol}
+              </span>
+              <p style="font-size:1.1rem; color:#4B6584; margin-top:20px;"><em>${curr.desc}</em></p>
+            </div>
+            <div class="options-grid">
+              ${curr.options.map(opt => `
+                <div class="option-card" onclick="checkAct2('${opt}', '${curr.correct}',${lvl})">
+                  <h3 style="color:var(--primary-dark);">${opt}</h3>
+                </div>
+              `).join('')}
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 3. Drag & Drop: Στο Σχολικό Εργαστήριο (Hub/Διακλαδωτής)
+      {
+        title: "3. Στο Σχολικό Εργαστήριο",
+        render: function(lvl) {
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Επίπεδο ${lvl}/1</span>
+            </div>
+            <div class="instructions">
+              Στο εργαστήριο, για να συνδεθούν πολλοί υπολογιστές μεταξύ τους, χρειάζεται μία ειδική συσκευή διακλάδωσης (<strong>Hub</strong>). Σύρε τους υπολογιστές στις θύρες του Hub!
+            </div>
+            <div class="drag-items-pool" id="pool">
+              <div class="draggable" draggable="true" ondragstart="drag(event)" id="pc1">🖥️ Υπολογιστής 1</div>
+              <div class="draggable" draggable="true" ondragstart="drag(event)" id="pc2">🖥️ Υπολογιστής 2</div>
+              <div class="draggable" draggable="true" ondragstart="drag(event)" id="pc3">🖥️ Υπολογιστής 3</div>
+            </div>
+            <div class="net-canvas">
+              <div style="display:flex; justify-content:space-around; width:100%; margin-bottom:20px;">
+                <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)">[ Θύρα 1 ]</div>
+                <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)">[ Θύρα 2 ]</div>
+                <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)">[ Θύρα 3 ]</div>
+              </div>
+              <div style="font-size:20px; color:var(--primary); font-weight:bold;">⬇️ Ενσύρματη Σύνδεση με Καλώδια ⬇️</div>
+              <div class="drop-zone filled" style="background:#FFF9E6; border-color:#FF9F1A; color:#C26300; font-size:1.1rem; margin-top:15px;">
+                🔀 Συσκευή Διακλαδωτή (Hub)
+              </div>
+            </div>
+            <button class="btn-action" onclick="checkAct3()">Έλεγχος Εργαστηρίου</button>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 4. Drag & Drop: Ασύρματο Δίκτυο στο Σπίτι
+      {
+        title: "4. Ασύρματο Δίκτυο στο Σπίτι",
+        render: function(lvl) {
+          const poolItems = lvl === 1 
+            ? ["📱 Κινητό Τηλέφωνο", "💻 Φορητός (Laptop)", "🍕 Πίτσα"]
+            : ["📱 Tablet", "🖨️ Ασύρματος Εκτυπωτής", "⚽ Μπάλα"];
+          const validItems = lvl === 1 
+            ? ["📱 Κινητό Τηλέφωνο", "💻 Φορητός (Laptop)"]
+            : ["📱 Tablet", "🖨️ Ασύρματος Εκτυπωτής"];
+
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Επίπεδο ${lvl}/2</span>
+            </div>
+            <div class="instructions">
+              Στο σπίτι, το Wi-Fi Router συνδέει ασύρματα τις ψηφιακές συσκευές. Σύρε στο δίκτυο <strong>μόνο τις συσκευές</strong> που μπορούν να συνδεθούν (προσοχή στον εισβολέα)!
+            </div>
+            <div class="drag-items-pool" id="pool">
+              ${poolItems.map((item, i) => `
+                <div class="draggable" draggable="true" ondragstart="drag(event)" id="homenet-${i}">${item}</div>
+              `).join('')}
+            </div>
+            <div class="net-canvas">
+              <div class="drop-zone filled" style="background:#E1F0FF; color:var(--primary-dark); font-size:1.1rem; margin-bottom:20px;">
+                📶 Ασύρματος Δρομολογητής (Wi-Fi Router)
+              </div>
+              <div style="display:flex; justify-content:space-around; width:100%; gap:15px;">
+                <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)">[ Ασύρματη Συσκευή 1 ]</div>
+                <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)">[ Ασύρματη Συσκευή 2 ]</div>
+              </div>
+            </div>
+            <button class="btn-action" onclick="checkAct4(${lvl}, ${JSON.stringify(validItems).replace(/"/g, '&quot;')})">Έλεγχος Σύνδεσης</button>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 5. Τα Οφέλη του Δικτύου
+      {
+        title: "5. Τι Κερδίζουμε από το Δίκτυο;",
+        render: function(lvl) {
+          const benefits = [
+            {
+              situation: "Ο Ήρωνας βρίσκεται στο δωμάτιό του και θέλει να τυπώσει μια ζωγραφιά στον εκτυπωτή που είναι στο σαλόνι.",
+              q: "Μπορεί να το κάνει χάρη στο δίκτυο;",
+              options: ["Ναι! Μπορεί να εκτυπώσει από απόσταση!", "Όχι, πρέπει να μεταφέρει τον υπολογιστή δίπλα."],
+              correct: "Ναι! Μπορεί να εκτυπώσει από απόσταση!"
+            },
+            {
+              situation: "Η Υπατία θέλει να στείλει ένα αρχείο με φωτογραφίες στον συμμαθητή της που είναι σε άλλο δωμάτιο.",
+              q: "Πώς βοηθάει το δίκτυο;",
+              options: ["Ανταλλάσσουμε αρχεία εύκολα και γρήγορα!", "Δεν γίνεται, πρέπει να το ζωγραφίσει ξανά."],
+              correct: "Ανταλλάσσουμε αρχεία εύκολα και γρήγορα!"
+            },
+            {
+              situation: "Θέλουμε να παίξουμε μουσική από το κινητό σε ένα ηχείο στο διπλανό δωμάτιο.",
+              q: "Τι προσφέρει το δίκτυο εδώ;",
+              options: ["Αναπαραγωγή μουσικής από απόσταση!", "Δεν προσφέρει τίποτα."],
+              correct: "Αναπαραγωγή μουσικής από απόσταση!"
+            }
+          ];
+          const curr = benefits[lvl - 1];
+
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Επίπεδο ${lvl}/3</span>
+            </div>
+            <div class="instructions">
+              Τα δίκτυα είναι σαν μια «μαγική γέφυρα» ανάμεσα στις συσκευές! Διάβασε την ιστορία και διάλεξε το σωστό όφελος.
+            </div>
+            <div style="background:#EAF4FE; border-left:4px solid var(--primary); padding:15px; border-radius:8px; margin:20px 0;">
+              <p style="font-size:1.15rem; margin:0; color:#1A365D;">${curr.situation}</p>
+            </div>
+            <p style="font-size:1.2rem; font-weight:600; color:var(--primary-dark);">${curr.q}</p>
+            <div class="options-grid">
+              ${curr.options.map(opt => `
+                <div class="option-card" onclick="checkAct5('${opt}', '${curr.correct}',${lvl})">
+                  <h3 style="color:var(--primary-dark);">${opt}</h3>
+                </div>
+              `).join('')}
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 6. Σωστό ή Λάθος στο Δίκτυο;
+      {
+        title: "6. Σωστό ή Λάθος στο Δίκτυο;",
+        render: function(lvl) {
+          const quiz = [
+            {
+              text: "«Τα δίκτυα υπολογιστών επιτρέπουν στις ψηφιακές συσκευές να επικοινωνούν μεταξύ τους.»",
+              ans: true,
+              hint: "Σωστά! Αυτός είναι ο βασικός σκοπός ενός δικτύου."
+            },
+            {
+              text: "«Τα δίκτυα μάς επιτρέπουν να μοιραζόμαστε ΜΟΝΟ μουσική και τίποτα άλλο με τους φίλους μας.»",
+              ans: false,
+              hint: "Λάθος! Μοιραζόμαστε κείμενα, εικόνες, βίντεο, μηνύματα και παιχνίδια!"
+            },
+            {
+              text: "«Ένας εκτυπωτής μπορεί να συνδεθεί σε δίκτυο ώστε να τυπώνουν πολλοί υπολογιστές μαζί.»",
+              ans: true,
+              hint: "Σωστά! Έτσι όλοι στο σπίτι ή στο σχολείο μοιράζονται έναν εκτυπωτή."
+            }
+          ];
+          const curr = quiz[lvl - 1];
+
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Επίπεδο ${lvl}/3</span>
+            </div>
+            <div class="instructions">
+              Διάβασε την πρόταση από το βιβλίο της Πληροφορικής και αποφάσισε αν είναι Σωστή ή Λάθος!
+            </div>
+            <p style="font-size:1.3rem; text-align:center; margin:35px 0; color:#0A3D62; font-weight:600;">
+              ${curr.text}
+            </p>
+            <div class="options-grid">
+              <div class="option-card" onclick="checkAct6(true, ${curr.ans}, '${curr.hint}', ${lvl})">
+                <h3 style="color:var(--success);">✅ ΣΩΣΤΟ</h3>
+              </div>
+              <div class="option-card" onclick="checkAct6(false, ${curr.ans}, '${curr.hint}', ${lvl})">
+                <h3 style="color:var(--danger);">❌ ΛΑΘΟΣ</h3>
+              </div>
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 7. Βρες τον «Εισβολέα» του Δικτύου
+      {
+        title: "7. Βρες τον «Εισβολέα» του Δικτύου",
+        render: function(lvl) {
+          const sets = [
+            {
+              title: "Τρόποι ασύρματης σύνδεσης συσκευών:",
+              items: ["Wi-Fi", "Bluetooth", "Καλώδιο Ρεύματος", "5G"],
+              wrong: "Καλώδιο Ρεύματος"
+            },
+            {
+              title: "Συσκευές που συνδέονται συχνά σε δίκτυο:",
+              items: ["Υπολογιστής", "Έξυπνο Κινητό", "Ξύλινη Καρέκλα", "Εκτυπωτής"],
+              wrong: "Ξύλινη Καρέκλα"
+            },
+            {
+              title: "Οφέλη από ένα δίκτυο:",
+              items: ["Επικοινωνία με φίλους", "Μοίρασμα αρχείων", "Καθάρισμα δωματίου", "Εκτύπωση από απόσταση"],
+              wrong: "Καθάρισμα δωματίου"
+            }
+          ];
+          const curr = sets[lvl - 1];
+
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Επίπεδο ${lvl}/3</span>
+            </div>
+            <div class="instructions">
+              Μία από τις επιλογές είναι «εισβολέας» και δεν έχει καμία σχέση με το δίκτυο. Κάνε κλικ στον εισβολέα!
+            </div>
+            <h3 style="text-align:center; color:var(--primary); margin:20px 0;">${curr.title}</h3>
+            <div class="options-grid">
+              ${curr.items.map(it => `
+                <div class="option-card" onclick="checkAct7('${it}', '${curr.wrong}',${lvl})">
+                  <h3 style="color:var(--primary-dark);">${it}</h3>
+                </div>
+              `).join('')}
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 8. Διαδραστικός Κατασκευαστής Δικτύου (Network Builder)
+      {
+        title: "8. Φτιάξε το Δικό σου Δίκτυο!",
+        render: function() {
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Εργαστήριο Δικτύων</span>
+            </div>
+            <div class="instructions">
+              1. Διάλεξε συσκευή και πάτησε <strong>«+ Προσθήκη»</strong>.<br>
+              2. <strong>Σύρε με το ποντίκι ή το δάχτυλο</strong> τις συσκευές όπου θέλεις μέσα στον χώρο.<br>
+              3. Επίλεξε είδος σύνδεσης (Καλώδιο ή Wi-Fi) και κάνε κλικ σε 2 συσκευές στη σειρά για να τις συνδέσεις!
+            </div>
+            <div class="creator-controls">
+              <select id="devType">
+                <option value="💻 Laptop">💻 Laptop</option>
+                <option value="🖥️ PC Γραφείου">🖥️ PC Γραφείου</option>
+                <option value="📱 Tablet">📱 Tablet</option>
+                <option value="📱 Κινητό">📱 Κινητό</option>
+                <option value="🖨️ Εκτυπωτής">🖨️ Εκτυπωτής</option>
+                <option value="📶 Wi-Fi Router">📶 Wi-Fi Router</option>
+                <option value="🔀 Hub (Διακλαδωτής)">🔀 Hub (Διακλαδωτής)</option>
+              </select>
+              <select id="connType">
+                <option value="cable">🔌 Σύνδεση με Καλώδιο (Συνεχής γραμμή)</option>
+                <option value="wifi">📶 Σύνδεση με Wi-Fi (Διακεκομμένη γραμμή)</option>
+              </select>
+              <button class="btn-action" style="margin-top:0;" onclick="createDeviceNode()">+ Προσθήκη</button>
+              <button class="btn-action" style="margin-top:0; background:#FF4757;" onclick="resetNetCanvas()">Καθαρισμός</button>
+            </div>
+            <div class="creator-canvas-container" id="netContainer">
+              <svg class="creator-svg-layer" id="netSvg"></svg>
+            </div>
+            <div class="feedback" id="fb8" style="color:var(--primary); font-size:0.95rem;">
+              💡 Συμβουλή: Σύρε τις συσκευές και ένωσέ τες στο δίκτυο!
+            </div>
+          `;
+        }
+      }
+    ];
+
+    function initNav() {
+      const nav = document.getElementById('navBar');
+      nav.innerHTML = activities.map((act, i) => `
+        <button class="nav-btn ${i === currentActivity ? 'active' : ''}" onclick="goToAct(${i})">
+          Δραστηριότητα ${i + 1}
+        </button>
+      `).join('');
+    }
+
+    function goToAct(i) {
+      currentActivity = i;
+      initNav();
+      renderCurrent();
+    }
+
+    function renderCurrent() {
+      const box = document.getElementById('activityBox');
+      box.innerHTML = activities[currentActivity].render(activityLevel[currentActivity]);
+      if (currentActivity === 7) {
+        initBuilderDefaults();
+      }
+    }
+
+    // Handlers
+    function checkAct1(choice, correct, lvl) {
+      const fb = document.getElementById('fb');
+      if (choice === correct) {
+        fb.innerHTML = "<span style='color:var(--success)'>🎉 Μπράβο! Το βρήκες αμέσως!</span>";
+        setTimeout(() => {
+          if (lvl < 3) { activityLevel[0]++; renderCurrent(); }
+          else { fb.innerHTML = "<span style='color:var(--success)'>🏆 Συγχαρητήρια! Ξεχωρίζεις άριστα τα καλώδια από τα ασύρματα!</span>"; }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Ξανασκέψου το: Υπάρχει καλώδιο ανάμεσα στις συσκευές ή όχι;</span>";
+      }
+    }
+
+    function checkAct2(choice, correct, lvl) {
+      const fb = document.getElementById('fb');
+      if (choice === correct) {
+        fb.innerHTML = "<span style='color:var(--success)'>✨ Εξαιρετικά! Γνωρίζεις τέλεια τα σήματα του δικτύου!</span>";
+        setTimeout(() => {
+          if (lvl < 3) { activityLevel[1]++; renderCurrent(); }
+          else { fb.innerHTML = "<span style='color:var(--success)'>🏆 Ολοκλήρωσες όλα τα επίπεδα σημάτων!</span>"; }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Αυτό δεν είναι το σωστό σήμα. Δοκίμασε ξανά!</span>";
+      }
+    }
+
+    // Drag & drop standard
+    function allowDrop(e) { e.preventDefault(); }
+    function drag(e) { e.dataTransfer.setData("text", e.target.id); }
+    function drop(e) {
+      e.preventDefault();
+      const id = e.dataTransfer.getData("text");
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (e.target.classList.contains('drop-zone')) {
+        e.target.innerText = el.innerText;
+        e.target.setAttribute('data-val', el.innerText);
+        e.target.classList.add('filled');
+        el.style.display = 'none';
+      }
+    }
+
+    function checkAct3() {
+      const zones = document.querySelectorAll('.net-canvas .drop-zone:not([style*="background"])');
+      let filled = 0;
+      zones.forEach(z => { if (z.getAttribute('data-val')) filled++; });
+      const fb = document.getElementById('fb');
+      if (filled === 3) {
+        fb.innerHTML = "<span style='color:var(--success)'>🎉 Τέλεια! Όλοι οι υπολογιστές συνδέθηκαν στο Hub με καλώδιο!</span>";
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>⚠️ Σύρε και τους 3 υπολογιστές στις θύρες του διακλαδωτή.</span>";
+      }
+    }
+
+    function checkAct4(lvl, validList) {
+      const zones = document.querySelectorAll('.net-canvas .drop-zone:not([style*="background"])');
+      let filled = 0, ok = true;
+      zones.forEach(z => {
+        const val = z.getAttribute('data-val');
+        if (val) {
+          filled++;
+          if (!validList.includes(val)) ok = false;
+        }
+      });
+      const fb = document.getElementById('fb');
+      if (filled === validList.length && ok) {
+        fb.innerHTML = "<span style='color:var(--success)'>📶 Μπράβο! Όλες οι συσκευές συνδέθηκαν στο Wi-Fi με επιτυχία!</span>";
+        setTimeout(() => {
+          if (lvl < 2) { activityLevel[3]++; renderCurrent(); }
+          else { fb.innerHTML = "<span style='color:var(--success)'>🏆 Συγχαρητήρια! Έφτιαξες το τέλειο οικιακό δίκτυο!</span>"; }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Έλεγξε ξανά: Έβαλες μόνο ψηφιακές συσκευές ή μήπως και τον εισβολέα;</span>";
+      }
+    }
+
+    function checkAct5(choice, correct, lvl) {
+      const fb = document.getElementById('fb');
+      if (choice === correct) {
+        fb.innerHTML = "<span style='color:var(--success)'>🎉 Ακριβώς! Αυτό είναι ένα μεγάλο όφελος της δικτύωσης!</span>";
+        setTimeout(() => {
+          if (lvl < 3) { activityLevel[4]++; renderCurrent(); }
+          else { fb.innerHTML = "<span style='color:var(--success)'>🏆 Μπράβο! Έμαθες όλα τα πλεονεκτήματα του δικτύου!</span>"; }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Ξανασκέψου το: Πώς μπορεί το δίκτυο να μας λύσει τα χέρια;</span>";
+      }
+    }
+
+    function checkAct6(choice, actual, hint, lvl) {
+      const fb = document.getElementById('fb');
+      if (choice === actual) {
+        fb.innerHTML = `<span style='color:var(--success)'>🎉 Σωστά απάντησες! ${hint}</span>`;
+        setTimeout(() => {
+          if (lvl < 3) { activityLevel[5]++; renderCurrent(); }
+          else { fb.innerHTML = "<span style='color:var(--success)'>🏆 Είσαι αστέρι στα δίκτυα υπολογιστών!</span>"; }
+        }, 1400);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Πρόσεξε καλύτερα τις λέξεις της πρότασης!</span>";
+      }
+    }
+
+    function checkAct7(selected, wrong, lvl) {
+      const fb = document.getElementById('fb');
+      if (selected === wrong) {
+        fb.innerHTML = "<span style='color:var(--success)'>🕵️ Μπράβο! Βρήκες τον εισβολέα που δεν ανήκει στο δίκτυο!</span>";
+        setTimeout(() => {
+          if (lvl < 3) { activityLevel[6]++; renderCurrent(); }
+          else { fb.innerHTML = "<span style='color:var(--success)'>🏆 Τέλεια παρατηρητικότητα!</span>"; }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Αυτό σχετίζεται με τα δίκτυα. Ψάξε εκείνο που δεν ταιριάζει!</span>";
+      }
+    }
+
+    // ==========================================
+    // NETWORK BUILDER ENGINE (Δραστηριότητα 8)
+    // ==========================================
+    let netDevices = [];
+    let netLinks = [];
+    let linkFirstDev = null;
+
+    function initBuilderDefaults() {
+      netDevices = [];
+      netLinks = [];
+      linkFirstDev = null;
+      spawnDevNode("📶 Wi-Fi Router", "hub", 260, 40);
+      spawnDevNode("💻 Laptop", "device", 80, 190);
+      spawnDevNode("📱 Tablet", "device", 440, 190);
+      netLinks.push({ from: netDevices[0].id, to: netDevices[1].id, type: "wifi" });
+      netLinks.push({ from: netDevices[0].id, to: netDevices[2].id, type: "wifi" });
+      updateNetSvg();
+    }
+
+    function createDeviceNode() {
+      const name = document.getElementById('devType').value;
+      const type = (name.includes("Hub") || name.includes("Router")) ? "hub" : "device";
+      const x = 50 + Math.random() * 140;
+      const y = 60 + Math.random() * 140;
+      spawnDevNode(name, type, x, y);
+      updateNetSvg();
+    }
+
+    function spawnDevNode(name, type, x, y) {
+      const container = document.getElementById('netContainer');
+      const id = 'dev_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+
+      const node = document.createElement('div');
+      node.className = `net-node type-${type}`;
+      node.id = id;
+      node.style.left = `${x}px`;
+      node.style.top = `${y}px`;
+
+      const span = document.createElement('span');
+      span.innerText = name;
+      node.appendChild(span);
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'del-node-btn';
+      delBtn.innerHTML = '&times;';
+      delBtn.title = 'Διαγραφή';
+      delBtn.onclick = (e) => {
+        e.stopPropagation();
+        deleteDevNode(id);
+      };
+      node.appendChild(delBtn);
+
+      node.onclick = (e) => {
+        if (e.target.classList.contains('del-node-btn')) return;
+        handleDevLink(id);
+      };
+
+      container.appendChild(node);
+      netDevices.push({ id, el: node });
+
+      enableUnifiedDrag(node, updateNetSvg);
+    }
+
+    function deleteDevNode(id) {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+      netDevices = netDevices.filter(d => d.id !== id);
+      netLinks = netLinks.filter(l => l.from !== id && l.to !== id);
+      if (linkFirstDev === id) linkFirstDev = null;
+      updateNetSvg();
+    }
+
+    function resetNetCanvas() {
+      const container = document.getElementById('netContainer');
+      container.querySelectorAll('.net-node').forEach(n => n.remove());
+      netDevices = [];
+      netLinks = [];
+      linkFirstDev = null;
+      updateNetSvg();
+    }
+
+    function handleDevLink(id) {
+      const fb = document.getElementById('fb8');
+      const connType = document.getElementById('connType').value;
+
+      if (!linkFirstDev) {
+        linkFirstDev = id;
+        document.getElementById(id).classList.add('selected-for-link');
+        fb.innerText = "👉 Τώρα κάνε κλικ στη δεύτερη συσκευή για να τις συνδέσεις!";
+      } else if (linkFirstDev === id) {
+        document.getElementById(id).classList.remove('selected-for-link');
+        linkFirstDev = null;
+        fb.innerText = "💡 Συμβουλή: Σύρε τις συσκευές και ένωσέ τες στο δίκτυο!";
+      } else {
+        const from = linkFirstDev;
+        const to = id;
+        document.getElementById(from).classList.remove('selected-for-link');
+        linkFirstDev = null;
+
+        const exists = netLinks.some(l => (l.from === from && l.to === to) || (l.from === to && l.to === from));
+        if (!exists) {
+          netLinks.push({ from, to, type: connType });
+          updateNetSvg();
+          fb.innerText = connType === 'cable' ? "🔌 Σύνδεση με Καλώδιο επιτυχής!" : "📶 Ασύρματη Σύνδεση Wi-Fi επιτυχής!";
+        } else {
+          fb.innerText = "⚠️ Οι συσκευές αυτές είναι ήδη συνδεδεμένες!";
+        }
+      }
+    }
+
+    function updateNetSvg() {
+      const svg = document.getElementById('netSvg');
+      if (!svg) return;
+      svg.innerHTML = '';
+
+      netLinks.forEach(lnk => {
+        const el1 = document.getElementById(lnk.from);
+        const el2 = document.getElementById(lnk.to);
+        if (!el1 || !el2) return;
+
+        const x1 = el1.offsetLeft + el1.offsetWidth / 2;
+        const y1 = el1.offsetTop + el1.offsetHeight / 2;
+        const x2 = el2.offsetLeft + el2.offsetWidth / 2;
+        const y2 = el2.offsetTop + el2.offsetHeight / 2;
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+
+        if (lnk.type === 'cable') {
+          line.setAttribute("stroke", "#0084FF");
+          line.setAttribute("stroke-width", "4");
+        } else {
+          line.setAttribute("stroke", "#00D2D3");
+          line.setAttribute("stroke-width", "3");
+          line.setAttribute("stroke-dasharray", "6,6");
+        }
+        svg.appendChild(line);
+      });
+    }
+
+    function enableUnifiedDrag(elmnt, onMoveCallback) {
+      let startX = 0, startY = 0, initialLeft = 0, initialTop = 0;
+      let isDragging = false;
+
+      elmnt.addEventListener('mousedown', dragStart);
+      elmnt.addEventListener('touchstart', dragStart, { passive: false });
+
+      function dragStart(e) {
+        if (e.target.classList.contains('del-node-btn')) return;
+        isDragging = true;
+        const evt = e.touches ? e.touches[0] : e;
+        startX = evt.clientX;
+        startY = evt.clientY;
+        initialLeft = elmnt.offsetLeft;
+        initialTop = elmnt.offsetTop;
+
+        document.addEventListener('mousemove', dragMove);
+        document.addEventListener('mouseup', dragEnd);
+        document.addEventListener('touchmove', dragMove, { passive: false });
+        document.addEventListener('touchend', dragEnd);
+      }
+
+      function dragMove(e) {
+        if (!isDragging) return;
+        if (e.cancelable) e.preventDefault();
+        const evt = e.touches ? e.touches[0] : e;
+        const dx = evt.clientX - startX;
+        const dy = evt.clientY - startY;
+
+        const container = elmnt.parentElement;
+        const maxW = container.clientWidth - elmnt.offsetWidth;
+        const maxH = container.clientHeight - elmnt.offsetHeight;
+
+        let newX = Math.max(0, Math.min(initialLeft + dx, maxW));
+        let newY = Math.max(0, Math.min(initialTop + dy, maxH));
+
+        elmnt.style.left = newX + 'px';
+        elmnt.style.top = newY + 'px';
+
+        if (onMoveCallback) onMoveCallback();
+      }
+
+      function dragEnd() {
+        isDragging = false;
+        document.removeEventListener('mousemove', dragMove);
+        document.removeEventListener('mouseup', dragEnd);
+        document.removeEventListener('touchmove', dragMove);
+        document.removeEventListener('touchend', dragEnd);
+      }
+    }
+
+    initNav();
+    renderCurrent();
+  </script>
+</body>
+</html>
