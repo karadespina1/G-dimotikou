@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μάθημα 18: Δικτυακός τόπος και ιστοσελίδες</title>
+  <style>
+    :root {
+      --primary: #0077FF;
+      --primary-dark: #0056B3;
+      --primary-light: #EBF4FF;
+      --accent-cyan: #00D2D3;
+      --accent-yellow: #FFD32A;
+      --success: #10AC84;
+      --danger: #FF4757;
+      --bg: #F0F6FD;
+      --card-bg: #FFFFFF;
+      --text: #1E272C;
+      --text-muted: #576574;
+    }
+
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { margin: 0; background-color: var(--bg); color: var(--text); padding-bottom: 30px; }
+
+    /* Header & Gamification Bar */
+    header {
+      background: linear-gradient(135deg, #0077FF 0%, #00C6FF 100%);
+      color: white;
+      padding: 16px 20px 22px;
+      box-shadow: 0 4px 15px rgba(0, 119, 255, 0.25);
+    }
+    .header-top {
+      max-width: 950px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .header-title-box { display: flex; align-items: center; gap: 14px; }
+    .header-icon {
+      font-size: 2.2rem;
+      background: rgba(255, 255, 255, 0.2);
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      backdrop-filter: blur(5px);
+    }
+    .header-title-box h1 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+    .header-title-box p { margin: 3px 0 0; font-size: 0.95rem; opacity: 0.92; }
+
+    .score-badge {
+      background: white;
+      color: var(--primary-dark);
+      padding: 6px 16px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .score-badge .star-icon { font-size: 1.3rem; color: #FFA502; }
+
+    /* Navigation Bar */
+    .nav-bar-container {
+      max-width: 950px;
+      margin: -12px auto 20px;
+      padding: 0 15px;
+    }
+    .nav-bar {
+      background: white;
+      padding: 10px;
+      border-radius: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      box-shadow: 0 6px 18px rgba(0, 119, 255, 0.1);
+      border: 2px solid #E1EDFA;
+    }
+    .nav-btn {
+      background: var(--primary-light);
+      border: 2px solid transparent;
+      border-radius: 25px;
+      padding: 8px 14px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--primary-dark);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .nav-btn:hover { background: #D9EBFF; border-color: var(--primary); }
+    .nav-btn.active {
+      background: linear-gradient(135deg, #0077FF, #00A8FF);
+      color: white;
+      border-color: #0077FF;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 119, 255, 0.3);
+    }
+
+    /* Main Container */
+    main { max-width: 950px; margin: 0 auto; padding: 0 15px; }
+    
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 24px;
+      border: 2px solid #DCEBFB;
+      box-shadow: 0 8px 24px rgba(0, 119, 255, 0.08);
+      position: relative;
+    }
+
+    .act-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #EEF5FD;
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .act-title-box { display: flex; align-items: center; gap: 10px; }
+    .act-icon { font-size: 1.6rem; }
+    .act-title { font-size: 1.28rem; font-weight: 800; color: var(--primary-dark); margin: 0; }
+    .act-sub { font-size: 0.9rem; color: var(--text-muted); margin: 2px 0 0; }
+    
+    .level-badge {
+      background: linear-gradient(135deg, #FF9F1A, #FFB142);
+      color: white;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      box-shadow: 0 2px 6px rgba(255, 159, 26, 0.3);
+    }
+
+    .instructions {
+      background: var(--primary-light);
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 0.98rem;
+      margin-bottom: 22px;
+      border-left: 5px solid var(--primary);
+      color: #0B3B60;
+      line-height: 1.45;
+    }
+
+    /* Action Buttons & Feedback */
+    .btn-action {
+      background: linear-gradient(135deg, #10AC84, #1DD1A1);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 24px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 18px;
+      box-shadow: 0 4px 12px rgba(16, 172, 132, 0.25);
+      transition: all 0.2s;
+    }
+    .btn-action:hover { transform: translateY(-2px); opacity: 0.95; }
+    .feedback {
+      margin-top: 16px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      min-height: 30px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Grid Options */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .option-card {
+      background: white;
+      border: 2px solid #E1EDFA;
+      border-radius: 14px;
+      padding: 18px 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 3px 8px rgba(0, 119, 255, 0.04);
+    }
+    .option-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0, 119, 255, 0.12);
+    }
+    .option-card.selected { border-color: var(--primary); background: var(--primary-light); }
+
+    /* Web Browser Simulator Mockup */
+    .browser-frame {
+      border: 2px solid #C8DDF2;
+      border-radius: 14px;
+      overflow: hidden;
+      background: white;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      margin: 15px 0;
+    }
+    .browser-toolbar {
+      background: #E8F1FC;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px solid #D6E6F8;
+    }
+    .browser-dots { display: flex; gap: 6px; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; }
+    .dot.red { background: #FF5F56; }
+    .dot.yellow { background: #FFBD2E; }
+    .dot.green { background: #27C93F; }
+    
+    .browser-nav-icons { display: flex; gap: 8px; font-size: 0.95rem; color: #576574; font-weight: bold; cursor: default; }
+    .browser-url-bar {
+      flex: 1;
+      background: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.88rem;
+      border: 1px solid #C4DCF5;
+      color: #2C3E50;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .browser-body { padding: 20px; min-height: 220px; background: #FCFDFF; }
+
+    /* Drag & Drop Standard */
+    .drag-items-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      min-height: 60px;
+      padding: 12px;
+      background: #F4F9FF;
+      border-radius: 14px;
+      border: 2px dashed #99C5FE;
+      margin-bottom: 20px;
+      justify-content: center;
+      align-items: center;
+    }
+    .draggable {
+      background: white;
+      border: 2px solid var(--primary);
+      border-radius: 10px;
+      padding: 9px 16px;
+      cursor: grab;
+      font-weight: 700;
+      color: var(--primary-dark);
+      user-select: none;
+      box-shadow: 0 3px 6px rgba(0, 119, 255, 0.12);
+    }
+    .draggable:active { cursor: grabbing; transform: scale(1.03); }
+
+    .drop-zone {
+      min-width: 130px;
+      min-height: 48px;
+      border: 2px dashed #74B9FF;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      padding: 8px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #576574;
+      text-align: center;
+    }
+    .drop-zone.filled {
+      border-style: solid;
+      border-color: var(--primary);
+      background: #E1F0FF;
+      color: var(--primary-dark);
+    }
+
+    /* Website Schema Area */
+    .site-map-box {
+      background: #F8FAFD;
+      border: 2px solid #E1EDFA;
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .site-root-node {
+      background: #FFD32A;
+      color: #7A5200;
+      border: 2px solid #FFA502;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 1.05rem;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      z-index: 2;
+    }
+    .site-branches {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      width: 100%;
+      margin-top: 25px;
+    }
+
+    /* Activity 8 - Website Builder */
+    .builder-canvas {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      border: 2px dashed #74B9FF;
+      border-radius: 14px;
+      background: white;
+      overflow: hidden;
+      touch-action: none;
+      margin-top: 15px;
+    }
+    .builder-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .web-node {
+      position: absolute;
+      padding: 10px 16px;
+      border-radius: 12px;
+      cursor: move;
+      user-select: none;
+      font-weight: 700;
+      z-index: 2;
+      box-shadow: 0 4px 10px rgba(0, 119, 255, 0.16);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .web-node.home {
+      background: #FFD32A;
+      border: 2px solid #FFA502;
+      color: #614200;
+      border-radius: 25px;
+    }
+    .web-node.subpage {
+      background: #E8F4FE;
+      border: 2px solid var(--primary);
+      color: var(--primary-dark);
+    }
+    .del-btn {
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 19px;
+      height: 19px;
+      font-size: 11px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Modal / Success celebration */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-box {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-top">
+      <div class="header-title-box">
+        <div class="header-icon">🌐</div>
+        <div>
+          <h1>Μάθημα 18: Δικτυακός τόπος και ιστοσελίδες</h1>
+          <p>Πληροφορική Γ' Δημοτικού • Μάθε πώς ταξιδεύουμε στον Παγκόσμιο Ιστό!</p>
+        </div>
+      </div>
+      <div class="score-badge">
+        <span class="star-icon">⭐</span>
+        <span>Αστέρια: <span id="starsCount">0</span></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="nav-bar-container">
+    <div class="nav-bar" id="navBar"></div>
+  </div>
+
+  <main>
+    <div class="card" id="activityBox">
+      <!-- Δυναμική δραστηριότητα -->
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+      <div style="font-size:3.5rem;">🎉🌟</div>
+      <h2 style="color:var(--primary-dark); margin:10px 0;">Συγχαρητήρια!</h2>
+      <p style="font-size:1.1rem; color:#4B6584;" id="modalMsg">Κέρδισες ένα νέο αστέρι!</p>
+      <button class="btn-action" onclick="closeModal()">Συνέχεια</button>
+    </div>
+  </div>
+
+  <script>
+    let currentActivity = 0;
+    let activityLevel = [1, 1, 1, 1, 1, 1, 1, 1];
+    let stars = 0;
+
+    const activities = [
+      // 1. Βιβλίο ή Δικτυακός Τόπος;
+      {
+        title: "1. Βιβλίο ή Δικτυακός Τόπος;",
+        sub: "Πώς διαβάζουμε τις πληροφορίες;",
+        render: function(lvl) {
+          const qs = [
+            {
+              desc: "«Έχει σελίδες με συγκεκριμένη σειρά. Για να φτάσεις στο τέλος, πρέπει να τις διαβάσεις μία προς μία με τη σειρά!»",
+              correct: "Έντυπο Βιβλίο",
+              hint: "Σαν το αγαπημένο σου παραμύθι από χαρτί!"
+            },
+            {
+              desc: "«Αποτελείται από πολλές ιστοσελίδες. Μπορείς να πατήσεις οποιονδήποτε σύνδεσμο (link) και να δεις όποια σελίδα θέλεις, χωρίς συγκεκριμένη σειρά!»",
+              correct: "Δικτυακός Τόπος (Website)",
+              hint: "Μπορούμε να κάνουμε κλικ και να πλοηγηθούμε ελεύθερα!"
+            },
+            {
+              desc: "«Χρησιμοποιεί ένα μενού επιλογών για να μεταπηδάς αμέσως από τη μία ιστοσελίδα στην άλλη!»",
+              correct: "Δικτυακός Τόπος (Website)",
+              hint: "Με ένα απλό κλικ βρισκόμαστε σε άλλη σελίδα."
+            }
+          ];
+          const curr = qs[lvl - 1];
+
+          return `
+            <div class="act-header">
+              <div class="act-title-box">
+                <span class="act-icon">📖 vs 🌐</span>
+                <div>
+                  <h2 class="act-title">${this.title}</h2>
+                  <p class="act-sub">${this.sub}</p>
+                </div>
+              </div>
+              <span class="level-badge">Επίπεδο ${lvl}/3</span>
+            </div>
+            <div class="instructions">
+              Διάβασε την περιγραφή και διάλεξε: <strong>Αναφέρεται σε ένα κλασικό Βιβλίο ή σε έναν Δικτυακό Τόπο (Website);</strong>
+            </div>
+            <p style="font-size:1.25rem; text-align:center; margin:35px 0; color:#0A3D62; font-weight:600;">
+              ${curr.desc}
+            </p>
+            <div class="options-grid">
+              <div class="option-card" onclick="checkAct1('Έντυπο Βιβλίο', '${curr.correct}', ${lvl})">
+                <div style="font-size:2.5rem; margin-bottom:8px;">📚</div>
+                <h3 style="color:#0056B3; margin:0 0 5px;">Έντυπο Βιβλίο</h3>
+                <p style="color:#666; font-size:0.9rem; margin:0;">Διαβάζεται με αυστηρή σειρά σελίδων</p>
+              </div>
+              <div class="option-card" onclick="checkAct1('Δικτυακός Τόπος (Website)', '${curr.correct}', ${lvl})">
+                <div style="font-size:2.5rem; margin-bottom:8px;">💻</div>
+                <h3 style="color:#0077FF; margin:0 0 5px;">Δικτυακός Τόπος</h3>
+                <p style="color:#666; font-size:0.9rem; margin:0;">Πλοήγηση σε ιστοσελίδες με κλικ</p>
+              </div>
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 2. Τι Χρειάζομαι για να δω μία Ιστοσελίδα;
+      {
+        title: "2. Τα Εργαλεία του Ταξιδιώτη του Ιστού",
+        sub: "Τι χρειαζόμαστε για να μπούμε στο internet;",
+        render: function(lvl) {
+          const items = [
+            { name: "📱 Ψηφιακή Συσκευή", need: true, icon: "💻", desc: "Υπολογιστής, tablet ή έξυπνο κινητό!" },
+            { name: "📶 Σύνδεση στο Διαδίκτυο", need: true, icon: "🌐", desc: "Μέσω Wi-Fi ή καλωδίου δικτύου!" },
+            { name: "🧭 Φυλλομετρητής (Browser)", need: true, icon: "🔍", desc: "Ειδική εφαρμογή για να ανοίγουν οι ιστοσελίδες!" },
+            { name: "🖨️ Εκτυπωτής με Χαρτί", need: false, icon: "📄", desc: "Χρειάζεται μόνο αν θέλουμε να τυπώσουμε, όχι για να δούμε μια σελίδα!" }
+          ];
+          const curr = items[lvl - 1];
+
+          return `
+            <div class="act-header">
+              <div class="act-title-box">
+                <span class="act-icon">🧰</span>
+                <div>
+                  <h2 class="act-title">${this.title}</h2>
+                  <p class="act-sub">${this.sub}</p>
+                </div>
+              </div>
+              <span class="level-badge">Επίπεδο ${lvl}/4</span>
+            </div>
+            <div class="instructions">
+              Σύμφωνα με το βιβλίο, για να δεις μία ιστοσελίδα χρειάζεσαι 3 βασικά πράγματα. Είναι το παρακάτω ένα από αυτά τα <strong>απαραίτητα</strong>;
+            </div>
+            <div style="text-align:center; margin:30px 0;">
+              <div style="font-size:3.5rem;">${curr.icon}</div>
+              <h2 style="color:var(--primary-dark); margin:10px 0 5px;">${curr.name}</h2>
+              <p style="color:#576574; font-size:1rem; margin:0;"><em>${curr.desc}</em></p>
+            </div>
+            <div class="options-grid">
+              <div class="option-card" onclick="checkAct2(true, ${curr.need}, ${lvl})">
+                <h3 style="color:var(--success);">✅ ΝΑΙ, είναι απαραίτητο!</h3>
+              </div>
+              <div class="option-card" onclick="checkAct2(false, ${curr.need}, ${lvl})">
+                <h3 style="color:var(--danger);">❌ ΟΧΙ, δεν είναι απαραίτητο</h3>
+              </div>
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 3. Drag & Drop: Σχεδιάγραμμα Σχολικού Ιστότοπου
+      {
+        title: "3. Οργάνωσε τον Δικτυακό Τόπο του Σχολείου",
+        sub: "Τοποθέτησε τις ιστοσελίδες στη σωστή θέση",
+        render: function(lvl) {
+          const pool = lvl === 1
+            ? ["Ώρες λειτουργίας", "Δράσεις & Εκδηλώσεις", "Εκπαιδευτικοί"]
+            : ["Εκπαιδευτικά προγράμματα", "Ανακοινώσεις", "Επικοινωνία"];
+
+          return `
+            <div class="act-header">
+              <div class="act-title-box">
+                <span class="act-icon">🏫</span>
+                <div>
+                  <h2 class="act-title">${this.title}</h2>
+                  <p class="act-sub">${this.sub}</p>
+                </div>
+              </div>
+              <span class="level-badge">Επίπεδο ${lvl}/2</span>
+            </div>
+            <div class="instructions">
+              Ένας σχολικός ιστότοπος έχει πολλές σχετικές ιστοσελίδες (όπως στη σελ. 73 του βιβλίου). Σύρε τα πλακίδια στον ιστό του σχολείου!
+            </div>
+            <div class="drag-items-pool" id="pool">
+              ${pool.map((it, i) => `
+                <div class="draggable" draggable="true" ondragstart="drag(event)" id="page-${i}">${it}</div>
+              `).join('')}
+            </div>
+            <div class="site-map-box">
+              <div class="site-root-node">🏫 Δημοτικό Σχολείο (Αρχική)</div>
+              <div style="font-size:1.5rem; margin-top:8px;">⬇️ 🔗 ⬇️</div>
+              <div class="site-branches">
+                <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)">[ Ιστοσελίδα 1 ]</div>
+                <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)">[ Ιστοσελίδα 2 ]</div>
+                <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)">[ Ιστοσελίδα 3 ]</div>
+              </div>
+            </div>
+            <button class="btn-action" onclick="checkAct3(${lvl})">Έλεγχος Ιστοτόπου</button>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 4. Προσομοιωτής Web Browser: Πλοήγηση στο Σχολείο
+      {
+        title: "4. Πλοήγηση στον Browser",
+        sub: "Κάνε κλικ στους συνδέσμους για να βρεις την πληροφορία",
+        render: function(lvl) {
+          const missions = [
+            {
+              task: "Βρες σε ποια ιστοσελίδα αναφέρεται: <strong>«Το σχολείο μας ανοίγει στις 08:00 και ολοκληρώνει το πρόγραμμα στις 13:15.»</strong>",
+              correctLink: "Ώρες Λειτουργίας",
+              info: "⏰ Πρόγραμμα: 08:00 - 13:15 | Ολοήμερο έως 16:00."
+            },
+            {
+              task: "Βρες σε ποια ιστοσελίδα αναφέρεται: <strong>«Την Παρασκευή θα πραγματοποιηθεί δεντροφύτευση στην αυλή μας!»</strong>",
+              correctLink: "Δράσεις Σχολείου",
+              info: "🌱 Δράση: Δεντροφύτευση και καθαρισμός της αυλής με όλες τις τάξεις!"
+            },
+            {
+              task: "Βρες σε ποια ιστοσελίδα αναφέρεται: <strong>«Τηλέφωνο γραφείου: 210-1234567, email: mail@dim-school.gr»</strong>",
+              correctLink: "Επικοινωνία",
+              info: "📞 Τηλέφωνο: 210-1234567 | ✉️ Email: mail@dim-school.gr"
+            }
+          ];
+          const curr = missions[lvl - 1];
+
+          return `
+            <div class="act-header">
+              <div class="act-title-box">
+                <span class="act-icon">🧭</span>
+                <div>
+                  <h2 class="act-title">${this.title}</h2>
+                  <p class="act-sub">${this.sub}</p>
+                </div>
+              </div>
+              <span class="level-badge">Επίπεδο ${lvl}/3</span>
+            </div>
+            <div class="instructions">
+              <strong>Αποστολή Εξερεύνησης:</strong> ${curr.task}<br>
+              Κάνε κλικ στο σωστό κουμπί του μενού μέσα στον προσομοιωτή Browser!
+            </div>
+            <div class="browser-frame">
+              <div class="browser-toolbar">
+                <div class="browser-dots">
+                  <div class="dot red"></div>
+                  <div class="dot yellow"></div>
+                  <div class="dot green"></div>
+                </div>
+                <div class="browser-nav-icons">◀ ▶ 🔄</div>
+                <div class="browser-url-bar">🔒 https://dimotiko-scholeio.gr/</div>
+              </div>
+              <div class="browser-body">
+                <div style="background:#EBF4FF; padding:10px 15px; border-radius:10px; display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+                  <button class="nav-btn" onclick="openSimPage('Ώρες Λειτουργίας', '${curr.correctLink}', ${lvl})">⏰ Ώρες Λειτουργίας</button>
+                  <button class="nav-btn" onclick="openSimPage('Δράσεις Σχολείου', '${curr.correctLink}', ${lvl})">🎨 Δράσεις Σχολείου</button>
+                  <button class="nav-btn" onclick="openSimPage('Εκπαιδευτικοί', '${curr.correctLink}', ${lvl})">👩‍🏫 Εκπαιδευτικοί</button>
+                  <button class="nav-btn" onclick="openSimPage('Επικοινωνία', '${curr.correctLink}', ${lvl})">📞 Επικοινωνία</button>
+                </div>
+                <div id="simContent" style="background:white; border:2px dashed #C8DDF2; border-radius:10px; padding:25px; text-align:center; min-height:100px;">
+                  <span style="color:#7F8C8D;">Κάνε κλικ σε μία επιλογή από το παραπάνω μενού...</span>
+                </div>
+              </div>
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 5. Πού ανήκει αυτή η Ιστοσελίδα; (Μουσείο vs Αθλητική Ομάδα)
+      {
+        title: "5. Σε ποιον Ιστότοπο Ανήκει;",
+        sub: "Αναγνώριση θεματολογίας ιστοσελίδων",
+        render: function(lvl) {
+          const cards = [
+            {
+              pageTitle: "«Έκθεση Αρχαίων Αγαλμάτων & Εισιτήρια»",
+              desc: "Πληροφορίες για τα αρχαία εκθέματα και το ωράριο επισκέψεων.",
+              options: ["🏛️ Δικτυακός Τόπος Μουσείου", "⚽ Δικτυακός Τόπος Αθλητικής Ομάδας"],
+              correct: "🏛️ Δικτυακός Τόπος Μουσείου"
+            },
+            {
+              pageTitle: "«Πρόγραμμα Αγώνων Ποδοσφαίρου & Βαθμολογία»",
+              desc: "Αποτελέσματα των τελευταίων αγώνων και πίνακας της σεζόν.",
+              options: ["🏛️ Δικτυακός Τόπος Μουσείου", "⚽ Δικτυακός Τόπος Αθλητικής Ομάδας"],
+              correct: "⚽ Δικτυακός Τόπος Αθλητικής Ομάδας"
+            },
+            {
+              pageTitle: "«Συναυλίες της Χρονιάς & Νέο Μουσικό Άλμπουμ»",
+              desc: "Τα νέα τραγούδια και οι ημερομηνίες για τη μεγάλη καλοκαιρινή περιοδεία.",
+              options: ["🎤 Δικτυακός Τόπος Τραγουδίστριας", "🛒 Δικτυακός Τόπος Σούπερ Μάρκετ"],
+              correct: "🎤 Δικτυακός Τόπος Τραγουδίστριας"
+            }
+          ];
+          const curr = cards[lvl - 1];
+
+          return `
+            <div class="act-header">
+              <div class="act-title-box">
+                <span class="act-icon">🎯</span>
+                <div>
+                  <h2 class="act-title">${this.title}</h2>
+                  <p class="act-sub">${this.sub}</p>
+                </div>
+              </div>
+              <span class="level-badge">Επίπεδο ${lvl}/3</span>
+            </div>
+            <div class="instructions">
+              Δες τον τίτλο και το περιεχόμενο της ιστοσελίδας. <strong>Σε ποιον από τους δύο δικτυακούς τόπους ανήκει;</strong>
+            </div>
+            <div style="background:#FFF9E6; border:2px solid #FFD32A; border-radius:14px; padding:20px; text-align:center; margin:25px 0;">
+              <h2 style="color:#B7791F; margin:0 0 8px;">${curr.pageTitle}</h2>
+              <p style="color:#576574; font-size:1.05rem; margin:0;">${curr.desc}</p>
+            </div>
+            <div class="options-grid">
+              ${curr.options.map(opt => `
+                <div class="option-card" onclick="checkAct5('${opt}', '${curr.correct}',${lvl})">
+                  <h3 style="color:var(--primary-dark); margin:0;">${opt}</h3>
+                </div>
+              `).join('')}
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 6. Σωστό ή Λάθος στο Διαδίκτυο;
+      {
+        title: "6. Σωστό ή Λάθος στον Ιστό;",
+        sub: "Έλεγχος των γνώσεων του μαθήματος",
+        render: function(lvl) {
+          const statements = [
+            {
+              text: "«Ένας δικτυακός τόπος (website) περιέχει πολλές ιστοσελίδες που συνδέονται μεταξύ τους.»",
+              ans: true,
+              hint: "Σωστά! Ο δικτυακός τόπος είναι το σύνολο όλων των ιστοσελίδων του."
+            },
+            {
+              text: "«Σε έναν δικτυακό τόπο είμαστε υποχρεωμένοι να διαβάζουμε τις ιστοσελίδες μόνο με τη σειρά, όπως σε ένα βιβλίο.»",
+              ans: false,
+              hint: "Λάθος! Μπορούμε να επιλέξουμε και να δούμε όποια ιστοσελίδα θέλουμε μέσω συνδέσμων!"
+            },
+            {
+              text: "«Ο φυλλομετρητής (browser) είναι η εφαρμογή που μας επιτρέπει να ανοίγουμε και να βλέπουμε ιστοσελίδες.»",
+              ans: true,
+              hint: "Ακριβώς! Όπως το Chrome, ο Edge, ο Firefox ή το Safari."
+            }
+          ];
+          const curr = statements[lvl - 1];
+
+          return `
+            <div class="act-header">
+              <div class="act-title-box">
+                <span class="act-icon">⚖️</span>
+                <div>
+                  <h2 class="act-title">${this.title}</h2>
+                  <p class="act-sub">${this.sub}</p>
+                </div>
+              </div>
+              <span class="level-badge">Επίπεδο ${lvl}/3</span>
+            </div>
+            <div class="instructions">
+              Διάβασε την πρόταση από το μάθημα 18 και επίλεξε αν είναι Σωστή ή Λάθος!
+            </div>
+            <p style="font-size:1.3rem; text-align:center; margin:35px 0; color:#0A3D62; font-weight:600;">
+              ${curr.text}
+            </p>
+            <div class="options-grid">
+              <div class="option-card" onclick="checkAct6(true, ${curr.ans}, '${curr.hint}', ${lvl})">
+                <h3 style="color:var(--success); font-size:1.3rem; margin:0;">✅ ΣΩΣΤΟ</h3>
+              </div>
+              <div class="option-card" onclick="checkAct6(false, ${curr.ans}, '${curr.hint}', ${lvl})">
+                <h3 style="color:var(--danger); font-size:1.3rem; margin:0;">❌ ΛΑΘΟΣ</h3>
+              </div>
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 7. Βρες τον Εισβολέα του Ιστότοπου
+      {
+        title: "7. Βρες τον Εισβολέα του Ιστότοπου",
+        sub: "Ποια ιστοσελίδα δεν ταιριάζει;",
+        render: function(lvl) {
+          const sets = [
+            {
+              siteName: "🏛️ Δικτυακός Τόπος Αρχαιολογικού Μουσείου",
+              pages: ["Εκθέματα", "Ωράριο Εισόδου", "Πίτσα Special", "Εκπαιδευτικά Προγράμματα"],
+              wrong: "Πίτσα Special"
+            },
+            {
+              siteName: "🛒 Δικτυακός Τόπος Καταστήματος Παιχνιδιών",
+              pages: ["Επιτραπέζια Παιχνίδια", "Κούκλες & Φιγούρες", "Βαθμολογία Ποδοσφαίρου", "Ηλεκτρονικά Αυτοκινητάκια"],
+              wrong: "Βαθμολογία Ποδοσφαίρου"
+            },
+            {
+              siteName: "🐾 Δικτυακός Τόπος Φροντίδας Κατοικίδιων",
+              pages: ["Συμβουλές για Σκύλους", "Τροφές για Γάτες", "Επισκευή Αυτοκινήτων", "Κτηνιατρική Βοήθεια"],
+              wrong: "Επισκευή Αυτοκινήτων"
+            }
+          ];
+          const curr = sets[lvl - 1];
+
+          return `
+            <div class="act-header">
+              <div class="act-title-box">
+                <span class="act-icon">🕵️</span>
+                <div>
+                  <h2 class="act-title">${this.title}</h2>
+                  <p class="act-sub">${this.sub}</p>
+                </div>
+              </div>
+              <span class="level-badge">Επίπεδο ${lvl}/3</span>
+            </div>
+            <div class="instructions">
+              Ένας δικτυακός τόπος έχει ιστοσελίδες με κοινό θέμα. Μία από τις παρακάτω σελίδες μπήκε κατά λάθος! <strong>Κάνε κλικ στον εισβολέα!</strong>
+            </div>
+            <h3 style="text-align:center; color:var(--primary); margin:20px 0;">${curr.siteName}</h3>
+            <div class="options-grid">
+              ${curr.pages.map(p => `
+                <div class="option-card" onclick="checkAct7('${p}', '${curr.wrong}',${lvl})">
+                  <h3 style="color:var(--primary-dark); margin:0;">📄 ${p}</h3>
+                </div>
+              `).join('')}
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 8. Σχεδίασε τον Δικό σου Δικτυακό Τόπο (Website Builder)
+      {
+        title: "8. Σχεδίασε τον Δικό σου Δικτυακό Τόπο!",
+        sub: "Φτιάξε τον χάρτη ενός website με Drag & Drop",
+        render: function() {
+          return `
+            <div class="act-header">
+              <div class="act-title-box">
+                <span class="act-icon">🏗️</span>
+                <div>
+                  <h2 class="act-title">${this.title}</h2>
+                  <p class="act-sub">${this.sub}</p>
+                </div>
+              </div>
+              <span class="level-badge">Ελεύθερη Δημιουργία</span>
+            </div>
+            <div class="instructions">
+              1. Γράψε το όνομα μιας ιστοσελίδας και πάτησε <strong>«+ Προσθήκη Σελίδας»</strong>.<br>
+              2. <strong>Σύρε με το ποντίκι ή το δάχτυλο</strong> τις ιστοσελίδες μέσα στον καμβά για να οργανώσεις τη δομή.<br>
+              3. Κάνε κλικ σε 2 ιστοσελίδες στη σειρά για να σχεδιάσεις <strong>υπερσύνδεσμο (link)</strong> ανάμεσά τους!
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+              <input type="text" id="pageNameInput" placeholder="Π.χ. Φωτογραφίες, Νέα, Παιχνίδια..." style="padding:10px; border:2px solid #C4DCF5; border-radius:10px; flex:2; min-width:180px; font-size:1rem;">
+              <select id="pageTypeSelect" style="padding:10px; border:2px solid #C4DCF5; border-radius:10px; font-size:0.95rem; background:white;">
+                <option value="subpage">📄 Εσωτερική Σελίδα (Μπλε)</option>
+                <option value="home">🏠 Αρχική Σελίδα (Κίτρινο)</option>
+              </select>
+              <button class="btn-action" style="margin-top:0;" onclick="createCustomPage()">+ Προσθήκη</button>
+              <button class="btn-action" style="margin-top:0; background:#FF4757;" onclick="resetSiteBuilder()">Καθαρισμός</button>
+            </div>
+            <div class="builder-canvas" id="builderContainer">
+              <svg class="builder-svg" id="builderSvg"></svg>
+            </div>
+            <div class="feedback" id="fb8" style="color:var(--primary); font-size:0.95rem;">
+              💡 Συμβουλή: Σύρε τις ιστοσελίδες και ένωσέ τες κάνοντας κλικ!
+            </div>
+          `;
+        }
+      }
+    ];
+
+    function initNav() {
+      const nav = document.getElementById('navBar');
+      nav.innerHTML = activities.map((act, i) => `
+        <button class="nav-btn ${i === currentActivity ? 'active' : ''}" onclick="goToAct(${i})">
+          <span>${i + 1}.</span> ${act.title.split('.')[1] || act.title}
+        </button>
+      `).join('');
+    }
+
+    function goToAct(i) {
+      currentActivity = i;
+      initNav();
+      renderCurrent();
+    }
+
+    function renderCurrent() {
+      const box = document.getElementById('activityBox');
+      box.innerHTML = activities[currentActivity].render(activityLevel[currentActivity]);
+      if (currentActivity === 7) {
+        initBuilderDefaults();
+      }
+    }
+
+    function awardStar() {
+      stars++;
+      document.getElementById('starsCount').innerText = stars;
+      showModal("🎉 Μπράβο! Κέρδισες ένα αστέρι γνώσης!");
+    }
+
+    function showModal(msg) {
+      document.getElementById('modalMsg').innerText = msg;
+      document.getElementById('modalOverlay').style.display = 'flex';
+    }
+    function closeModal() {
+      document.getElementById('modalOverlay').style.display = 'none';
+    }
+
+    // Act 1
+    function checkAct1(choice, correct, lvl) {
+      const fb = document.getElementById('fb');
+      if (choice === correct) {
+        fb.innerHTML = "<span style='color:var(--success)'>🎉 Πολύ σωστά! Το κατάλαβες αμέσως!</span>";
+        setTimeout(() => {
+          if (lvl < 3) { activityLevel[0]++; renderCurrent(); }
+          else { awardStar(); }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Ξανασκέψου το: Έχει αυστηρή σειρά σελίδων ή ελεύθερη πλοήγηση;</span>";
+      }
+    }
+
+    // Act 2
+    function checkAct2(userChoice, actualNeed, lvl) {
+      const fb = document.getElementById('fb');
+      if (userChoice === actualNeed) {
+        fb.innerHTML = "<span style='color:var(--success)'>✨ Μπράβο! Σωστή κρίση!</span>";
+        setTimeout(() => {
+          if (lvl < 4) { activityLevel[1]++; renderCurrent(); }
+          else { awardStar(); }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Θυμήσου: Χρειαζόμαστε συσκευή, internet και browser. Τίποτε άλλο δεν είναι υποχρεωτικό!</span>";
+      }
+    }
+
+    // Drag & drop standard
+    function allowDrop(e) { e.preventDefault(); }
+    function drag(e) { e.dataTransfer.setData("text", e.target.id); }
+    function drop(e) {
+      e.preventDefault();
+      const id = e.dataTransfer.getData("text");
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (e.target.classList.contains('drop-zone')) {
+        e.target.innerText = el.innerText;
+        e.target.setAttribute('data-val', el.innerText);
+        e.target.classList.add('filled');
+        el.style.display = 'none';
+      }
+    }
+
+    // Act 3
+    function checkAct3(lvl) {
+      const zones = document.querySelectorAll('.site-branches .drop-zone');
+      let filled = 0;
+      zones.forEach(z => { if (z.getAttribute('data-val')) filled++; });
+      const fb = document.getElementById('fb');
+      if (filled === 3) {
+        fb.innerHTML = "<span style='color:var(--success)'>🌟 Εξαιρετικά! Όλες οι ιστοσελίδες συνδέθηκαν στον ιστότοπο!</span>";
+        setTimeout(() => {
+          if (lvl < 2) { activityLevel[2]++; renderCurrent(); }
+          else { awardStar(); }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>⚠️ Σύρε και τις 3 ιστοσελίδες στα κενά πλαίσια.</span>";
+      }
+    }
+
+    // Act 4: Sim Page Click
+    function openSimPage(clicked, correct, lvl) {
+      const container = document.getElementById('simContent');
+      const fb = document.getElementById('fb');
+      
+      if (clicked === correct) {
+        container.innerHTML = `
+          <h3 style="color:var(--primary-dark); margin:0 0 10px;">📄 Ιστοσελίδα: ${clicked}</h3>
+          <p style="font-size:1.15rem; color:#2C3E50; font-weight:bold;">${activities[3].render(lvl).match(/⏰|🌱|📞/) ? '' : ''} Βρήκες την πληροφορία!</p>
+        `;
+        fb.innerHTML = "<span style='color:var(--success)'>🎯 Μπράβο! Πλοηγήθηκες στη σωστή ιστοσελίδα!</span>";
+        setTimeout(() => {
+          if (lvl < 3) { activityLevel[3]++; renderCurrent(); }
+          else { awardStar(); }
+        }, 1300);
+      } else {
+        container.innerHTML = `
+          <h3 style="color:#7F8C8D; margin:0 0 10px;">📄 Ιστοσελίδα: ${clicked}</h3>
+          <p style="color:#576574;">Εδώ υπάρχουν άλλες πληροφορίες. Ψάξε σε άλλο κουμπί του μενού!</p>
+        `;
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Δεν βρίσκεται εδώ αυτή η πληροφορία. Δοκίμασε άλλη σελίδα!</span>";
+      }
+    }
+
+    // Act 5
+    function checkAct5(choice, correct, lvl) {
+      const fb = document.getElementById('fb');
+      if (choice === correct) {
+        fb.innerHTML = "<span style='color:var(--success)'>🎉 Ακριβώς! Αυτό είναι το κατάλληλο website!</span>";
+        setTimeout(() => {
+          if (lvl < 3) { activityLevel[4]++; renderCurrent(); }
+          else { awardStar(); }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Αυτή η ιστοσελίδα δεν ταιριάζει με τη συγκεκριμένη θεματολογία.</span>";
+      }
+    }
+
+    // Act 6
+    function checkAct6(choice, actual, hint, lvl) {
+      const fb = document.getElementById('fb');
+      if (choice === actual) {
+        fb.innerHTML = `<span style='color:var(--success)'>🎉 Σωστά! ${hint}</span>`;
+        setTimeout(() => {
+          if (lvl < 3) { activityLevel[5]++; renderCurrent(); }
+          else { awardStar(); }
+        }, 1400);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Πρόσεξε ξανά τι λέει η πρόταση!</span>";
+      }
+    }
+
+    // Act 7
+    function checkAct7(selected, wrong, lvl) {
+      const fb = document.getElementById('fb');
+      if (selected === wrong) {
+        fb.innerHTML = "<span style='color:var(--success)'>🕵️ Μπράβο! Βρήκες τον εισβολέα που δεν ταιριάζει στον ιστότοπο!</span>";
+        setTimeout(() => {
+          if (lvl < 3) { activityLevel[6]++; renderCurrent(); }
+          else { awardStar(); }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Αυτή η ιστοσελίδα ταιριάζει κανονικά. Ψάξε εκείνη που είναι άσχετη!</span>";
+      }
+    }
+
+    // ==========================================
+    // WEBSITE BUILDER ENGINE (Δραστηριότητα 8)
+    // ==========================================
+    let sitePages = [];
+    let siteLinks = [];
+    let linkFirstPage = null;
+
+    function initBuilderDefaults() {
+      sitePages = [];
+      siteLinks = [];
+      linkFirstPage = null;
+      spawnWebNode("🏠 Αρχική Σελίδα", "home", 240, 30);
+      spawnWebNode("📄 Φωτογραφίες", "subpage", 80, 180);
+      spawnWebNode("📄 Επικοινωνία", "subpage", 420, 180);
+      siteLinks.push({ from: sitePages[0].id, to: sitePages[1].id });
+      siteLinks.push({ from: sitePages[0].id, to: sitePages[2].id });
+      updateBuilderSvg();
+    }
+
+    function createCustomPage() {
+      const input = document.getElementById('pageNameInput');
+      const val = input.value.trim();
+      if (!val) return;
+      const type = document.getElementById('pageTypeSelect').value;
+      const x = 50 + Math.random() * 150;
+      const y = 80 + Math.random() * 120;
+      spawnWebNode((type === 'home' ? '🏠 ' : '📄 ') + val, type, x, y);
+      input.value = '';
+      updateBuilderSvg();
+    }
+
+    function spawnWebNode(title, type, x, y) {
+      const container = document.getElementById('builderContainer');
+      const id = 'page_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+
+      const node = document.createElement('div');
+      node.className = `web-node ${type}`;
+      node.id = id;
+      node.style.left = `${x}px`;
+      node.style.top = `${y}px`;
+
+      const span = document.createElement('span');
+      span.innerText = title;
+      node.appendChild(span);
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'del-btn';
+      delBtn.innerHTML = '&times;';
+      delBtn.title = 'Διαγραφή';
+      delBtn.onclick = (e) => {
+        e.stopPropagation();
+        deleteWebNode(id);
+      };
+      node.appendChild(delBtn);
+
+      node.onclick = (e) => {
+        if (e.target.classList.contains('del-btn')) return;
+        handlePageLink(id);
+      };
+
+      container.appendChild(node);
+      sitePages.push({ id, el: node });
+
+      enableUnifiedDrag(node, updateBuilderSvg);
+    }
+
+    function deleteWebNode(id) {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+      sitePages = sitePages.filter(p => p.id !== id);
+      siteLinks = siteLinks.filter(l => l.from !== id && l.to !== id);
+      if (linkFirstPage === id) linkFirstPage = null;
+      updateBuilderSvg();
+    }
+
+    function resetSiteBuilder() {
+      const container = document.getElementById('builderContainer');
+      container.querySelectorAll('.web-node').forEach(n => n.remove());
+      sitePages = [];
+      siteLinks = [];
+      linkFirstPage = null;
+      updateBuilderSvg();
+    }
+
+    function handlePageLink(id) {
+      const fb = document.getElementById('fb8');
+
+      if (!linkFirstPage) {
+        linkFirstPage = id;
+        document.getElementById(id).style.outline = "3px dashed #FF4757";
+        fb.innerText = "👉 Τώρα κάνε κλικ στη δεύτερη ιστοσελίδα για να τις ενώσεις με υπερσύνδεσμο (link)!";
+      } else if (linkFirstPage === id) {
+        document.getElementById(id).style.outline = "none";
+        linkFirstPage = null;
+        fb.innerText = "💡 Συμβουλή: Σύρε τις ιστοσελίδες και ένωσέ τες κάνοντας κλικ!";
+      } else {
+        const from = linkFirstPage;
+        const to = id;
+        document.getElementById(from).style.outline = "none";
+        linkFirstPage = null;
+
+        const exists = siteLinks.some(l => (l.from === from && l.to === to) || (l.from === to && l.to === from));
+        if (!exists) {
+          siteLinks.push({ from, to });
+          updateBuilderSvg();
+          fb.innerText = "🔗 Ο υπερσύνδεσμος δημιουργήθηκε!";
+        } else {
+          fb.innerText = "⚠️ Αυτές οι ιστοσελίδες είναι ήδη συνδεδεμένες!";
+        }
+      }
+    }
+
+    function updateBuilderSvg() {
+      const svg = document.getElementById('builderSvg');
+      if (!svg) return;
+      svg.innerHTML = '';
+
+      siteLinks.forEach(lnk => {
+        const el1 = document.getElementById(lnk.from);
+        const el2 = document.getElementById(lnk.to);
+        if (!el1 || !el2) return;
+
+        const x1 = el1.offsetLeft + el1.offsetWidth / 2;
+        const y1 = el1.offsetTop + el1.offsetHeight / 2;
+        const x2 = el2.offsetLeft + el2.offsetWidth / 2;
+        const y2 = el2.offsetTop + el2.offsetHeight / 2;
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("stroke", "#0077FF");
+        line.setAttribute("stroke-width", "3");
+        line.setAttribute("stroke-dasharray", "6,6");
+        svg.appendChild(line);
+      });
+    }
+
+    function enableUnifiedDrag(elmnt, onMoveCallback) {
+      let startX = 0, startY = 0, initialLeft = 0, initialTop = 0;
+      let isDragging = false;
+
+      elmnt.addEventListener('mousedown', dragStart);
+      elmnt.addEventListener('touchstart', dragStart, { passive: false });
+
+      function dragStart(e) {
+        if (e.target.classList.contains('del-btn')) return;
+        isDragging = true;
+        const evt = e.touches ? e.touches[0] : e;
+        startX = evt.clientX;
+        startY = evt.clientY;
+        initialLeft = elmnt.offsetLeft;
+        initialTop = elmnt.offsetTop;
+
+        document.addEventListener('mousemove', dragMove);
+        document.addEventListener('mouseup', dragEnd);
+        document.addEventListener('touchmove', dragMove, { passive: false });
+        document.addEventListener('touchend', dragEnd);
+      }
+
+      function dragMove(e) {
+        if (!isDragging) return;
+        if (e.cancelable) e.preventDefault();
+        const evt = e.touches ? e.touches[0] : e;
+        const dx = evt.clientX - startX;
+        const dy = evt.clientY - startY;
+
+        const container = elmnt.parentElement;
+        const maxW = container.clientWidth - elmnt.offsetWidth;
+        const maxH = container.clientHeight - elmnt.offsetHeight;
+
+        let newX = Math.max(0, Math.min(initialLeft + dx, maxW));
+        let newY = Math.max(0, Math.min(initialTop + dy, maxH));
+
+        elmnt.style.left = newX + 'px';
+        elmnt.style.top = newY + 'px';
+
+        if (onMoveCallback) onMoveCallback();
+      }
+
+      function dragEnd() {
+        isDragging = false;
+        document.removeEventListener('mousemove', dragMove);
+        document.removeEventListener('mouseup', dragEnd);
+        document.removeEventListener('touchmove', dragMove);
+        document.removeEventListener('touchend', dragEnd);
+      }
+    }
+
+    // Start
+    initNav();
+    renderCurrent();
+  </script>
+</body>
+</html>
