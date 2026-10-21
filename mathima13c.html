@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber-Police HQ: Μάθημα 13 - Ασφάλεια στο Διαδίκτυο</title>
+<style>
+  :root {
+    --bg-terminal: #050B14;
+    --card-surface: #0E1A2B;
+    --agent-green: #00FF88;
+    --alert-red: #FF3366;
+    --radar-blue: #00D4FF;
+    --badge-gold: #FFB800;
+    --text-white: #F1F5F9;
+    --text-dim: #94A3B8;
+  }
+
+  * { box-sizing: border-box; user-select: none; }
+  body {
+    font-family: 'Courier New', Courier, monospace, 'Segoe UI', sans-serif;
+    background: var(--bg-terminal);
+    color: var(--text-white);
+    margin: 0;
+    padding: 12px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Cyber Header / Agent Clearance */
+  .hq-terminal {
+    background: linear-gradient(180deg, #0E1A2B 0%, #08101D 100%);
+    border: 2px solid var(--radar-blue);
+    border-radius: 16px;
+    box-shadow: 0 0 25px rgba(0, 212, 255, 0.2);
+    max-width: 950px;
+    width: 100%;
+    padding: 14px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .hq-title {
+    font-size: 1.35rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--radar-blue);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .agent-status {
+    display: flex;
+    gap: 12px;
+    font-weight: bold;
+    font-size: 0.95rem;
+  }
+  .agent-chip {
+    background: #050B14;
+    border: 1px solid var(--agent-green);
+    padding: 6px 14px;
+    border-radius: 8px;
+    color: var(--agent-green);
+    letter-spacing: 1px;
+  }
+
+  /* Mission Folder Bar */
+  .case-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    max-width: 950px;
+    width: 100%;
+    margin-bottom: 14px;
+  }
+  .case-btn {
+    background: #0E1A2B;
+    border: 1px solid #1E3A5F;
+    border-radius: 8px;
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 900;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .case-btn:hover {
+    border-color: var(--agent-green);
+    color: var(--text-white);
+  }
+  .case-btn.active {
+    background: var(--agent-green);
+    color: #000;
+    border-color: #FFF;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+    font-weight: 900;
+  }
+
+  /* Case Dossier Screen */
+  .dossier-screen {
+    background: var(--card-surface);
+    border: 2px solid #1E3A5F;
+    border-radius: 20px;
+    max-width: 950px;
+    width: 100%;
+    padding: 24px;
+    display: none;
+    position: relative;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.6);
+  }
+  .dossier-screen.active { display: block; animation: openFile 0.3s ease; }
+
+  @keyframes openFile {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .dossier-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed var(--radar-blue);
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+  }
+  .dossier-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--agent-green);
+    letter-spacing: 1px;
+  }
+  .level-badge {
+    background: #050B14;
+    border: 1px solid var(--badge-gold);
+    color: var(--badge-gold);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 900;
+  }
+
+  .dossier-briefing {
+    background: #050B14;
+    border-left: 4px solid var(--radar-blue);
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin-bottom: 18px;
+    color: #E2E8F0;
+  }
+
+  /* Evidence Selection Grid */
+  .evidence-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 14px;
+    margin: 16px 0;
+  }
+
+  .evidence-card {
+    background: #08121F;
+    border: 2px solid #1E3A5F;
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .evidence-card:hover {
+    border-color: var(--radar-blue);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+    transform: translateY(-3px);
+  }
+  .evidence-card svg {
+    width: 65px;
+    height: 65px;
+  }
+  .evidence-card span {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-white);
+  }
+
+  .evidence-card.correct {
+    background: #042F1A !important;
+    border-color: var(--agent-green) !important;
+    box-shadow: 0 0 20px var(--agent-green) !important;
+    animation: successScan 0.4s;
+  }
+  .evidence-card.wrong {
+    background: #3B0814 !important;
+    border-color: var(--alert-red) !important;
+    box-shadow: 0 0 20px var(--alert-red) !important;
+    animation: alertBlink 0.3s;
+  }
+
+  @keyframes successScan {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+  }
+  @keyframes alertBlink {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+
+  .terminal-feedback {
+    min-height: 40px;
+    font-size: 1.15rem;
+    font-weight: 900;
+    text-align: center;
+    margin: 14px 0;
+    letter-spacing: 1px;
+  }
+  .terminal-feedback.pass { color: var(--agent-green); text-shadow: 0 0 8px rgba(0,255,136,0.6); }
+  .terminal-feedback.fail { color: var(--alert-red); text-shadow: 0 0 8px rgba(255,51,102,0.6); }
+
+  .btn-next-step {
+    background: linear-gradient(90deg, var(--agent-green), #00C868);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 28px;
+    color: #000;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0,255,136,0.4);
+    display: none;
+    margin: 10px auto;
+  }
+  .btn-next-step:hover { transform: scale(1.05); }
+
+  /* Interactive Radar / Scanner Area */
+  .scanner-zone {
+    background: #050B14;
+    border: 2px dashed #1E3A5F;
+    border-radius: 14px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    position: relative;
+    overflow: hidden;
+    margin: 14px 0;
+  }
+  .alien-virus {
+    position: absolute;
+    left: 20%;
+    transition: all 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+</style>
+</head>
+<body>
+
+<!-- Detective Agent HUD -->
+<div class="hq-terminal">
+  <div class="hq-title">🕵️‍♂️ CYBER-POLICE HQ // UNIT 13</div>
+  <div class="agent-status">
+    <div class="agent-chip" id="hudScore">SECURITY RATING: 0%</div>
+    <div class="agent-chip" style="border-color:var(--radar-blue); color:var(--radar-blue);" id="hudCases">ΥΠΟΘΕΣΕΙΣ: 0/8</div>
+  </div>
+</div>
+
+<!-- 8 Mission Folders -->
+<div class="case-grid">
+  <button class="case-btn active" onclick="loadCase(1)">ΥΠΟΘΕΣΗ 01: Ο Ιός</button>
+  <button class="case-btn" onclick="loadCase(2)">ΥΠΟΘΕΣΗ 02: Antivirus</button>
+  <button class="case-btn" onclick="loadCase(3)">ΥΠΟΘΕΣΗ 03: Το Κλειδωμένο Σπίτι</button>
+  <button class="case-btn" onclick="loadCase(4)">ΥΠΟΘΕΣΗ 04: Live Update</button>
+  <button class="case-btn" onclick="loadCase(5)">ΥΠΟΘΕΣΗ 05: Παγίδα Phishing</button>
+  <button class="case-btn" onclick="loadCase(6)">ΥΠΟΘΕΣΗ 06: Μυστικός Κωδικός</button>
+  <button class="case-btn" onclick="loadCase(7)">ΥΠΟΘΕΣΗ 07: Κρυπτογράφηση</button>
+  <button class="case-btn" onclick="loadCase(8)">ΥΠΟΘΕΣΗ 08: Αποσύνδεση</button>
+</div>
+
+<!-- ================= CASE 1 ================= -->
+<div class="dossier-screen active" id="case1">
+  <div class="dossier-header">
+    <h2>📁 ΥΠΟΘΕΣΗ 01: ΤΟ ΚΑΚΟΒΟΥΛΟ ΛΟΓΙΣΜΙΚΟ (VIRUS)</h2>
+    <span class="level-badge" id="lvlBadge1">ΕΠΙΠΕΔΟ 1/3</span>
+  </div>
+  <div class="dossier-briefing" id="brief1"></div>
+  <div class="evidence-grid" id="grid1"></div>
+  <div class="terminal-feedback" id="fb1"></div>
+  <button class="btn-next-step" id="next1" onclick="nextStage(1)">ΕΠΟΜΕΝΟ ΣΤΑΔΙΟ ΕΡΕΥΝΑΣ ➡️</button>
+</div>
+
+<!-- ================= CASE 2 ================= -->
+<div class="dossier-screen" id="case2">
+  <div class="dossier-header">
+    <h2>📁 ΥΠΟΘΕΣΗ 02: Η ΨΗΦΙΑΚΗ ΑΣΠΙΔΑ (ANTIVIRUS)</h2>
+    <span class="level-badge" id="lvlBadge2">ΕΠΙΠΕΔΟ 1/3</span>
+  </div>
+  <div class="dossier-briefing" id="brief2"></div>
+  <div class="scanner-zone" id="radarZone2" style="display:none;">
+    <div id="virusEntity" class="alien-virus">
+      <svg width="55" height="55" viewBox="0 0 60 60">
+        <circle cx="30" cy="30" r="18" fill="#FF3366"/>
+        <line x1="12" y1="12" x2="22" y2="22" stroke="#FF3366" stroke-width="4"/>
+        <line x1="48" y1="12" x2="38" y2="22" stroke="#FF3366" stroke-width="4"/>
+        <line x1="12" y1="48" x2="22" y2="38" stroke="#FF3366" stroke-width="4"/>
+        <line x1="48" y1="48" x2="38" y2="38" stroke="#FF3366" stroke-width="4"/>
+        <circle cx="24" cy="28" r="3" fill="#FFF"/><circle cx="36" cy="28" r="3" fill="#FFF"/>
+      </svg>
+    </div>
+    <button class="case-btn" style="background:var(--radar-blue); color:#000; font-size:1rem;" onclick="activateShield()">
+      🛡️ ΕΝΕΡΓΟΠΟΙΗΣΗ ΑΣΠΙΔΑΣ ANTIVIRUS!
+    </button>
+    <div style="text-align:center;">
+      <svg width="70" height="70" viewBox="0 0 80 80">
+        <path d="M40 10 L65 20 C65 48, 40 68, 40 68 C40 68, 15 48, 15 20 Z" fill="#00FF88"/>
+      </svg>
+      <div style="font-size:0.8rem; font-weight:bold; color:var(--agent-green); margin-top:4px;">SECURE PC</div>
+    </div>
+  </div>
+  <div class="evidence-grid" id="grid2"></div>
+  <div class="terminal-feedback" id="fb2"></div>
+  <button class="btn-next-step" id="next2" onclick="nextStage(2)">ΕΠΟΜΕΝΟ ΣΤΑΔΙΟ ΕΡΕΥΝΑΣ ➡️</button>
+</div>
+
+<!-- ================= CASE 3 ================= -->
+<div class="dossier-screen" id="case3">
+  <div class="dossier-header">
+    <h2>📁 ΥΠΟΘΕΣΗ 03: Ο ΥΠΟΛΟΓΙΣΤΗΣ ΣΑΝ ΚΛΕΙΔΩΜΕΝΟ ΣΠΙΤΙ</h2>
+    <span class="level-badge" id="lvlBadge3">ΕΠΙΠΕΔΟ 1/3</span>
+  </div>
+  <div class="dossier-briefing" id="brief3"></div>
+  <div class="evidence-grid" id="grid3"></div>
+  <div class="terminal-feedback" id="fb3"></div>
+  <button class="btn-next-step" id="next3" onclick="nextStage(3)">ΕΠΟΜΕΝΟ ΣΤΑΔΙΟ ΕΡΕΥΝΑΣ ➡️</button>
+</div>
+
+<!-- ================= CASE 4 ================= -->
+<div class="dossier-screen" id="case4">
+  <div class="dossier-header">
+    <h2>📁 ΥΠΟΘΕΣΗ 04: ΕΝΗΜΕΡΩΣΗ ΑΠΟ ΤΟ ΔΙΑΔΙΚΤΥΟ (UPDATE)</h2>
+    <span class="level-badge" id="lvlBadge4">ΕΠΙΠΕΔΟ 1/3</span>
+  </div>
+  <div class="dossier-briefing" id="brief4"></div>
+  <div class="evidence-grid" id="grid4"></div>
+  <div class="terminal-feedback" id="fb4"></div>
+  <button class="btn-next-step" id="next4" onclick="nextStage(4)">ΕΠΟΜΕΝΟ ΣΤΑΔΙΟ ΕΡΕΥΝΑΣ ➡️</button>
+</div>
+
+<!-- ================= CASE 5 ================= -->
+<div class="dossier-screen" id="case5">
+  <div class="dossier-header">
+    <h2>📁 ΥΠΟΘΕΣΗ 05: ΥΠΟΠΤΑ ΜΗΝΥΜΑΤΑ & ΨΕΥΤΙΚΑ ΔΩΡΑ</h2>
+    <span class="level-badge" id="lvlBadge5">ΕΠΙΠΕΔΟ 1/3</span>
+  </div>
+  <div class="dossier-briefing" id="brief5"></div>
+  <div class="evidence-grid" id="grid5"></div>
+  <div class="terminal-feedback" id="fb5"></div>
+  <button class="btn-next-step" id="next5" onclick="nextStage(5)">ΕΠΟΜΕΝΟ ΣΤΑΔΙΟ ΕΡΕΥΝΑΣ ➡️</button>
+</div>
+
+<!-- ================= CASE 6 ================= -->
+<div class="dossier-screen" id="case6">
+  <div class="dossier-header">
+    <h2>📁 ΥΠΟΘΕΣΗ 06: Ο ΚΩΔΙΚΟΣ ΕΙΝΑΙ ΤΟ ΜΥΣΤΙΚΟ ΚΛΕΙΔΙ</h2>
+    <span class="level-badge" id="lvlBadge6">ΕΠΙΠΕΔΟ 1/3</span>
+  </div>
+  <div class="dossier-briefing" id="brief6"></div>
+  <div class="evidence-grid" id="grid6"></div>
+  <div class="terminal-feedback" id="fb6"></div>
+  <button class="btn-next-step" id="next6" onclick="nextStage(6)">ΕΠΟΜΕΝΟ ΣΤΑΔΙΟ ΕΡΕΥΝΑΣ ➡️</button>
+</div>
+
+<!-- ================= CASE 7 ================= -->
+<div class="dossier-screen" id="case7">
+  <div class="dossier-header">
+    <h2>📁 ΥΠΟΘΕΣΗ 07: ΟΙ ΙΣΧΥΡΟΙ ΚΩΔΙΚΟΙ ΤΗΣ ΥΠΑΤΙΑΣ (ΣΕΛ. 55)</h2>
+    <span class="level-badge" id="lvlBadge7">ΕΠΙΠΕΔΟ 1/3</span>
+  </div>
+  <div class="dossier-briefing" id="brief7"></div>
+  <div class="evidence-grid" id="grid7"></div>
+  <div class="terminal-feedback" id="fb7"></div>
+  <button class="btn-next-step" id="next7" onclick="nextStage(7)">ΕΠΟΜΕΝΟ ΣΤΑΔΙΟ ΕΡΕΥΝΑΣ ➡️</button>
+</div>
+
+<!-- ================= CASE 8 ================= -->
+<div class="dossier-screen" id="case8">
+  <div class="dossier-header">
+    <h2>📁 ΥΠΟΘΕΣΗ 08: ΠΡΩΤΟΚΟΛΛΟ ΑΣΦΑΛΟΥΣ ΑΠΟΣΥΝΔΕΣΗΣ</h2>
+    <span class="level-badge" id="lvlBadge8">ΕΠΙΠΕΔΟ 1/3</span>
+  </div>
+  <div class="dossier-briefing" id="brief8"></div>
+  <div class="evidence-grid" id="grid8"></div>
+  <div class="terminal-feedback" id="fb8"></div>
+  <button class="btn-next-step" id="next8" onclick="nextStage(8)">ΟΛΟΚΛΗΡΩΣΗ ΕΚΠΑΙΔΕΥΣΗΣ 🏆</button>
+</div>
+
+<script>
+  // Simple Retro Audio Feedback
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  let audioCtx = null;
+
+  function beep(type) {
+    try {
+      if (!audioCtx) audioCtx = new AudioCtx();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'pass') {
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+      } else {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(110, audioCtx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+      }
+    } catch(e) {}
+  }
+
+  let securityScore = 0;
+  let finishedCases = new Set();
+
+  function addScore(pts) {
+    securityScore = Math.min(100, securityScore + pts);
+    document.getElementById('hudScore').innerText = `SECURITY RATING: ${securityScore}%`;
+  }
+
+  function loadCase(id) {
+    document.querySelectorAll('.dossier-screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.case-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('case' + id).classList.add('active');
+    document.querySelectorAll('.case-btn')[id - 1].classList.add('active');
+  }
+
+  function shuffle(arr) {
+    let cur = arr.length, rand;
+    while (cur != 0) {
+      rand = Math.floor(Math.random() * cur);
+      cur--;
+      [arr[cur], arr[rand]] = [arr[rand], arr[cur]];
+    }
+    return arr;
+  }
+
+  const caseLevels = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1 };
+
+  // AGENT DOSSIER DATABASE (3 Levels per Case)
+  const caseData = {
+    1: [
+      {
+        brief: "ΑΝΑΦΟΡΑ ΥΠΗΡΕΣΙΑΣ: Ένας «ιός» (virus) προσπαθεί να εισβάλει. Τι είναι στην πραγματικότητα ένας ιός υπολογιστή;",
+        items: [
+          { text: "Εφαρμογή (κακόβουλο λογισμικό) που φτιάχτηκε για να προκαλέσει ζημιά!", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#FF3366"/><line x1="16" y1="16" x2="24" y2="24" stroke="#FF3366" stroke-width="4"/><line x1="48" y1="16" x2="40" y2="24" stroke="#FF3366" stroke-width="4"/><line x1="16" y1="48" x2="24" y2="40" stroke="#FF3366" stroke-width="4"/><line x1="48" y1="48" x2="40" y2="40" stroke="#FF3366" stroke-width="4"/><circle cx="27" cy="30" r="2" fill="#FFF"/><circle cx="37" cy="30" r="2" fill="#FFF"/></svg>`, correct: true },
+          { text: "Ένα μικρόβιο που κολλάμε συνάχι", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="#64748B"/></svg>`, correct: false },
+          { text: "Ένα καλώδιο που έχει σκονιστεί", icon: `<svg viewBox="0 0 64 64"><path d="M16 48 C20 20, 44 20, 48 48" stroke="#F59E0B" stroke-width="4" fill="none"/></svg>`, correct: false }
+        ]
+      },
+      {
+        brief: "ΣΤΟΧΟΣ ΕΠΙΤΙΘΕΜΕΝΟΥ: Τι προσπαθεί να κλέψει το κακόβουλο λογισμικό από τον υπολογιστή μας;",
+        items: [
+          { text: "Τους κωδικούς πρόσβασης και τα προσωπικά μας δεδομένα!", icon: `<svg viewBox="0 0 64 64"><rect x="18" y="24" width="28" height="24" rx="4" fill="#00D4FF"/><circle cx="32" cy="34" r="3" fill="#000"/><line x1="32" y1="37" x2="32" y2="42" stroke="#000" stroke-width="2"/></svg>`, correct: true },
+          { text: "Τη σκόνη από το πληκτρολόγιο", icon: `<svg viewBox="0 0 64 64"><rect x="14" y="20" width="36" height="24" fill="#334155"/></svg>`, correct: false },
+          { text: "Τα κουμπιά της οθόνης", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="8" fill="#94A3B8"/></svg>`, correct: false }
+        ]
+      },
+      {
+        brief: "ΠΡΟΕΙΔΟΠΟΙΗΣΗ ΑΣΦΑΛΕΙΑΣ: Μπορεί ένας ιός να καταστρέψει τα αποθηκευμένα μας αρχεία;",
+        items: [
+          { text: "ΝΑΙ! Μπορεί να σβήσει ή να καταστρέψει δεδομένα!", icon: `<svg viewBox="0 0 64 64"><rect x="18" y="14" width="28" height="36" fill="#1E293B" stroke="#FF3366" stroke-width="2"/><line x1="22" y1="24" x2="42" y2="44" stroke="#FF3366" stroke-width="4"/><line x1="42" y1="24" x2="22" y2="44" stroke="#FF3366" stroke-width="4"/></svg>`, correct: true },
+          { text: "ΟΧΙ, απλώς καθαρίζει την οθόνη", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#00FF88"/></svg>`, correct: false }
+        ]
+      }
+    ],
+
+    2: [
+      {
+        brief: "ΠΡΟΣΤΑΣΙΑ ΣΥΣΤΗΜΑΤΟΣ: Τι είναι το λογισμικό Antivirus;",
+        items: [
+          { text: "Ο ψηφιακός «ήρωας» που μπλοκάρει και εξουδετερώνει τους ιούς!", icon: `<svg viewBox="0 0 64 64"><path d="M32 8 L52 16 C52 38, 32 54, 32 54 C32 54, 12 38, 12 16 Z" fill="#00FF88"/><path d="M24 30 L30 36 L40 24" stroke="#000" stroke-width="4" fill="none"/></svg>`, correct: true },
+          { text: "Ένα παιχνίδι με αυτοκίνητα", icon: `<svg viewBox="0 0 64 64"><rect x="14" y="26" width="36" height="16" fill="#F59E0B"/></svg>`, correct: false },
+          { text: "Ένα πρόγραμμα ζωγραφικής", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#00D4FF"/></svg>`, correct: false }
+        ]
+      },
+      {
+        brief: "ΠΡΟΣΟΜΟΙΩΤΗΣ ΑΜΥΝΑΣ: Πάτησε το κουμπί για να ενεργοποιήσεις την ασπίδα Antivirus!",
+        type: "radar"
+      },
+      {
+        brief: "ΕΓΚΑΤΑΣΤΑΣΗ: Πότε αρχίζει να προστατεύει τον υπολογιστή μας το Antivirus;",
+        items: [
+          { text: "Μόλις το προμηθευτούμε και το εγκαταστήσουμε στη συσκευή!", icon: `<svg viewBox="0 0 64 64"><rect x="14" y="14" width="36" height="36" rx="6" fill="#1E293B" stroke="#00FF88" stroke-width="3"/><path d="M32 22 L32 38 M24 30 L32 38 L40 30" stroke="#00FF88" stroke-width="4"/></svg>`, correct: true },
+          { text: "Χωρίς να το εγκαταστήσουμε, λειτουργεί μόνο με τη σκέψη", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#64748B"/></svg>`, correct: false }
+        ]
+      }
+    ],
+
+    3: [
+      {
+        brief: "ΠΑΡΟΜΟΙΩΣΗ ΒΙΒΛΙΟΥ: Σε τι μοιάζει ένας υπολογιστής με Antivirus;",
+        items: [
+          { text: "Σε ένα κλειδωμένο σπίτι που κανείς δεν μπαίνει χωρίς άδεια!", icon: `<svg viewBox="0 0 64 64"><path d="M12 30 L32 14 L52 30 Z" fill="#FF3366"/><rect x="18" y="30" width="28" height="22" fill="#00D4FF"/><circle cx="32" cy="42" r="4" fill="#000"/></svg>`, correct: true },
+          { text: "Σε ένα ανοιχτό γήπεδο χωρίς πόρτες", icon: `<svg viewBox="0 0 64 64"><rect x="12" y="20" width="40" height="28" fill="#10B981"/></svg>`, correct: false }
+        ]
+      },
+      {
+        brief: "ΠΡΟΣΤΑΣΙΑ ΦΩΤΟΓΡΑΦΙΩΝ: Πώς προστατεύει το Antivirus τις οικογενειακές μας φωτογραφίες;",
+        items: [
+          { text: "Εμποδίζει τους ιούς που θέλουν να τις κλέψουν ή να τις σβήσουν!", icon: `<svg viewBox="0 0 64 64"><rect x="14" y="16" width="36" height="30" rx="3" fill="#1E293B" stroke="#00FF88" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="#FFE600"/><polygon points="18,40 28,30 36,36 44,26 46,40" fill="#00FF88"/></svg>`, correct: true },
+          { text: "Τις εκτυπώνει αυτόματα σε χαρτί", icon: `<svg viewBox="0 0 64 64"><rect x="18" y="20" width="28" height="24" fill="#94A3B8"/></svg>`, correct: false }
+        ]
+      },
+      {
+        brief: "ΜΠΛΟΚΑΡΙΣΜΑ: Τι κάνει το Antivirus όταν εντοπίσει μια επικίνδυνη εφαρμογή;",
+        items: [
+          { text: "Τη μπλοκάρει αμέσως και προειδοποιεί τον χρήστη!", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="#FF3366"/><line x1="20" y1="20" x2="44" y2="44" stroke="#FFF" stroke-width="5"/></svg>`, correct: true },
+          { text: "Την αφήνει να κάνει ό,τι θέλει", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="#64748B"/></svg>`, correct: false }
+        ]
+      }
+    ],
+
+    4: [
+      {
+        brief: "ΔΙΑΔΙΚΑΣΙΑ UPDATE: Γιατί το Antivirus συνδέεται τακτικά στο διαδίκτυο;",
+        items: [
+          { text: "Για να ενημερωθεί (update) και να μάθει τους καινούργιους ιούς!", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" stroke="#00FF88" stroke-width="4" fill="none"/><path d="M32 18 A14 14 0 1 1 18 32" stroke="#00D4FF" stroke-width="4" fill="none"/></svg>`, correct: true },
+          { text: "Για να παραγγείλει πίτσα", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="18" fill="#F59E0B"/></svg>`, correct: false },
+          { text: "Για να παίξει βιντεοπαιχνίδια", icon: `<svg viewBox="0 0 64 64"><rect x="16" y="24" width="32" height="18" fill="#8B5CF6"/></svg>`, correct: false }
+        ]
+      },
+      {
+        brief: "ΠΑΛΙΟ ANTIVIRUS: Τι συμβαίνει αν δεν ενημερώνουμε ποτέ το Antivirus;",
+        items: [
+          { text: "Δεν θα μπορεί να αναγνωρίσει τους νέους ιούς και κινδυνεύουμε!", icon: `<svg viewBox="0 0 64 64"><polygon points="32,10 54,48 10,48" fill="#FFB800"/><text x="28" y="42" font-size="22" font-weight="bold">!</text></svg>`, correct: true },
+          { text: "Γίνεται πιο γρήγορο", icon: `<svg viewBox="0 0 64 64"><path d="M12 32 L52 32" stroke="#FFF" stroke-width="4"/></svg>`, correct: false }
+        ]
+      },
+      {
+        brief: "ΚΑΝΟΝΑΣ ΑΣΦΑΛΕΙΑΣ: Ποια είναι η σωστή συνήθεια ενός υπεύθυνου χρήστη;",
+        items: [
+          { text: "Κρατάμε το πρόγραμμα προστασίας πάντα ενημερωμένο!", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#00FF88"/><path d="M22 32 L28 38 L42 24" stroke="#000" stroke-width="4" fill="none"/></svg>`, correct: true },
+          { text: "Το απενεργοποιούμε για να μην μας ενοχλεί", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#FF3366"/></svg>`, correct: false }
+        ]
+      }
+    ],
+
+    5: [
+      {
+        brief: "ΥΠΟΠΤΗ ΕΝΔΕΙΞΗ: Στην οθόνη εμφανίζεται μήνυμα «ΚΕΡΔΙΣΕΣ ΕΝΑ TABLET! ΠΑΤΑ ΕΔΩ!». Τι κάνεις;",
+        items: [
+          { text: "ΔΕΝ κάνω κλικ! Είναι παγίδα κακόβουλου λογισμικού!", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#FF3366"/><line x1="20" y1="20" x2="44" y2="44" stroke="#FFF" stroke-width="5"/><line x1="44" y1="20" x2="20" y2="44" stroke="#FFF" stroke-width="5"/></svg>`, correct: true },
+          { text: "Κάνω γρήγορα κλικ για να πάρω το δώρο", icon: `<svg viewBox="0 0 64 64"><rect x="18" y="20" width="28" height="28" fill="#FFE600"/></svg>`, correct: false },
+          { text: "Το στέλνω σε όλους τους φίλους μου", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#00D4FF"/></svg>`, correct: false }
+        ]
+      },
+      {
+        brief: "ΠΑΡΑΞΕΝΟ EMAIL: Λαμβάνεις email από άγνωστο αποστολέα με περίεργο σύνδεσμο. Τι κάνεις;",
+        items: [
+          { text: "Δεν ανοίγω τον σύνδεσμο και το λέω στους γονείς μου!", icon: `<svg viewBox="0 0 64 64"><rect x="12" y="18" width="40" height="28" rx="3" fill="#1E293B" stroke="#00FF88" stroke-width="2"/><polygon points="12,18 32,32 52,18" fill="#00D4FF"/></svg>`, correct: true },
+          { text: "Γράφω αμέσως το όνομα και τη διεύθυνσή μου", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#FF3366"/></svg>`, correct: false }
+        ]
+      },
+      {
+        brief: "ΕΓΚΑΤΑΣΤΑΣΗ ΕΦΑΡΜΟΓΩΝ: Όταν ένα άγνωστο πρόγραμμα ζητά άδεια να εγκατασταθεί, τι κάνεις;",
+        items: [
+          { text: "Προσέχουμε πολύ και ρωτάμε έναν ενήλικα (γονέα ή δάσκαλο)!", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="#00D4FF"/><circle cx="32" cy="24" r="3" fill="#000"/><rect x="30" y="30" width="4" height="12" fill="#000"/></svg>`, correct: true },
+          { text: "Πατάμε «Ναι σε όλα» χωρίς να διαβάσουμε", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#EF4444"/></svg>`, correct: false }
+        ]
+      }
+    ],
+
+    6: [
+      {
+        brief: "ΜΥΣΤΙΚΟ ΚΛΕΙΔΙ: Γιατί χρειαζόμαστε ισχυρό κωδικό πρόσβασης (password);",
+        items: [
+          { text: "Για να μην μπορεί κανείς άλλος να μπει στον λογαριασμό μας!", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="10" fill="#00D4FF"/><rect x="22" y="32" width="20" height="18" rx="4" fill="#00D4FF"/><circle cx="32" cy="40" r="3" fill="#000"/></svg>`, correct: true },
+          { text: "Για να φαίνεται ωραία η οθόνη", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#94A3B8"/></svg>`, correct: false }
+        ]
+      },
+      {
+        brief: "ΚΑΝΟΝΑΣ 8 ΧΑΡΑΚΤΗΡΩΝ: Πόσους χαρακτήρες πρέπει να έχει τουλάχιστον ένας ισχυρός κωδικός;",
+        items: [
+          { text: "Τουλάχιστον 8 χαρακτήρες (γράμματα, αριθμούς & σύμβολα)!", icon: `<svg viewBox="0 0 64 64"><rect x="10" y="20" width="44" height="24" rx="4" fill="#00FF88"/><text x="16" y="38" font-size="18" font-weight="900" fill="#000">8+ #$!</text></svg>`, correct: true },
+          { text: "Μόνο 2 γράμματα", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#FF3366"/></svg>`, correct: false }
+        ]
+      },
+      {
+        brief: "ΠΡΟΣΩΠΙΚΑ ΣΤΟΙΧΕΙΑ: Βάζουμε ποτέ για κωδικό το όνομά μας ή τα γενέθλιά μας;",
+        items: [
+          { text: "ΠΟΤΕ! Οι άλλοι μπορούν να τα μαντέψουν πανεύκολα!", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="#FF3366"/><line x1="20" y1="20" x2="44" y2="44" stroke="#FFF" stroke-width="4"/></svg>`, correct: true },
+          { text: "Ναι, είναι η καλύτερη ιδέα", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#64748B"/></svg>`, correct: false }
+        ]
+      }
+    ],
+
+    7: [
+      {
+        brief: "ΕΛΕΓΧΟΣ ΣΕΛ. 55: Ποιος από τους παρακάτω κωδικούς της Υπατίας είναι ΠΡΑΓΜΑΤΙΚΑ ΙΣΧΥΡΟΣ;",
+        items: [
+          { text: "&p@t#@2030 (Έχει σύμβολα, αριθμούς & γράμματα!)", icon: `<svg viewBox="0 0 64 64"><rect x="10" y="20" width="44" height="24" rx="4" fill="#00FF88"/><text x="14" y="37" font-size="14" font-weight="bold" fill="#000">&p@t#@</text></svg>`, correct: true },
+          { text: "ypatia123 (Αδύναμος: το όνομά της και 123)", icon: `<svg viewBox="0 0 64 64"><rect x="10" y="20" width="44" height="24" rx="4" fill="#FF3366"/><text x="14" y="37" font-size="14" font-weight="bold" fill="#FFF">ypatia</text></svg>`, correct: false }
+        ]
+      },
+      {
+        brief: "ΚΡΥΠΤΟΓΡΑΦΗΣΗ ΤΡΑΓΟΥΔΙΟΥ: Ο κωδικός 7fmlfmnp! φτιάχτηκε από το «Φεγγαράκι μου λαμπρό». Είναι ασφαλής;",
+        items: [
+          { text: "ΝΑΙ! Εμείς τον θυμόμαστε εύκολα, αλλά οι άλλοι δεν μπορούν να τον μαντέψουν!", icon: `<svg viewBox="0 0 64 64"><path d="M32 14 L36 26 L48 26 L38 34 L42 46 L32 38 L22 46 L26 34 L16 26 L28 26 Z" fill="#FFE600"/></svg>`, correct: true },
+          { text: "Όχι, είναι λάθος", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#64748B"/></svg>`, correct: false }
+        ]
+      },
+      {
+        brief: "ΚΟΙΝΟΠΟΙΗΣΗ ΚΩΔΙΚΟΥ: Σε ποιον επιτρέπεται να εμπιστευτούμε τον κωδικό μας;",
+        items: [
+          { text: "ΜΟΝΟ στους γονείς μας!", icon: `<svg viewBox="0 0 64 64"><circle cx="24" cy="26" r="8" fill="#00D4FF"/><circle cx="40" cy="26" r="8" fill="#00FF88"/><path d="M14 50 C14 38, 50 38, 50 50 Z" fill="#1E293B" stroke="#00D4FF" stroke-width="2"/></svg>`, correct: true },
+          { text: "Σε αγνώστους σε online παιχνίδια", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#FF3366"/></svg>`, correct: false }
+        ]
+      }
+    ],
+
+    8: [
+      {
+        brief: "ΠΡΩΤΟΚΟΛΛΟ LOGOUT: Όταν τελειώνουμε σε κοινόχρηστο υπολογιστή (π.χ. στο σχολείο), τι κάνουμε;",
+        items: [
+          { text: "Πατάμε πάντα ΑΠΟΣΥΝΔΕΣΗ (Log out) από τον λογαριασμό μας!", icon: `<svg viewBox="0 0 64 64"><rect x="14" y="14" width="22" height="36" fill="#1E293B" stroke="#00FF88" stroke-width="2"/><path d="M30 32 L50 32 M42 24 L50 32 L42 40" stroke="#00FF88" stroke-width="4"/></svg>`, correct: true },
+          { text: "Φεύγουμε τρέχοντας αφήνοντας τα πάντα ανοιχτά", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#FF3366"/></svg>`, correct: false }
+        ]
+      },
+      {
+        brief: "ΚΙΝΔΥΝΟΣ: Τι μπορεί να συμβεί αν ξεχάσεις να αποσυνδεθείς στο σχολείο;",
+        items: [
+          { text: "Ο επόμενος χρήστης μπορεί να δει τα μηνύματα ή να σβήσει τις εργασίες μας!", icon: `<svg viewBox="0 0 64 64"><polygon points="32,10 54,48 10,48" fill="#FF3366"/><text x="28" y="42" font-size="22" font-weight="bold" fill="#000">!</text></svg>`, correct: true },
+          { text: "Δεν πειράζει, κερδίζουμε πόντους", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#64748B"/></svg>`, correct: false }
+        ]
+      },
+      {
+        brief: "ΤΕΛΙΚΟΣ ΟΡΚΟΣ ΠΡΑΚΤΟΡΑ: Ποια είναι η πιο υπεύθυνη συμπεριφορά στο διαδίκτυο;",
+        items: [
+          { text: "Προστατεύουμε τους κωδικούς μας, έχουμε Antivirus και προσέχουμε πού κάνουμε κλικ!", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#00FF88"/><text x="18" y="40" font-size="24">🏆</text></svg>`, correct: true },
+          { text: "Δίνουμε τους κωδικούς μας σε όλους", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#FF3366"/></svg>`, correct: false }
+        ]
+      }
+    ]
+  };
+
+  function renderStage(caseId) {
+    const lvl = caseLevels[caseId];
+    const data = caseData[caseId][lvl - 1];
+    document.getElementById(`lvlBadge${caseId}`).innerText = `ΕΠΙΠΕΔΟ ${lvl}/3`;
+    document.getElementById(`brief${caseId}`).innerText = data.brief;
+    document.getElementById(`fb${caseId}`).innerText = '';
+    document.getElementById(`next${caseId}`).style.display = 'none';
+
+    const grid = document.getElementById(`grid${caseId}`);
+    grid.innerHTML = '';
+
+    if (caseId === 2 && data.type === 'radar') {
+      document.getElementById('radarZone2').style.display = 'flex';
+      const virus = document.getElementById('virusEntity');
+      virus.style.left = '20%';
+      return;
+    } else if (caseId === 2) {
+      document.getElementById('radarZone2').style.display = 'none';
+    }
+
+    const shuffled = shuffle([...data.items]);
+    shuffled.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'evidence-card';
+      card.innerHTML = `${item.icon}<span>${item.text}</span>`;
+      card.onclick = () => {
+        grid.querySelectorAll('.evidence-card').forEach(c => c.className = 'evidence-card');
+        const fb = document.getElementById(`fb${caseId}`);
+        if (item.correct) {
+          card.classList.add('correct');
+          fb.className = 'terminal-feedback pass';
+          fb.innerText = '✔ ΕΓΚΡΙΣΗ ΑΣΦΑΛΕΙΑΣ! ΟΡΘΗ ΕΠΙΛΟΓΗ!';
+          beep('pass');
+          addScore(4);
+          document.getElementById(`next${caseId}`).style.display = 'inline-block';
+        } else {
+          card.classList.add('wrong');
+          fb.className = 'terminal-feedback fail';
+          fb.innerText = '✖ ΠΡΟΕΙΔΟΠΟΙΗΣΗ ΑΣΦΑΛΕΙΑΣ! ΕΠΙΚΙΝΔΥΝΗ ΕΠΙΛΟΓΗ!';
+          beep('fail');
+        }
+      };
+      grid.appendChild(card);
+    });
+  }
+
+  function activateShield() {
+    const virus = document.getElementById('virusEntity');
+    const fb = document.getElementById('fb2');
+    virus.style.left = '-80px';
+    beep('pass');
+    setTimeout(() => {
+      fb.className = 'terminal-feedback pass';
+      fb.innerText = '🛡️ ΤΟ ANTIVIRUS ΕΞΟΥΔΕΤΕΡΩΣΕ ΤΟΝ ΕΙΣΒΟΛΕΑ!';
+      addScore(5);
+      document.getElementById('next2').style.display = 'inline-block';
+    }, 700);
+  }
+
+  function nextStage(caseId) {
+    if (caseLevels[caseId] < 3) {
+      caseLevels[caseId]++;
+      renderStage(caseId);
+    } else {
+      finishedCases.add(caseId);
+      document.getElementById('hudCases').innerText = `ΥΠΟΘΕΣΕΙΣ: ${finishedCases.size}/8`;
+      const fb = document.getElementById(`fb${caseId}`);
+      fb.className = 'terminal-feedback pass';
+      fb.innerText = '⭐ ΥΠΟΘΕΣΗ ΕΠΙΛΥΘΗΚΕ ΠΛΗΡΩΣ! ΠΡΟΧΩΡΗΣΤΕ ΣΤΗΝ ΕΠΟΜΕΝΗ!';
+      document.getElementById(`next${caseId}`).style.display = 'none';
+    }
+  }
+
+  window.onload = () => {
+    for (let i = 1; i <= 8; i++) {
+      renderStage(i);
+    }
+  };
+</script>
+
+</body>
+</html>

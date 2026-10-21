@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Μάθημα 14: Αρχεία & Φάκελοι - File Island Adventure</title>
+<style>
+  :root {
+    --sand-bg: #FFFDF5;
+    --sea-blue: #0284C7;
+    --island-teal: #0D9488;
+    --folder-yellow: #F59E0B;
+    --coral: #F43F5E;
+    --wood: #78350F;
+    --card-surface: #FFFFFF;
+    --text-main: #1E293B;
+  }
+
+  * { box-sizing: border-box; user-select: none; }
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comfortaa', cursive, sans-serif;
+    background: linear-gradient(135deg, #E0F2FE 0%, #FEF3C7 50%, #ECFDF5 100%);
+    color: var(--text-main);
+    margin: 0;
+    padding: 12px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, #0284C7, #0D9488, #F59E0B);
+    color: white;
+    padding: 16px 22px;
+    border-radius: 24px;
+    text-align: center;
+    max-width: 950px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(2, 132, 199, 0.25);
+    margin-bottom: 14px;
+    border: 4px solid #FFFFFF;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  header p { margin: 4px 0 0 0; font-size: 1.05rem; font-weight: bold; opacity: 0.95; }
+
+  /* Navigation Bar */
+  .island-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    max-width: 960px;
+    width: 100%;
+    margin-bottom: 14px;
+  }
+  .island-btn {
+    background: white;
+    border: 3px solid #CBD5E1;
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 0.92rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.25s;
+    color: #475569;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.04);
+  }
+  .island-btn:hover {
+    transform: translateY(-2px);
+    border-color: var(--sea-blue);
+  }
+  .island-btn.active {
+    background: linear-gradient(135deg, #0284C7, #0D9488);
+    color: white;
+    border-color: #FFFFFF;
+    transform: scale(1.06);
+    box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
+  }
+
+  /* Activity Screen */
+  .island-screen {
+    background: var(--card-surface);
+    border-radius: 28px;
+    padding: 22px;
+    width: 100%;
+    max-width: 950px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    display: none;
+    border: 4px solid #BAE6FD;
+    animation: popIn 0.35s ease;
+  }
+  .island-screen.active { display: block; }
+
+  @keyframes popIn {
+    0% { opacity: 0; transform: scale(0.96); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  .screen-header {
+    background: linear-gradient(135deg, #E0F2FE, #FEF3C7);
+    border-left: 8px solid var(--sea-blue);
+    padding: 10px 16px;
+    border-radius: 16px;
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #0369A1;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .level-badge {
+    background: #F59E0B;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 18px;
+    font-size: 0.95rem;
+    font-weight: 900;
+    box-shadow: 0 3px 8px rgba(245, 158, 11, 0.3);
+  }
+
+  .screen-brief {
+    background: #F8FAFC;
+    border: 2px solid #E2E8F0;
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  .scenario-title {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #0F766E;
+    margin-bottom: 12px;
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .choice-card {
+    background: white;
+    border: 3px solid #CBD5E1;
+    border-radius: 18px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+  }
+  .choice-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    border-color: var(--sea-blue);
+    background: #F0FDFA;
+  }
+  .choice-card svg { width: 70px; height: 70px; }
+  .choice-card span { font-size: 1.05rem; font-weight: bold; }
+
+  .choice-card.correct {
+    background: #DCFCE7 !important;
+    border-color: #16A34A !important;
+    color: #064E3B !important;
+    animation: bounce 0.4s;
+  }
+  .choice-card.wrong {
+    background: #FFE4E6 !important;
+    border-color: #E11D48 !important;
+    color: #881337 !important;
+    animation: shake 0.3s;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  .feedback-box {
+    font-size: 1.15rem;
+    font-weight: 900;
+    min-height: 35px;
+    margin-top: 10px;
+    text-align: center;
+  }
+  .feedback-box.good { color: #15803D; }
+  .feedback-box.bad { color: #BE123C; }
+
+  .btn-next-lvl {
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: white;
+    border: none;
+    border-radius: 18px;
+    padding: 10px 22px;
+    font-size: 1.1rem;
+    font-weight: 900;
+    cursor: pointer;
+    margin-top: 12px;
+    display: none;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+  }
+  .btn-next-lvl:hover { transform: scale(1.05); }
+
+  /* Interactive Explorer */
+  .explorer-window {
+    background: #FFFFFF;
+    border: 3px solid #64748B;
+    border-radius: 14px;
+    display: flex;
+    min-height: 160px;
+    overflow: hidden;
+    margin: 12px auto;
+    max-width: 650px;
+    text-align: left;
+  }
+  .explorer-sidebar {
+    background: #F1F5F9;
+    width: 35%;
+    border-right: 2px solid #CBD5E1;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: bold;
+  }
+  .explorer-content {
+    background: #FFFFFF;
+    width: 65%;
+    padding: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .folder-icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+  .folder-icon-item:hover { background: #E0F2FE; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏝️ Το Μαγικό Νησί των Αρχείων & Φακέλων! 📂</h1>
+  <p>Πληροφορική Γ΄ Δημοτικού • Μάθημα 14: Αρχεία και φάκελοι (3 Επίπεδα ανά Αποστολή)</p>
+</header>
+
+<div class="island-nav">
+  <button class="island-btn active" onclick="loadScreen(1)">1. 📁 Φάκελος ή Αρχείο;</button>
+  <button class="island-btn" onclick="loadScreen(2)">2. 🏷️ Εικονίδια & Τύποι</button>
+  <button class="island-btn" onclick="loadScreen(3)">3. ⚖️ Ποιο είναι πιο «Βαρύ»;</button>
+  <button class="island-btn" onclick="loadScreen(4)">4. 🗂️ Ο Εξερευνητής</button>
+  <button class="island-btn" onclick="loadScreen(5)">5. ✨ Νέος Φάκελος</button>
+  <button class="island-btn" onclick="loadScreen(6)">6. 🗃️ Τακτοποίηση στο Σχολείο</button>
+  <button class="island-btn" onclick="loadScreen(7)">7. 🔍 Εικονίδια ή Λίστα;</button>
+  <button class="island-btn" onclick="loadScreen(8)">8. 🏷️ Το Σωστό Όνομα</button>
+</div>
+
+<!-- ================= 1. ΦΑΚΕΛΟΣ Η ΑΡΧΕΙΟ ================= -->
+<div class="island-screen active" id="screen1">
+  <div class="screen-header">
+    <span>📁 Αποστολή 1: Φάκελος ή Αρχείο;</span>
+    <span class="level-badge" id="lvlBadge1">Επίπεδο 1/3 ⭐</span>
+  </div>
+  <div class="screen-brief">
+    <div class="scenario-title" id="scenario1"></div>
+    <div class="options-grid" id="grid1"></div>
+    <div class="feedback-box" id="fb1"></div>
+    <button class="btn-next-lvl" id="next1" onclick="advanceScreen(1)">ΕΠΟΜΕΝΟ ΕΠΙΠΕΔΟ ➡️</button>
+  </div>
+</div>
+
+<!-- ================= 2. ΕΙΚΟΝΙΔΙΑ ΚΑΙ ΤΥΠΟΙ ================= -->
+<div class="island-screen" id="screen2">
+  <div class="screen-header">
+    <span>🏷️ Αποστολή 2: Εικονίδια και Τύποι Αρχείων</span>
+    <span class="level-badge" id="lvlBadge2">Επίπεδο 1/3 ⭐</span>
+  </div>
+  <div class="screen-brief">
+    <div class="scenario-title" id="scenario2"></div>
+    <div class="options-grid" id="grid2"></div>
+    <div class="feedback-box" id="fb2"></div>
+    <button class="btn-next-lvl" id="next2" onclick="advanceScreen(2)">ΕΠΟΜΕΝΟ ΕΠΙΠΕΔΟ ➡️</button>
+  </div>
+</div>
+
+<!-- ================= 3. ΒΑΡΥ Η ΕΛΑΦΡΥ ================= -->
+<div class="island-screen" id="screen3">
+  <div class="screen-header">
+    <span>⚖️ Αποστολή 3: Ποιο Αρχείο είναι πιο «Βαρύ» σε Μέγεθος;</span>
+    <span class="level-badge" id="lvlBadge3">Επίπεδο 1/3 ⭐</span>
+  </div>
+  <div class="screen-brief">
+    <div class="scenario-title" id="scenario3"></div>
+    <div class="options-grid" id="grid3"></div>
+    <div class="feedback-box" id="fb3"></div>
+    <button class="btn-next-lvl" id="next3" onclick="advanceScreen(3)">ΕΠΟΜΕΝΟ ΕΠΙΠΕΔΟ ➡️</button>
+  </div>
+</div>
+
+<!-- ================= 4. Ο ΕΞΕΡΕΥΝΗΤΗΣ ================= -->
+<div class="island-screen" id="screen4">
+  <div class="screen-header">
+    <span>🗂️ Αποστολή 4: Η Εφαρμογή «Εξερευνητής Αρχείων»</span>
+    <span class="level-badge" id="lvlBadge4">Επίπεδο 1/3 ⭐</span>
+  </div>
+  <div class="screen-brief">
+    <div class="scenario-title" id="scenario4"></div>
+    <div class="explorer-window">
+      <div class="explorer-sidebar">
+        <div>📌 Τοποθεσίες</div>
+        <div style="color:#0284C7; margin-top:8px;">📁 Έγγραφα</div>
+        <div style="color:#64748B;">📁 Εικόνες</div>
+        <div style="color:#64748B;">📁 Μουσική</div>
+      </div>
+      <div class="explorer-content">
+        <div class="folder-icon-item">
+          <svg width="40" height="40" viewBox="0 0 64 64"><path d="M6 14 L24 14 L30 22 L58 22 L58 52 L6 52 Z" fill="#F59E0B"/></svg>
+          <span style="font-size:0.8rem; font-weight:bold;">Το Χωριό</span>
+        </div>
+        <div class="folder-icon-item">
+          <svg width="40" height="40" viewBox="0 0 64 64"><rect x="14" y="8" width="36" height="48" rx="3" fill="#3B82F6"/><path d="M22 24 L42 24 M22 34 L42 34 M22 44 L34 44" stroke="#FFF" stroke-width="3"/></svg>
+          <span style="font-size:0.8rem; font-weight:bold;">Αίσωπος.odt</span>
+        </div>
+      </div>
+    </div>
+    <div class="options-grid" id="grid4"></div>
+    <div class="feedback-box" id="fb4"></div>
+    <button class="btn-next-lvl" id="next4" onclick="advanceScreen(4)">ΕΠΟΜΕΝΟ ΕΠΙΠΕΔΟ ➡️</button>
+  </div>
+</div>
+
+<!-- ================= 5. ΝΕΟΣ ΦΑΚΕΛΟΣ ================= -->
+<div class="island-screen" id="screen5">
+  <div class="screen-header">
+    <span>✨ Αποστολή 5: Πώς Φτιάχνουμε έναν Νέο Φάκελο;</span>
+    <span class="level-badge" id="lvlBadge5">Επίπεδο 1/3 ⭐</span>
+  </div>
+  <div class="screen-brief">
+    <div class="scenario-title" id="scenario5"></div>
+    <div class="options-grid" id="grid5"></div>
+    <div class="feedback-box" id="fb5"></div>
+    <button class="btn-next-lvl" id="next5" onclick="advanceScreen(5)">ΕΠΟΜΕΝΟ ΕΠΙΠΕΔΟ ➡️</button>
+  </div>
+</div>
+
+<!-- ================= 6. ΤΑΚΤΟΠΟΙΗΣΗ ΣΤΟ ΣΧΟΛΕΙΟ (ΑΠΛΟΠΟΙΗΜΕΝΗ) ================= -->
+<div class="island-screen" id="screen6">
+  <div class="screen-header">
+    <span>🗃️ Αποστολή 6: Τακτοποίηση Αρχείων στον Σωστό Φάκελο!</span>
+    <span class="level-badge" id="lvlBadge6">Επίπεδο 1/3 ⭐</span>
+  </div>
+  <div class="screen-brief">
+    <div class="scenario-title" id="scenario6"></div>
+    <div class="options-grid" id="grid6"></div>
+    <div class="feedback-box" id="fb6"></div>
+    <button class="btn-next-lvl" id="next6" onclick="advanceScreen(6)">ΕΠΟΜΕΝΟ ΕΠΙΠΕΔΟ ➡️</button>
+  </div>
+</div>
+
+<!-- ================= 7. ΠΡΟΒΟΛΗ ΚΑΙ ΜΕΓΕΘΥΝΣΗ ================= -->
+<div class="island-screen" id="screen7">
+  <div class="screen-header">
+    <span>🔍 Αποστολή 7: Εικονίδια ή Λίστα Λεπτομερειών;</span>
+    <span class="level-badge" id="lvlBadge7">Επίπεδο 1/3 ⭐</span>
+  </div>
+  <div class="screen-brief">
+    <div class="scenario-title" id="scenario7"></div>
+    <div class="options-grid" id="grid7"></div>
+    <div class="feedback-box" id="fb7"></div>
+    <button class="btn-next-lvl" id="next7" onclick="advanceScreen(7)">ΕΠΟΜΕΝΟ ΕΠΙΠΕΔΟ ➡️</button>
+  </div>
+</div>
+
+<!-- ================= 8. ΤΟ ΣΩΣΤΟ ΟΝΟΜΑ ================= -->
+<div class="island-screen" id="screen8">
+  <div class="screen-header">
+    <span>🏷️ Αποστολή 8: Το Σωστό Όνομα Αρχείου!</span>
+    <span class="level-badge" id="lvlBadge8">Επίπεδο 1/3 ⭐</span>
+  </div>
+  <div class="screen-brief">
+    <div class="scenario-title" id="scenario8"></div>
+    <div class="options-grid" id="grid8"></div>
+    <div class="feedback-box" id="fb8"></div>
+    <button class="btn-next-lvl" id="next8" onclick="advanceScreen(8)">ΟΛΟΚΛΗΡΩΣΗ ΑΠΟΣΤΟΛΗΣ 🏆</button>
+  </div>
+</div>
+
+<script>
+  function loadScreen(num) {
+    document.querySelectorAll('.island-screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.island-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('screen' + num).classList.add('active');
+    document.querySelectorAll('.island-btn')[num - 1].classList.add('active');
+  }
+
+  function shuffle(arr) {
+    let cur = arr.length, rand;
+    while (cur != 0) {
+      rand = Math.floor(Math.random() * cur);
+      cur--;
+      [arr[cur], arr[rand]] = [arr[rand], arr[cur]];
+    }
+    return arr;
+  }
+
+  const currentLevel = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1 };
+
+  // ================= DATA (3 LEVELS PER ACTIVITY) =================
+  const islandData = {
+    1: [
+      {
+        title: "ΕΠΙΠΕΔΟ 1: Ποιο αντικείμενο είναι ένας ΦΑΚΕΛΟΣ που βάζουμε μέσα άλλα αρχεία;",
+        items: [
+          { text: "Ο κίτρινος φάκελος (folder)!", icon: `<svg viewBox="0 0 64 64"><path d="M6 14 L24 14 L30 22 L58 22 L58 52 L6 52 Z" fill="#F59E0B"/></svg>`, correct: true },
+          { text: "Μια μεμονωμένη φωτογραφία", icon: `<svg viewBox="0 0 64 64"><rect x="12" y="14" width="40" height="36" rx="4" fill="#0284C7"/><circle cx="24" cy="26" r="4" fill="#FDE047"/></svg>`, correct: false },
+          { text: "Ένα αρχείο ήχου", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="#EC4899"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 2: Μπορεί ένας φάκελος να έχει μέσα του κι ΑΛΛΟΥΣ μικρότερους φακέλους;",
+        items: [
+          { text: "ΝΑΙ! Μπορούμε να βάλουμε φακέλους μέσα σε φακέλους!", icon: `<svg viewBox="0 0 64 64"><path d="M4 10 L20 10 L26 18 L52 18 L52 46 L4 46 Z" fill="#F59E0B"/><path d="M16 26 L28 26 L32 32 L56 32 L56 54 L16 54 Z" fill="#FBBF24"/></svg>`, correct: true },
+          { text: "ΟΧΙ, απαγορεύεται αυστηρά", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="#EF4444"/><line x1="20" y1="20" x2="44" y2="44" stroke="#FFF" stroke-width="5"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 3: Γιατί φτιάχνουμε φακέλους στον υπολογιστή μας;",
+        items: [
+          { text: "Για να οργανώνουμε και να βρίσκουμε εύκολα τις εργασίες μας!", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#10B981"/><path d="M20 32 L28 40 L44 24" stroke="#FFF" stroke-width="5" fill="none"/></svg>`, correct: true },
+          { text: "Για να γεμίζει η οθόνη με κίτρινο χρώμα", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#FCD34D"/></svg>`, correct: false },
+          { text: "Για να σβήνονται τα αρχεία μόνα τους", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#64748B"/></svg>`, correct: false }
+        ]
+      }
+    ],
+
+    2: [
+      {
+        title: "ΕΠΙΠΕΔΟ 1: Ποιο εικονίδιο αντιστοιχεί σε αρχείο ΕΙΚΟΝΑΣ (π.χ. JPEG ή PNG);",
+        items: [
+          { text: "Εικονίδιο με τοπίο ή φωτογραφία (JPEG / PNG)!", icon: `<svg viewBox="0 0 64 64"><rect x="10" y="12" width="44" height="40" rx="4" fill="#0284C7"/><circle cx="22" cy="24" r="5" fill="#FDE047"/><polygon points="14,48 26,34 38,42 46,30 50,48" fill="#10B981"/></svg>`, correct: true },
+          { text: "Εικονίδιο με νότες μουσικής", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="#EC4899"/><path d="M26 40 L26 24 L42 20 L42 36" stroke="#FFF" stroke-width="3"/></svg>`, correct: false },
+          { text: "Εικονίδιο με γραμμές κειμένου", icon: `<svg viewBox="0 0 64 64"><rect x="14" y="10" width="36" height="44" fill="#FFF" stroke="#64748B" stroke-width="3"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 2: Ποιο αρχείο περιέχει ΗΧΟ ή τραγούδι (π.χ. μορφής MP3 ή WAV);",
+        items: [
+          { text: "Αρχείο με νότες ή σύμβολο αναπαραγωγής (MP3 / WAV)!", icon: `<svg viewBox="0 0 64 64"><rect x="12" y="10" width="40" height="44" rx="4" fill="#FFF" stroke="#EC4899" stroke-width="3"/><text x="18" y="44" font-size="12" font-weight="bold" fill="#EC4899">mp3</text><circle cx="32" cy="25" r="7" fill="#EC4899"/></svg>`, correct: true },
+          { text: "Αρχείο με γράμματα κειμένου", icon: `<svg viewBox="0 0 64 64"><rect x="14" y="10" width="36" height="44" fill="#0284C7"/></svg>`, correct: false },
+          { text: "Κενός φάκελος", icon: `<svg viewBox="0 0 64 64"><path d="M6 14 L24 14 L30 22 L58 22 L58 52 L6 52 Z" fill="#F59E0B"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 3: Ποιο αρχείο είναι ΒΙΝΤΕΟ (ταινία ή κινούμενο σχέδιο);",
+        items: [
+          { text: "Αρχείο μορφής MP4 (με εικόνα από το βίντεο)!", icon: `<svg viewBox="0 0 64 64"><rect x="10" y="12" width="44" height="40" rx="4" fill="#F97316"/><polygon points="26,24 44,32 26,40" fill="#FFF"/><text x="20" y="48" font-size="9" font-weight="bold" fill="#FFF">MP4</text></svg>`, correct: true },
+          { text: "Ένα απλό αρχείο κειμένου", icon: `<svg viewBox="0 0 64 64"><rect x="16" y="12" width="32" height="40" fill="#E2E8F0"/></svg>`, correct: false }
+        ]
+      }
+    ],
+
+    3: [
+      {
+        title: "ΕΠΙΠΕΔΟ 1: Ποιο αρχείο πιάνει περισσότερο χώρο στον δίσκο;",
+        items: [
+          { text: "Μια ταινία βίντεο (πολλά MB ή GB)!", icon: `<svg viewBox="0 0 64 64"><rect x="8" y="16" width="48" height="32" rx="4" fill="#7C3AED"/><polygon points="26,24 42,32 26,40" fill="#FFF"/></svg>`, correct: true },
+          { text: "Ένα μικρό κείμενο με 3 γραμμές (λίγα kB)", icon: `<svg viewBox="0 0 64 64"><rect x="16" y="12" width="32" height="40" fill="#E2E8F0"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 2: Βλέπεις δύο αρχεία: 107 kB και 1,6 MB. Ποιο είναι το μεγαλύτερο;",
+        items: [
+          { text: "Το 1,6 MB! (Γιατί 1 MB = 1.000 kB!)", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#10B981"/><text x="14" y="38" font-size="16" font-weight="bold" fill="#FFF">MB</text></svg>`, correct: true },
+          { text: "Το 107 kB", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#94A3B8"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 3: Πού μπορούμε να δούμε το μέγεθος ενός αρχείου;",
+        items: [
+          { text: "Στην εφαρμογή «Εξερευνητής Αρχείων» δίπλα στο όνομα!", icon: `<svg viewBox="0 0 64 64"><rect x="10" y="14" width="44" height="36" fill="#1E293B" stroke="#0284C7" stroke-width="2"/><text x="14" y="36" font-size="12" fill="#38BDF8">47,0 kB</text></svg>`, correct: true },
+          { text: "Πάνω στο πληκτρολόγιο με μεγεθυντικό φακό", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#64748B"/></svg>`, correct: false }
+        ]
+      }
+    ],
+
+    4: [
+      {
+        title: "ΕΠΙΠΕΔΟ 1: Πώς ανοίγουμε έναν φάκελο ή ένα αρχείο στον Εξερευνητή;",
+        items: [
+          { text: "Κάνοντας ΓΡΗΓΟΡΟ ΔΙΠΛΟ ΚΛΙΚ με το ποντίκι!", icon: `<svg viewBox="0 0 64 64"><ellipse cx="32" cy="34" rx="14" ry="20" fill="#0284C7"/><path d="M32 14 L32 26" stroke="#FFF" stroke-width="3"/><circle cx="26" cy="22" r="3" fill="#FFE600"/><circle cx="38" cy="22" r="3" fill="#FFE600"/></svg>`, correct: true },
+          { text: "Κουνώντας απλώς το ποντίκι στον αέρα", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#64748B"/></svg>`, correct: false },
+          { text: "Κλείνοντας την οθόνη", icon: `<svg viewBox="0 0 64 64"><rect x="14" y="20" width="36" height="24" fill="#000"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 2: Τι εμφανίζεται στην ΑΡΙΣΤΕΡΗ στήλη του παραθύρου του Εξερευνητή;",
+        items: [
+          { text: "Οι Τοποθεσίες (βασικοί φάκελοι & Επιφάνεια εργασίας)!", icon: `<svg viewBox="0 0 64 64"><rect x="10" y="12" width="20" height="40" fill="#0284C7"/><rect x="34" y="12" width="20" height="40" fill="#E2E8F0"/></svg>`, correct: true },
+          { text: "Ένα ρολόι τοίχου", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#F59E0B"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 3: Τι εμφανίζεται στη ΔΕΞΙΑ στήλη όταν πατάμε σε έναν φάκελο;",
+        items: [
+          { text: "Το Περιεχόμενο του φακέλου (τα αρχεία που έχει μέσα)!", icon: `<svg viewBox="0 0 64 64"><rect x="10" y="12" width="20" height="40" fill="#E2E8F0"/><rect x="34" y="12" width="20" height="40" fill="#10B981"/></svg>`, correct: true },
+          { text: "Μια μαύρη τρύπα", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#000"/></svg>`, correct: false }
+        ]
+      }
+    ],
+
+    5: [
+      {
+        title: "ΕΠΙΠΕΔΟ 1: Ποιο κλικ πατάμε σε κενό χώρο για να φτιάξουμε νέο φάκελο;",
+        items: [
+          { text: "Δεξί κλικ με το ποντίκι!", icon: `<svg viewBox="0 0 64 64"><ellipse cx="32" cy="34" rx="14" ry="20" fill="#64748B"/><path d="M32 14 L32 26" stroke="#FFF" stroke-width="2"/><path d="M32 14 A14 20 0 0 1 46 28 L32 28 Z" fill="#0284C7"/></svg>`, correct: true },
+          { text: "Πατάμε το κουμπί σβησίματος του υπολογιστή", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#EF4444"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 2: Από το μενού που ανοίγει με δεξί κλικ, ποια επιλογή διαλέγουμε;",
+        items: [
+          { text: "Επιλέγουμε «Δημιουργία» (ή Νέος Φάκελος)!", icon: `<svg viewBox="0 0 64 64"><rect x="12" y="16" width="40" height="32" rx="4" fill="#FFF" stroke="#0284C7" stroke-width="3"/><path d="M26 32 L38 32 M32 26 L32 38" stroke="#10B981" stroke-width="4"/></svg>`, correct: true },
+          { text: "Επιλέγουμε «Διαγραφή όλων»", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#EF4444"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 3: Μόλις εμφανιστεί ο νέος κίτρινος φάκελος, τι πρέπει να κάνουμε;",
+        items: [
+          { text: "Πληκτρολογούμε ένα σωστό Όνομα για τον φάκελο!", icon: `<svg viewBox="0 0 64 64"><rect x="12" y="24" width="40" height="20" fill="#FFF" stroke="#F59E0B" stroke-width="3"/><text x="16" y="38" font-size="11" font-weight="bold">Όνομα...</text></svg>`, correct: true },
+          { text: "Τον αφήνουμε χωρίς όνομα για πάντα", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#94A3B8"/></svg>`, correct: false }
+        ]
+      }
+    ],
+
+    // ΑΠΛΟΠΟΙΗΜΕΝΗ ΔΡΑΣΤΗΡΙΟΤΗΤΑ 6
+    6: [
+      {
+        title: "ΕΠΙΠΕΔΟ 1: Ηχογραφήσατε ένα όμορφο παραμύθι (αρχείο ήχου). Σε ποιον φάκελο θα το αποθηκεύσετε;",
+        items: [
+          { text: "Στον φάκελο «Διηγήσεις & Τραγούδια» 🎵!", icon: `<svg viewBox="0 0 64 64"><path d="M6 14 L24 14 L30 22 L58 22 L58 52 L6 52 Z" fill="#F59E0B"/><circle cx="32" cy="38" r="6" fill="#FFF"/><path d="M38 32 L38 38" stroke="#FFF" stroke-width="2"/></svg>`, correct: true },
+          { text: "Στον φάκελο «Σκουπίδια / Απορρίμματα» 🗑️", icon: `<svg viewBox="0 0 64 64"><rect x="20" y="20" width="24" height="32" fill="#64748B"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 2: Βγάλατε μια φωτογραφία από την εκδρομή στο χωριό. Σε ποιον φάκελο ταιριάζει;",
+        items: [
+          { text: "Στον φάκελο «Φωτογραφίες & Εικόνες» 🖼️!", icon: `<svg viewBox="0 0 64 64"><path d="M6 14 L24 14 L30 22 L58 22 L58 52 L6 52 Z" fill="#F59E0B"/><circle cx="24" cy="34" r="3" fill="#FFF"/><polygon points="20,44 32,34 40,40 48,32 50,44" fill="#FFF"/></svg>`, correct: true },
+          { text: "Στον φάκελο «Αριθμομηχανή»", icon: `<svg viewBox="0 0 64 64"><rect x="18" y="16" width="28" height="34" fill="#94A3B8"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 3: Γράψατε ένα κείμενο για τα αξιοθέατα του χωριού. Πού θα το τακτοποιήσετε;",
+        items: [
+          { text: "Στον φάκελο «Πληροφορίες & Κείμενα» 📝!", icon: `<svg viewBox="0 0 64 64"><path d="M6 14 L24 14 L30 22 L58 22 L58 52 L6 52 Z" fill="#F59E0B"/><line x1="22" y1="34" x2="42" y2="34" stroke="#FFF" stroke-width="3"/><line x1="22" y1="42" x2="36" y2="42" stroke="#FFF" stroke-width="3"/></svg>`, correct: true },
+          { text: "Σε έναν άδειο φάκελο χωρίς όνομα", icon: `<svg viewBox="0 0 64 64"><path d="M6 14 L24 14 L30 22 L58 22 L58 52 L6 52 Z" fill="#CBD5E1"/></svg>`, correct: false }
+        ]
+      }
+    ],
+
+    7: [
+      {
+        title: "ΕΠΙΠΕΔΟ 1: Ποιο κουμπί πατάμε για να επιστρέψουμε στον προηγούμενο φάκελο;",
+        items: [
+          { text: "Το κουμπί Πίσω (βελάκι προς τα αριστερά)!", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#0284C7"/><path d="M38 20 L24 32 L38 44" stroke="#FFF" stroke-width="5" fill="none"/></svg>`, correct: true },
+          { text: "Το κουμπί απενεργοποίησης", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#EF4444"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 2: Τι μας δείχνει η «Προβολή Λίστας» στον Εξερευνητή;",
+        items: [
+          { text: "Περισσότερες πληροφορίες (μέγεθος σε kB, ημερομηνία, τύπο)!", icon: `<svg viewBox="0 0 64 64"><rect x="12" y="14" width="40" height="36" fill="#FFF" stroke="#64748B" stroke-width="2"/><line x1="18" y1="22" x2="46" y2="22" stroke="#0284C7" stroke-width="3"/><line x1="18" y1="32" x2="46" y2="32" stroke="#0284C7" stroke-width="3"/><line x1="18" y1="42" x2="46" y2="42" stroke="#0284C7" stroke-width="3"/></svg>`, correct: true },
+          { text: "Μόνο άσπρο χρώμα", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#E2E8F0"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 3: Με ποιο εργαλείο μπορούμε να κάνουμε τα εικονίδια μεγαλύτερα;",
+        items: [
+          { text: "Με τον μεγεθυντικό φακό / ποσοστό μεγέθυνσης (π.χ. 200%)!", icon: `<svg viewBox="0 0 64 64"><circle cx="28" cy="28" r="16" stroke="#0284C7" stroke-width="5" fill="none"/><line x1="40" y1="40" x2="54" y2="54" stroke="#0284C7" stroke-width="6"/></svg>`, correct: true },
+          { text: "Με ένα ψαλίδι", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#94A3B8"/></svg>`, correct: false }
+        ]
+      }
+    ],
+
+    8: [
+      {
+        title: "ΕΠΙΠΕΔΟ 1: Έφτιαξες μια ζωγραφιά με μια πασχαλίτσα. Ποιο είναι το πιο κατάλληλο όνομα;",
+        items: [
+          { text: "«Πασχαλίτσα.png» (θυμίζει ακριβώς τι περιέχει)!", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#EF4444"/><circle cx="32" cy="32" r="4" fill="#000"/><circle cx="24" cy="24" r="3" fill="#000"/><circle cx="40" cy="24" r="3" fill="#000"/></svg>`, correct: true },
+          { text: "«Άτιτλο 1» (δεν ξέρουμε τι είναι)", icon: `<svg viewBox="0 0 64 64"><rect x="16" y="16" width="32" height="32" fill="#E2E8F0"/></svg>`, correct: false },
+          { text: "«ασδφ1234»", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#64748B"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 2: Γιατί δεν είναι καλό να ονομάζουμε όλα τα αρχεία μας «Άτιτλο»;",
+        items: [
+          { text: "Γιατί μετά θα μπερδευτούμε και δεν θα ξέρουμε ποιο αρχείο να ανοίξουμε!", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="#F59E0B"/><text x="26" y="40" font-size="24" font-weight="bold" fill="#FFF">?</text></svg>`, correct: true },
+          { text: "Γιατί χαλάει το ποντίκι", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#64748B"/></svg>`, correct: false }
+        ]
+      },
+      {
+        title: "ΕΠΙΠΕΔΟ 3: Τελικό Συμπέρασμα: Κάθε αρχείο στον υπολογιστή έχει πάντα:",
+        items: [
+          { text: "Ένα Εικονίδιο (που δείχνει τον τύπο) και ένα Όνομα!", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#10B981"/><text x="18" y="40" font-size="22">🏆</text></svg>`, correct: true },
+          { text: "Μόνο έναν αριθμό", icon: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="16" fill="#94A3B8"/></svg>`, correct: false }
+        ]
+      }
+    ]
+  };
+
+  function renderIslandStage(screenId) {
+    const lvl = currentLevel[screenId];
+    const data = islandData[screenId][lvl - 1];
+    document.getElementById(`lvlBadge${screenId}`).innerText = `Επίπεδο ${lvl}/3 ⭐`;
+    document.getElementById(`scenario${screenId}`).innerText = data.title;
+    document.getElementById(`fb${screenId}`).innerText = '';
+    document.getElementById(`next${screenId}`).style.display = 'none';
+
+    const grid = document.getElementById(`grid${screenId}`);
+    grid.innerHTML = '';
+
+    const shuffled = shuffle([...data.items]);
+    shuffled.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'choice-card';
+      card.innerHTML = `${item.icon}<span>${item.text}</span>`;
+      card.onclick = () => {
+        grid.querySelectorAll('.choice-card').forEach(c => c.className = 'choice-card');
+        const fb = document.getElementById(`fb${screenId}`);
+        if (item.correct) {
+          card.classList.add('correct');
+          fb.className = 'feedback-box good';
+          fb.innerText = lvl === 3 ? "🏆 ΣΥΓΧΑΡΗΤΗΡΙΑ! Ολοκλήρωσες και τα 3 επίπεδα της αποστολής!" : "🎉 Μπράβο! Πολύ σωστή επιλογή!";
+          if (lvl < 3) document.getElementById(`next${screenId}`).style.display = 'inline-block';
+        } else {
+          card.classList.add('wrong');
+          fb.className = 'feedback-box bad';
+          fb.innerText = "🤔 Σκέψου το λίγο ακόμα και ξαναδοκίμασε!";
+        }
+      };
+      grid.appendChild(card);
+    });
+  }
+
+  function advanceScreen(screenId) {
+    if (currentLevel[screenId] < 3) {
+      currentLevel[screenId]++;
+      renderIslandStage(screenId);
+    }
+  }
+
+  window.onload = () => {
+    for (let i = 1; i <= 8; i++) {
+      renderIslandStage(i);
+    }
+  };
+</script>
+
+</body>
+</html>
