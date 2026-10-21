@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μάθημα 20: KidSearch - Ο Προσομοιωτής Μηχανής Αναζήτησης Γ΄ Δημοτικού</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700;800&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --accent: #0284c7;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg: #f1f5f9;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #cbd5e1;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #e0f2fe 0%, #ede9fe 50%, #fef3c7 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    /* Activity Selector Carousel / Menu */
+    .activity-nav-bar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.08);
+      border: 2px solid #e0e7ff;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-buttons-track {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+
+    .btn-act-jump {
+      background: #f8fafc;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: #334155;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-act-jump:hover {
+      background: #e0e7ff;
+      border-color: #a5b4fc;
+      transform: translateY(-2px);
+    }
+
+    .btn-act-jump.current {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+
+    /* Top HUD / Mission Tracker */
+    .mission-hud {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 1rem 1.4rem;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.1);
+      border: 2px solid #e0e7ff;
+    }
+
+    .hud-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 0.8rem;
+    }
+
+    .activity-badge {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--primary);
+      background: #e0e7ff;
+      padding: 5px 14px;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stars-box {
+      font-weight: 900;
+      font-size: 1.05rem;
+      color: #b45309;
+      background: #fef3c7;
+      padding: 4px 14px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Level progression bar */
+    .level-stepper {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 0.8rem;
+    }
+
+    .step-pill {
+      flex: 1;
+      height: 10px;
+      border-radius: 10px;
+      background: #cbd5e1;
+      transition: all 0.4s ease;
+    }
+
+    .step-pill.done { background: var(--success); }
+    .step-pill.active {
+      background: var(--warning);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+      transform: scaleY(1.3);
+    }
+
+    .task-dialogue {
+      background: #f8fafc;
+      border-left: 5px solid var(--accent);
+      border-radius: 0 14px 14px 0;
+      padding: 0.8rem 1.1rem;
+      font-size: 1.02rem;
+      line-height: 1.5;
+    }
+    .task-dialogue strong { color: var(--accent); font-weight: 800; }
+
+    /* Browser Window Simulation */
+    .browser-window {
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.15);
+      border: 3px solid #cbd5e1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 520px;
+    }
+
+    /* Browser Window Bar */
+    .browser-topbar {
+      background: #e2e8f0;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 2px solid #cbd5e1;
+    }
+
+    .traffic-lights {
+      display: flex;
+      gap: 7px;
+    }
+    .traffic-lights span {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .tl-red { background: #f87171; }
+    .tl-yellow { background: #fbbf24; }
+    .tl-green { background: #4ade80; }
+
+    .browser-url-bar {
+      flex: 1;
+      background: white;
+      border-radius: 50px;
+      padding: 5px 14px;
+      font-size: 0.82rem;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #94a3b8;
+    }
+    .browser-url-bar .lock-icon { font-size: 0.75rem; }
+
+    /* Search Engine Canvas */
+    .search-viewport {
+      padding: 2rem 1.8rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #ffffff;
+      overflow-y: auto;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+      margin-top: 0.5rem;
+      transition: all 0.3s;
+    }
+
+    .engine-logo {
+      font-family: 'Comfortaa', cursive;
+      font-size: 2.3rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+    .logo-k { color: #4f46e5; }
+    .logo-i { color: #ef4444; }
+    .logo-d { color: #f59e0b; }
+    .logo-s { color: #10b981; }
+    .logo-e { color: #0284c7; }
+    .logo-tag {
+      background: #e0e7ff;
+      color: #3730a3;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* Search Input Box */
+    .search-box-wrap {
+      width: 100%;
+      max-width: 620px;
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .search-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: 50px;
+      padding: 6px 10px 6px 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      transition: all 0.2s ease;
+    }
+
+    .search-bar:focus-within {
+      background: white;
+      border-color: var(--primary);
+      box-shadow: 0 8px 20px rgba(79, 70, 229, 0.15);
+    }
+
+    .search-bar input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 1.05rem;
+      font-family: inherit;
+      font-weight: 700;
+      color: #0f172a;
+      padding: 6px 8px;
+    }
+
+    .btn-search {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 9px 20px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-search:hover { background: var(--primary-hover); transform: scale(1.03); }
+
+    /* Suggestion helper chips */
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 1.2rem;
+      max-width: 680px;
+    }
+
+    .bank-chip {
+      background: #f1f5f9;
+      border: 2px solid #cbd5e1;
+      border-radius: 50px;
+      padding: 6px 14px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #334155;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s;
+    }
+    .bank-chip:hover {
+      background: #e2e8f0;
+      border-color: #94a3b8;
+      transform: translateY(-2px);
+    }
+
+    /* Tabs (Όλα, Εικόνες, κλπ) */
+    .search-categories {
+      display: none;
+      gap: 12px;
+      border-bottom: 2px solid #e2e8f0;
+      width: 100%;
+      max-width: 720px;
+      margin-bottom: 1.2rem;
+      padding-bottom: 6px;
+    }
+    .search-categories.show { display: flex; }
+
+    .cat-tab {
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .cat-tab.active {
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    /* Results Area */
+    .results-container {
+      width: 100%;
+      max-width: 720px;
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+      animation: fadeIn 0.3s ease;
+    }
+    .results-container.show { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-card {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .result-card:hover {
+      border-color: var(--accent);
+      background: #f0fdf4;
+      transform: translateX(4px);
+    }
+
+    .res-url {
+      font-size: 0.8rem;
+      color: #059669;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .res-title {
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: #1d4ed8;
+      line-height: 1.3;
+      margin-bottom: 6px;
+    }
+    .res-desc {
+      font-size: 0.9rem;
+      color: #475569;
+      line-height: 1.45;
+    }
+
+    /* Live Feedback Toast */
+    .feedback-banner {
+      width: 100%;
+      max-width: 720px;
+      margin-top: 1rem;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 0.98rem;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .feedback-banner.show { display: flex; }
+
+    @keyframes popIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .feedback-banner.correct {
+      background: #dcfce7;
+      color: #166534;
+      border: 2px solid #86efac;
+    }
+
+    .feedback-banner.wrong {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 2px solid #fca5a5;
+    }
+
+    .auto-advance-indicator {
+      font-size: 0.82rem;
+      background: rgba(0,0,0,0.07);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* Activity Finish Toast */
+    .act-complete-notice {
+      display: none;
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      color: #92400e;
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-top: 10px;
+      font-weight: 800;
+      text-align: center;
+      width: 100%;
+      max-width: 720px;
+    }
+    .act-complete-notice.show { display: block; }
+
+    /* Completion Overlay */
+    .congrats-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .congrats-modal.show { display: flex; }
+
+    .congrats-card {
+      background: white;
+      border-radius: 28px;
+      padding: 2.5rem;
+      max-width: 520px;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      border: 4px solid #818cf8;
+      animation: popIn 0.4s ease;
+    }
+
+    .congrats-card h2 {
+      font-family: 'Comfortaa', cursive;
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 0.8rem;
+    }
+
+    .btn-restart {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 28px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 1.5rem;
+      box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+    }
+    .btn-restart:hover { background: var(--primary-hover); }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      body { padding: 0.5rem; }
+      .search-viewport { padding: 1.5rem 1rem; }
+      .engine-logo { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- Direct Activity Jump Bar -->
+    <div class="activity-nav-bar">
+      <div class="nav-title">
+        <span>🚀 Ελεύθερη Επιλογή Δραστηριότητας (Κάνε κλικ για να πας κατευθείαν):</span>
+        <span id="levelLabelSmall" style="color: var(--primary); font-weight: 900;"></span>
+      </div>
+      <div class="nav-buttons-track" id="activityNavTrack">
+        <!-- Buttons 1 to 8 injected via JS -->
+      </div>
+    </div>
+
+    <!-- Mission HUD -->
+    <div class="mission-hud">
+      <div class="hud-header">
+        <span class="activity-badge" id="hudActivityBadge">ΔΡΑΣΤΗΡΙΟΤΗΤΑ 1 ΑΠΟ 8</span>
+        <div class="stars-box">
+          ⭐ Αστέρια: <span id="starCounter">0</span> / 24
+        </div>
+      </div>
+
+      <!-- 3-level step tracker for current activity -->
+      <div class="level-stepper">
+        <div class="step-pill active" id="stepPill1"></div>
+        <div class="step-pill" id="stepPill2"></div>
+        <div class="step-pill" id="stepPill3"></div>
+      </div>
+
+      <div class="task-dialogue" id="taskPrompt">
+        <!-- Filled with mission text -->
+      </div>
+    </div>
+
+    <!-- Browser Simulator Window -->
+    <div class="browser-window">
+      <!-- Browser chrome bar -->
+      <div class="browser-topbar">
+        <div class="traffic-lights">
+          <span class="tl-red"></span>
+          <span class="tl-yellow"></span>
+          <span class="tl-green"></span>
+        </div>
+        <div class="browser-url-bar">
+          <span class="lock-icon">🔒</span>
+          <span id="browserUrl">https://www.kidsearch.gr</span>
+        </div>
+      </div>
+
+      <!-- Engine Canvas -->
+      <div class="search-viewport">
+
+        <!-- Logo -->
+        <div class="logo-container" id="logoContainer">
+          <div class="engine-logo">
+            <span class="logo-k">K</span><span class="logo-i">i</span><span class="logo-d">d</span><span class="logo-s">S</span><span class="logo-e">e</span><span class="logo-a">a</span><span class="logo-r">r</span><span class="logo-c">c</span><span class="logo-s">h</span>
+          </div>
+          <span class="logo-tag">Μηχανή για Παιδιά</span>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-box-wrap">
+          <div class="search-bar">
+            <span>🔎</span>
+            <input type="text" id="mainSearchInput" placeholder="Πληκτρολόγησε εδώ λέξεις-κλειδιά..." autocomplete="off">
+            <button class="btn-search" onclick="submitSearch()">Αναζήτηση</button>
+          </div>
+        </div>
+
+        <!-- Word helper chips for young kids -->
+        <div class="word-bank" id="wordBank">
+          <!-- Populated per mission -->
+        </div>
+
+        <!-- Search Categories (Όλα, Εικόνες, κλπ) -->
+        <div class="search-categories" id="searchCategories">
+          <div class="cat-tab active" id="tabAll" onclick="selectCategory('all')">🌐 Όλα</div>
+          <div class="cat-tab" id="tabImages" onclick="selectCategory('images')">🖼️ Εικόνες</div>
+          <div class="cat-tab" id="tabMaps" onclick="selectCategory('maps')">🗺️ Χάρτες</div>
+        </div>
+
+        <!-- Results stream -->
+        <div class="results-container" id="resultsContainer">
+          <!-- Populated per search -->
+        </div>
+
+        <!-- Feedback Banner -->
+        <div class="feedback-banner" id="feedbackBanner">
+          <span id="feedbackText"></span>
+          <span class="auto-advance-indicator" id="advanceCountdown"></span>
+        </div>
+
+        <!-- Activity Complete Notice -->
+        <div class="act-complete-notice" id="actCompleteNotice">
+          🏆 Μπράβο! Ολοκλήρωσες και τα 3 επίπεδα αυτής της δραστηριότητας! Ετοιμάσου για την επόμενη...
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Final Modal -->
+  <div class="congrats-modal" id="congratsModal">
+    <div class="congrats-card">
+      <div style="font-size: 4rem; margin-bottom: 10px;">🏆🌟🎉</div>
+      <h2>Συγχαρητήρια, Μικρέ Εξερευνητή!</h2>
+      <p style="font-size: 1.15rem; color: #475569; line-height: 1.6;">
+        Ολοκλήρωσες και τα <strong>3 επίπεδα</strong> και στις <strong>8 δραστηριότητες</strong>!<br>
+        Έμαθες να χρησιμοποιείς τις λέξεις-κλειδιά και τη μηχανή αναζήτησης σαν αληθινός επαγγελματίας της Πληροφορικής!
+      </p>
+      <div style="font-size: 1.4rem; font-weight: 900; color: #b45309; margin-top: 1rem;">
+        Συνολικό Σκορ: <span id="finalScoreModal">24</span> / 24 Αστέρια ⭐
+      </div>
+      <button class="btn-restart" onclick="restartEverything()">Παίξε Ξανά από την Αρχή</button>
+    </div>
+  </div>
+
+  <script>
+    /* ========================================================
+       DATA MODEL: 8 ΔΡΑΣΤΗΡΙΟΤΗΤΕΣ x 3 ΑΥΤΟΜΑΤΑ ΕΠΙΠΕΔΑ
+       ======================================================== */
+    const activities = [
+      {
+        id: 1,
+        shortName: "1. Χάρτης Απαντήσεων",
+        title: "Ο Χάρτης των Απαντήσεων (Πού θα ψάξω;)",
+        levels: [
+          {
+            prompt: "Ο Ήρωνας ρωτάει: 💬 <em>«Πώς φτιάχνει η γιαγιά τα πεντανόστιμα κουλουράκια της;»</em> Πού είναι καλύτερα να ρωτήσει; Πάτα την κατάλληλη κάρτα παρακάτω!",
+            allowedKeywords: ["γιαγια", "σπιτι", "φαγητο", "κουλουρακια"],
+            chips: ["👵 Ρωτάω τη γιαγιά", "🌐 Ψάχνω στο Google", "📺 Βλέπω τηλεόραση"],
+            directPickMode: true,
+            results: [
+              { id: 'grandma', title: "👵 Ρωτάω κατευθείαν τη γιαγιά!", url: "οικογενειακό σπίτι", desc: "Για μυστικές οικογενειακές συνταγές, το καλύτερο μέρος είναι να ρωτήσουμε τους ίδιους τους ανθρώπους μας!", correct: true, why: "Μπράβο! Για οικογενειακά μυστικά δεν ψάχνουμε στο ίντερνετ, ρωτάμε τους δικούς μας ανθρώπους!" },
+              { id: 'google', title: "🌐 Ψάχνω σε μηχανή αναζήτησης", url: "www.google.gr", desc: "Θα βρει γενικές συνταγές, αλλά όχι τη μυστική γεύση της δικής σου γιαγιάς!", correct: false, why: "Το ίντερνετ δεν ξέρει τα μυστικά υλικά της γιαγιάς σου!" },
+              { id: 'tv', title: "📺 Ανοίγω την τηλεόραση", url: "τηλεοπτικό κανάλι", desc: "Μπορεί να έχει παιδικά, αλλά όχι τη συνταγή!", correct: false, why: "Η τηλεόραση παίζει προγράμματα, δεν απαντάει προσωπικά!" }
+            ]
+          },
+          {
+            prompt: "Η Υπατία ρωτάει: 💬 <em>«Πόσα χιλιόμετρα μακριά είναι η Σελήνη από τη Γη;»</em> Πληκτρολόγησε λέξεις-κλειδιά στο κουτί (π.χ. <strong>Σελήνη απόσταση</strong>) και πάτα Αναζήτηση!",
+            allowedKeywords: ["σεληνη αποσταση", "αποσταση σεληνης", "γη σεληνη", "αποσταση γης σεληνης", "σεληνη"],
+            chips: ["σελήνη", "απόσταση", "γη", "χιλιόμετρα"],
+            results: [
+              { id: 'moon-correct', title: "🚀 Πόσο απέχει η Σελήνη από τη Γη; - Αστρονομία", url: "www.astronomy-kids.gr", desc: "Η μέση απόσταση της Σελήνης από τη Γη είναι περίπου 384.400 χιλιόμετρα!", correct: true, why: "Τέλεια αναζήτηση! Για επιστημονικά θέματα η μηχανή αναζήτησης μας δίνει ακριβείς αριθμούς!" },
+              { id: 'moon-song', title: "🎵 Φεγγαράκι μου λαμπρό - Παιδικό Τραγούδι", url: "www.tragoudia.gr", desc: "Ένα παραδοσιακό τραγούδι για το φεγγάρι.", correct: false, why: "Αυτό είναι τραγούδι, δεν αναφέρει τα χιλιόμετρα!" }
+            ]
+          },
+          {
+            prompt: "💬 <em>«Ποιος ήταν ο πρώτος διευθυντής του σχολείου μας πριν από 60 χρόνια;»</em> Πού είναι καλύτερα να απευθυνθούμε;",
+            chips: ["🏫 Ρωτάω τον διευθυντή & το αρχείο του σχολείου", "🌐 Γράφω στο Google γενικά", "🎮 Ψάχνω μέσα στο Minecraft"],
+            directPickMode: true,
+            results: [
+              { id: 'school-archive', title: "🏫 Ρωτάω τον διευθυντή & το ιστορικό αρχείο του σχολείου", url: "αρχείο σχολείου", desc: "Το σχολείο διατηρεί ειδικό βιβλίο με την ιστορία και όλους τους παλιούς δασκάλους!", correct: true, why: "Εξαιρετικά! Οι παλιές τοπικές πληροφορίες βρίσκονται στα αρχεία του ίδιου του σχολείου!" },
+              { id: 'google-gen', title: "🌐 Γράφω γενικά στο Google", url: "www.google.gr", desc: "Δεν περιέχει τα ιδιωτικά παλιά χαρτιά κάθε σχολείου της Ελλάδας.", correct: false, why: "Μια γενική μηχανή δύσκολα βρίσκει παλιά τοπικά αρχεία ενός μεμονωμένου σχολείου!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 2,
+        shortName: "2. Περιττές Λέξεις",
+        title: "Το Ψαλίδι των Περιττών Λέξεων",
+        levels: [
+          {
+            prompt: "Ο Ήρωνας έγραψε: <em>«θέλω να βρω εικόνες για τη σημαία της ελλάδας»</em>. Είναι πολλά λόγια! Δοκίμασε να γράψεις μόνο τις 2 λέξεις-κλειδιά: <strong>σημαία ελλάδας</strong>!",
+            allowedKeywords: ["σημαια ελλαδας", "σημαια της ελλαδας", "ελληνικη σημαια"],
+            chips: ["σημαία", "ελλάδας", "θέλω", "να βρω"],
+            results: [
+              { id: 'flag-res', title: "🇬🇷 Η Σημαία της Ελλάδας - Ιστορία & Εικόνες", url: "www.history-school.gr", desc: "Η γαλανόλευκη σημαία με τον σταυρό και τις εννέα λωρίδες...", correct: true, why: "Μπράβο! Κόψαμε τα περιττά «θέλω να βρω» και η μηχανή βρήκε ακριβώς τη σημαία!" }
+            ]
+          },
+          {
+            prompt: "Η Υπατία θέλει να μάθει: <em>«πόσα χρόνια ζει κατά μέσο όρο μία γάτα;»</em>. Ποιες είναι οι 2-3 σημαντικές λέξεις-κλειδιά; Πληκτρολόγησε: <strong>μέσος όρος ζωής γάτας</strong>!",
+            allowedKeywords: ["μεσος ορος ζωης γατας", "ζωη γατας", "ποσα χρονια ζει η γατα", "διαρκεια ζωης γατας"],
+            chips: ["μέσος", "όρος", "ζωής", "γάτας", "πόσα", "χρόνια"],
+            results: [
+              { id: 'cat-life', title: "🐱 Πόσα Χρόνια Ζει μια Γάτα; - Φροντίδα Κατοικίδιων", url: "www.pets-care.gr", desc: "Οι οικόσιτες γάτες ζουν συνήθως από 12 έως 15 χρόνια...", correct: true, why: "Ακριβώς! Η φράση «μέσος όρος ζωής γάτας» είναι η πιο σαφής και επιστημονική αναζήτηση!" }
+            ]
+          },
+          {
+            prompt: "Ποια αναζήτηση είναι η πιο σωστή για μια μηχανή; Διάλεξε την πιο καθαρή και σύντομη επιλογή:",
+            directPickMode: true,
+            results: [
+              { id: 'kw-good', title: "🔑 «καιρός αθήνα σαββατοκύριακο»", url: "σύντομες λέξεις-κλειδιά", desc: "Περιέχει μόνο τον τόπο, τον χρόνο και αυτό που ψάχνουμε, χωρίς περιττές λέξεις.", correct: true, why: "Σωστά! Οι μηχανές προτιμούν ουσιαστικά και όρους, όχι ολόκληρες εκθέσεις!" },
+              { id: 'kw-bad', title: "❌ «γεια σου μπορείς να μου πεις αν θα βρέξει στην αθήνα το σάββατο σε παρακαλώ;»", url: "πλήρης πρόταση ευγενείας", desc: "Πάρα πολλά λόγια που μπερδεύουν τη μηχανή αναζήτησης.", correct: false, why: "Δεν χρειάζεται να μιλάμε στη μηχανή όπως σε άνθρωπο, αρκούν οι λέξεις-κλειδιά!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 3,
+        shortName: "3. Προσομοιωτής & Enter",
+        title: "Ο Προσομοιωτής Πληκτρολόγησης & Enter",
+        levels: [
+          {
+            prompt: "Πληκτρολόγησε στο κουτί τη λέξη <strong>Ελλάδα</strong> και πάτησε το κουμπί <strong>Αναζήτηση</strong> (ή το Enter στο πληκτρολόγιό σου)!",
+            allowedKeywords: ["ελλαδα"],
+            chips: ["Ελλάδα"],
+            results: [
+              { id: 'gr-res', title: "🏛️ Ελλάδα - Γεωγραφία & Πολιτισμός", url: "el.wikipedia.org/wiki/Ελλάδα", desc: "Η Ελλάδα είναι χώρα στη νοτιοανατολική Ευρώπη με μακραίωνη ιστορία...", correct: true, why: "Πολύ ωραία! Πληκτρολόγησες σωστά και εκτέλεσες την πρώτη σου αναζήτηση!" }
+            ]
+          },
+          {
+            prompt: "Τώρα βάλε και κενό διάστημα! Πληκτρολόγησε: <strong>ακρόπολη αθηνών</strong> και πάτα Αναζήτηση!",
+            allowedKeywords: ["ακροπολη αθηνων", "ακροπολη"],
+            chips: ["ακρόπολη", "αθηνών"],
+            results: [
+              { id: 'akr-res', title: "🏛️ Ο Ιερός Βράχος της Ακρόπολης", url: "www.culture.gov.gr", desc: "Ο Παρθενώνας και τα μνημεία της κλασικής Αθήνας...", correct: true, why: "Μπράβο! Χρησιμοποίησες σωστά το πλήκτρο διαστήματος ανάμεσα στις λέξεις!" }
+            ]
+          },
+          {
+            prompt: "Τι συμβαίνει όταν κάνουμε ορθογραφικό λάθος; Δοκίμασε να γράψεις επίτηδες λάθος: <strong>μουσίο</strong>",
+            allowedKeywords: ["μουσιο"],
+            chips: ["μουσίο"],
+            results: [
+              { id: 'typo-res', title: "💡 Μήπως εννοείτε: «Μουσείο»;", url: "kidsearch.gr/didyoumean", desc: "Η μηχανή αναζήτησης κατάλαβε το λάθος και σου προτείνει τη σωστή γραφή με «ει»!", correct: true, why: "Φανταστικό! Οι έξυπνες μηχανές αναζήτησης καταλαβαίνουν τα λάθη μας και μας βοηθούν να τα διορθώσουμε!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 4,
+        shortName: "4. Κόσκινο Αποτελεσμάτων",
+        title: "Το Κόσκινο των Αποτελεσμάτων",
+        levels: [
+          {
+            prompt: "Ψάξαμε «Εθνικό Αρχαιολογικό Μουσείο». Κάνε κλικ στο αποτέλεσμα που είναι <strong>ΑΣΧΕΤΟ</strong> και πρέπει να πετάξουμε:",
+            directPickMode: true,
+            results: [
+              { id: 'pizza', title: "🍕 Πιτσαρία ο Μάκης - Παράδοση Πίτσας σε 20 λεπτά!", url: "www.makispizza.gr", desc: "Νόστιμες πίτσες, μακαρονάδες και αναψυκτικά στο κέντρο της Αθήνας.", correct: true, why: "Μπράβο! Το πέταξες! Μια πιτσαρία δεν έχει καμία σχέση με το αρχαιολογικό μουσείο!" },
+              { id: 'mus-ok', title: "🏛️ Εθνικό Αρχαιολογικό Μουσείο - Επίσημη Σελίδα", url: "www.namuseum.gr", desc: "Πληροφορίες για τα αρχαία εκθέματα, τις συλλογές και τα εκπαιδευτικά προγράμματα.", correct: false, why: "Όχι, αυτό είναι το επίσημο και σωστό αποτέλεσμα, δεν πρέπει να το πετάξουμε!" }
+            ]
+          },
+          {
+            prompt: "Θέλουμε να μάθουμε τι ώρα ανοίγει το μουσείο το Σάββατο. Ποιο αποτέλεσμα απαντάει στην ερώτησή μας; Κάνε κλικ επάνω του!",
+            directPickMode: true,
+            results: [
+              { id: 'hours-res', title: "🕒 Πληροφορίες Επίσκεψης: Ώρες Λειτουργίας & Εισιτήρια", url: "www.namuseum.gr/visit", desc: "Δευτέρα - Κυριακή: 08:30 - 15:30. Ειδικές τιμές για σχολεία και μαθητές.", correct: true, why: "Τέλεια! Διάβασες την περιγραφή και βρήκες ακριβώς το ωράριο για το Σάββατο!" },
+              { id: 'souv-res', title: "🛍️ Το Πωλητήριο του Μουσείου: Αρχαία Αναμνηστικά", url: "www.namuseum.gr/shop", desc: "Αντίγραφα αγαλμάτων, βιβλία και σελιδοδείκτες.", correct: false, why: "Εδώ έχει μόνο αναμνηστικά δώρα, δεν γράφει τις ώρες που ανοίγει το μουσείο!" }
+            ]
+          },
+          {
+            prompt: "Αν θέλουμε να δούμε <strong>ΜΟΝΟ ΦΩΤΟΓΡΑΦΙΕΣ</strong> από τα αρχαία αγάλματα, ποια καρτέλα πατάμε επάνω στη μηχανή;",
+            directPickMode: true,
+            results: [
+              { id: 'tab-img-res', title: "🖼️ Πατάμε την καρτέλα «Εικόνες»", url: "φίλτρο αναζήτησης", desc: "Η μηχανή κρύβει τα μεγάλα κείμενα και δείχνει μόνο φωτογραφικό υλικό!", correct: true, why: "Σωστά! Η καρτέλα «Εικόνες» μας δείχνει κατευθείαν φωτογραφίες και σχέδια!" },
+              { id: 'tab-news-res', title: "📰 Πατάμε την καρτέλα «Ειδήσεις»", url: "φίλτρο ειδήσεων", desc: "Δείχνει άρθρα εφημερίδων και ανακοινώσεις.", correct: false, why: "Οι ειδήσεις έχουν άρθρα, όχι συλλογή φωτογραφιών!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 5,
+        shortName: "5. Kiddle & Μηχανές",
+        title: "Γνωριμία με το Kiddle & Ασφάλεια για Παιδιά",
+        levels: [
+          {
+            prompt: "Ποια από τις παρακάτω ιστοσελίδες είναι <strong>Μηχανή Αναζήτησης</strong>; Κάνε κλικ στη σωστή:",
+            directPickMode: true,
+            results: [
+              { id: 'google-is', title: "🔍 Google (www.google.gr)", url: "μηχανή αναζήτησης", desc: "Σελίδα που ψάχνει και βρίσκει πληροφορίες σε όλο τον παγκόσμιο ιστό.", correct: true, why: "Σωστά! Το Google είναι μία από τις πιο γνωστές μηχανές αναζήτησης στον κόσμο!" },
+              { id: 'tux-is', title: "🎨 TuxPaint", url: "πρόγραμμα ζωγραφικής", desc: "Εφαρμογή για να ζωγραφίζουμε με τον πιγκουίνο στον υπολογιστή.", correct: false, why: "Το TuxPaint είναι εφαρμογή ζωγραφικής, όχι μηχανή αναζήτησης στο διαδίκτυο!" }
+            ]
+          },
+          {
+            prompt: "Στο βιβλίο είδαμε το <strong>Kiddle</strong> με το ρομποτάκι. Γιατί είναι ξεχωριστό;",
+            directPickMode: true,
+            results: [
+              { id: 'kiddle-safe', title: "🛡️ Kiddle: Μηχανή ασφαλής και σχεδιασμένη ειδικά για παιδιά!", url: "www.kiddle.co", desc: "Φιλτράρει επικίνδυνο περιεχόμενο και εμφανίζει μεγάλα γράμματα και ασφαλείς σελίδες.", correct: true, why: "Μπράβο! Το Kiddle ελέγχεται ώστε να προστατεύει τους μικρούς μαθητές!" },
+              { id: 'kiddle-game', title: "🎮 Είναι μόνο για να κατεβάζεις παιχνίδια", url: "ισχυρισμός", desc: "Δεν προσφέρει αναζήτηση πληροφοριών.", correct: false, why: "Λάθος, το Kiddle είναι κανονική μηχανή αναζήτησης, απλά ασφαλής για παιδιά!" }
+            ]
+          },
+          {
+            prompt: "Ποια μηχανή αναζήτησης από το βιβλίο έχει για σήμα μία <strong>πάπια</strong>;",
+            directPickMode: true,
+            results: [
+              { id: 'duck-res', title: "🦆 DuckDuckGo", url: "www.duckduckgo.com", desc: "Μηχανή αναζήτησης που σέβεται την ιδιωτικότητα των χρηστών.", correct: true, why: "Έτσι ακριβώς! Η DuckDuckGo έχει τη διάσημη πάπια με το παπιγιόν!" },
+              { id: 'bing-res', title: "🔷 Microsoft Bing", url: "www.bing.com", desc: "Μηχανή αναζήτησης της Microsoft.", correct: false, why: "Το Bing έχει για σήμα ένα γαλάζιο γράμμα, όχι πάπια!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 6,
+        shortName: "6. Οδηγός Μουσείου",
+        title: "Αποστολή στο Μουσείο με την Υπατία",
+        levels: [
+          {
+            prompt: "Βήμα 1: Η Υπατία δεν ξέρει τη διεύθυνση του Μουσείου. Πληκτρολόγησε: <strong>εθνικό αρχαιολογικό μουσείο</strong> και πάτα Αναζήτηση!",
+            allowedKeywords: ["εθνικο αρχαιολογικο μουσειο", "αρχαιολογικο μουσειο"],
+            chips: ["εθνικό", "αρχαιολογικό", "μουσείο"],
+            results: [
+              { id: 'nam-official', title: "🏛️ Εθνικό Αρχαιολογικό Μουσείο Αθηνών", url: "www.namuseum.gr", desc: "Το μεγαλύτερο αρχαιολογικό μουσείο της χώρας, στην οδό Πατησίων 44...", correct: true, why: "Μπράβο! Βρήκαμε κατευθείαν την επίσημη ιστοσελίδα και τη διεύθυνση!" }
+            ]
+          },
+          {
+            prompt: "Βήμα 2: Θέλουν να μάθουν πώς θα πάνε με λεωφορείο ή μετρό. Πληκτρολόγησε: <strong>μουσείο πρόσβαση</strong>",
+            allowedKeywords: ["μουσειο προσβαση", "προσβαση", "μουσειο λεωφορεια"],
+            chips: ["μουσείο", "πρόσβαση", "λεωφορεία"],
+            results: [
+              { id: 'nam-access', title: "🚌 Πώς θα έρθετε στο Μουσείο: Μετρό, Λεωφορεία, Τρόλεϊ", url: "www.namuseum.gr/access", desc: "Σταθμοί Μετρό: Ομόνοια και Βικτώρια. Λεωφορεία: Γραμμές 2, 3, 5, 11, 15.", correct: true, why: "Τέλεια! Η λέξη «πρόσβαση» έδειξε αμέσως τις γραμμές των λεωφορείων!" }
+            ]
+          },
+          {
+            prompt: "Βήμα 3: Ποια πληροφορία είναι απαραίτητο να σημειώσουν πριν ξεκινήσουν από το σπίτι;",
+            directPickMode: true,
+            results: [
+              { id: 'check-hours', title: "📝 Το ωράριο λειτουργίας και τη διεύθυνση (οδό και αριθμό)", url: "σημαντικές πληροφορίες", desc: "Για να μην πάνε και βρουν τις πόρτες κλειστές!", correct: true, why: "Σωστά! Ελέγχουμε πάντα τις ώρες λειτουργίας πριν ξεκινήσουμε!" },
+              { id: 'check-color', title: "🎨 Το χρώμα που έχουν βαμμένοι οι τοίχοι μέσα", url: "ασήμαντη λεπτομέρεια", desc: "Δεν επηρεάζει την επίσκεψη.", correct: false, why: "Το χρώμα των τοίχων δεν είναι απαραίτητο για να πας στο μουσείο!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 7,
+        shortName: "7. Αλήθεια ή Ψέμα",
+        title: "Αλήθεια ή Ψέμα στο Διαδίκτυο;",
+        levels: [
+          {
+            prompt: "Ο Ήρωνας διάβασε κάτι περίεργο. <em>«Ό,τι γράφεται στο ίντερνετ είναι ΠΑΝΤΑ αλήθεια;»</em> Διάλεξε τη σωστή στάση:",
+            directPickMode: true,
+            results: [
+              { id: 'fact-no', title: "❌ ΟΧΙ, δεν είναι όλα αλήθεια!", url: "ασφάλεια στο διαδίκτυο", desc: "Ο καθένας μπορεί να γράψει ό,τι θέλει. Πρέπει πάντα να ελέγχουμε την πηγή και να ρωτάμε δασκάλους και γονείς!", correct: true, why: "Μπράβο! Στο διαδίκτυο υπάρχουν και λάθη και ψέματα. Είμαστε πάντα υποψιασμένοι!" },
+              { id: 'fact-yes', title: "✔️ ΝΑΙ, αφού το γράφει ο υπολογιστής είναι σίγουρο!", url: "λάθος αντίληψη", desc: "Πιστεύουμε ό,τι διαβάζουμε χωρίς δεύτερη σκέψη.", correct: false, why: "Προσοχή! Ο υπολογιστής απλά μεταφέρει όσα έγραψαν άνθρωποι, δεν εγγυάται ότι είναι όλα σωστά!" }
+            ]
+          },
+          {
+            prompt: "Εμφανίζεται μήνυμα στην οθόνη: <em>«Συγχαρητήρια, κέρδισες ένα νέο κινητό! Πάτα εδώ!»</em> Τι κάνουμε;",
+            directPickMode: true,
+            results: [
+              { id: 'trap-stop', title: "🛑 Δεν πατάμε ποτέ! Το δείχνουμε αμέσως στον δάσκαλο ή στους γονείς μας!", url: "κανόνας προστασίας", desc: "Είναι ηλεκτρονική παγίδα (διαφήμιση ή κακόβουλο λογισμικό) που προσπαθεί να μας ξεγελάσει.", correct: true, why: "Σωστά! Τέτοια μηνύματα είναι επικίνδυνες απάτες. Δεν πατάμε ποτέ!" },
+              { id: 'trap-click', title: "🎁 Πατάμε γρήγορα το κουμπί να πάρουμε το δώρο!", url: "επικίνδυνη ενέργεια", desc: "Μπορεί να κολλήσει ιό ο υπολογιστής μας.", correct: false, why: "Όχι! Κανείς δεν μοιράζει δωρεάν κινητά στο ίντερνετ. Είναι παγίδα!" }
+            ]
+          },
+          {
+            prompt: "Ποια ιστοσελίδα είναι πιο <strong>αξιόπιστη</strong> για να πάρουμε στοιχεία για μια σχολική εργασία;",
+            directPickMode: true,
+            results: [
+              { id: 'src-reliable', title: "🏛️ Επίσημη ιστοσελίδα Υπουργείου Παιδείας ή Εθνικού Μουσείου", url: "επίσημος κρατικός φορέας (.gov.gr / .sch.gr)", desc: "Οι πληροφορίες ελέγχονται από επιστήμονες και δασκάλους.", correct: true, why: "Εξαιρετικά! Οι επίσημοι φορείς και τα πανεπιστήμια έχουν τις πιο έγκυρες πληροφορίες!" },
+              { id: 'src-anon', title: "💬 Ένα ανώνυμο σχόλιο κάτω από ένα βίντεο παιχνιδιών", url: "ανώνυμο φόρουμ", desc: "Ο καθένας γράφει τη γνώμη του χωρίς έλεγχο.", correct: false, why: "Ένα ανώνυμο σχόλιο δεν είναι ελεγμένη επιστημονική πηγή!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 8,
+        shortName: "8. Μεγάλοι Αριθμοί",
+        title: "Το Κυνήγι των Μεγάλων Αριθμών",
+        levels: [
+          {
+            prompt: "Αναζήτησε στη μηχανή: <strong>γάτα διάρκεια ζωής</strong> και δες το αποτέλεσμα!",
+            allowedKeywords: ["γατα διαρκεια ζωης", "διαρκεια ζωης γατας", "γατα", "ζωη γατας"],
+            chips: ["γάτα", "διάρκεια", "ζωής"],
+            results: [
+              { id: 'cat-years', title: "🐱 Πόσα Χρόνια Ζει η Γάτα; - 12 έως 15 Έτη", url: "www.zoopedia.gr", desc: "Μια καλοταϊσμένη οικόσιτη γάτα ζει κατά μέσο όρο 12 με 15 χρόνια!", correct: true, why: "Μπράβο! Βρήκες τον αριθμό: 12-15 χρόνια!" }
+            ]
+          },
+          {
+            prompt: "Τώρα ψάξε έναν τεράστιο αριθμό! Πληκτρολόγησε: <strong>απόσταση γης σελήνης</strong>",
+            allowedKeywords: ["αποσταση γης σεληνης", "αποσταση σεληνης", "γη σεληνη"],
+            chips: ["απόσταση", "γης", "σελήνης", "χιλιόμετρα"],
+            results: [
+              { id: 'space-km', title: "🌌 384.400 Χιλιόμετρα στο Διάστημα!", url: "www.space-kids.gr", desc: "Αυτή είναι η μέση απόσταση που χρειάζεται να ταξιδέψει ένα διαστημόπλοιο για να φτάσει στο φεγγάρι!", correct: true, why: "Φανταστικό! 384.400 χιλιόμετρα! Έλυσες και αυτό το μυστήριο!" }
+            ]
+          },
+          {
+            prompt: "Τελική ερώτηση σοφίας: Αφού βρούμε μια πληροφορία στο διαδίκτυο, τι κάνουμε;",
+            directPickMode: true,
+            results: [
+              { id: 'finish-smart', title: "📝 Τη διαβάζουμε με προσοχή και κρατάμε με δικά μας λόγια τις σημειώσεις!", url: "σωστή μάθηση", desc: "Καταλαβαίνουμε την ουσία και γινόμαστε πιο έξυπνοι!", correct: true, why: "Συγχαρητήρια! Αυτό είναι το μυστικό ενός έξυπνου μαθητή που ξέρει να ερευνά!" },
+              { id: 'finish-copy', title: "📋 Κάνουμε αντιγραφή-επικόλληση 50 σελίδες χωρίς καν να τις διαβάσουμε", url: "μηχανική αντιγραφή", desc: "Έτσι δεν μαθαίνουμε τίποτα.", correct: false, why: "Η αντιγραφή χωρίς ανάγνωση δεν μας προσφέρει καμία γνώση!" }
+            ]
+          }
+        ]
+      }
+    ];
+
+    /* ================= APP STATE ================= */
+    let currentActivityIndex = 0;
+    let currentLevelIndex = 0; // 0, 1, 2
+    let totalScore = 0;
+    let isAdvancing = false;
+    let solvedTasks = new Set(); // store 'act-lvl' strings
+
+    // Elements
+    const activityNavTrackEl = document.getElementById('activityNavTrack');
+    const taskPromptEl = document.getElementById('taskPrompt');
+    const hudActivityBadgeEl = document.getElementById('hudActivityBadge');
+    const starCounterEl = document.getElementById('starCounter');
+    const wordBankEl = document.getElementById('wordBank');
+    const mainSearchInputEl = document.getElementById('mainSearchInput');
+    const resultsContainerEl = document.getElementById('resultsContainer');
+    const feedbackBannerEl = document.getElementById('feedbackBanner');
+    const feedbackTextEl = document.getElementById('feedbackText');
+    const advanceCountdownEl = document.getElementById('advanceCountdown');
+    const searchCategoriesEl = document.getElementById('searchCategories');
+    const browserUrlEl = document.getElementById('browserUrl');
+    const congratsModalEl = document.getElementById('congratsModal');
+    const actCompleteNoticeEl = document.getElementById('actCompleteNotice');
+    const levelLabelSmallEl = document.getElementById('levelLabelSmall');
+
+    // Build the Navigation Bar (Buttons 1 to 8)
+    function buildNavButtons() {
+      activityNavTrackEl.innerHTML = "";
+      activities.forEach((act, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "btn-act-jump" + (idx === currentActivityIndex ? " current" : "");
+        btn.id = "navBtn" + idx;
+        btn.innerHTML = `<span>${act.shortName}</span>`;
+        btn.onclick = () => jumpToActivity(idx);
+        activityNavTrackEl.appendChild(btn);
+      });
+    }
+
+    // Direct Jump to Any Activity
+    function jumpToActivity(idx) {
+      if (isAdvancing) return;
+      currentActivityIndex = idx;
+      currentLevelIndex = 0; // Start at Level 1 of that activity
+      updateNavHighlight();
+      loadCurrentMission();
+    }
+
+    function updateNavHighlight() {
+      activities.forEach((_, idx) => {
+        const btn = document.getElementById("navBtn" + idx);
+        if (btn) {
+          if (idx === currentActivityIndex) btn.classList.add("current");
+          else btn.classList.remove("current");
+        }
+      });
+    }
+
+    // Initialize
+    buildNavButtons();
+    loadCurrentMission();
+
+    function loadCurrentMission() {
+      isAdvancing = false;
+      const act = activities[currentActivityIndex];
+      const lvl = act.levels[currentLevelIndex];
+
+      // Update HUD
+      hudActivityBadgeEl.innerText = `ΔΡΑΣΤΗΡΙΟΤΗΤΑ ${act.id} ΑΠΟ 8: ${act.title.toUpperCase()}`;
+      levelLabelSmallEl.innerText = `Επίπεδο ${currentLevelIndex + 1} από 3`;
+      updateStepPills();
+      updateNavHighlight();
+
+      // Update prompt
+      taskPromptEl.innerHTML = `<strong>Επίπεδο ${currentLevelIndex + 1}:</strong> ${lvl.prompt}`;
+
+      // Reset Inputs and views
+      mainSearchInputEl.value = "";
+      resultsContainerEl.innerHTML = "";
+      resultsContainerEl.classList.remove('show');
+      feedbackBannerEl.classList.remove('show', 'correct', 'wrong');
+      advanceCountdownEl.innerText = "";
+      actCompleteNoticeEl.classList.remove('show');
+
+      // URL bar simulation
+      browserUrlEl.innerText = `https://www.kidsearch.gr/activity-${act.id}/level-${currentLevelIndex + 1}`;
+
+      // Populate helper chips
+      wordBankEl.innerHTML = "";
+      if (lvl.chips && lvl.chips.length > 0) {
+        lvl.chips.forEach(chipText => {
+          const chip = document.createElement('div');
+          chip.className = "bank-chip";
+          chip.innerText = chipText;
+          chip.onclick = () => {
+            if (lvl.directPickMode) {
+              mainSearchInputEl.value = chipText;
+              submitSearch();
+            } else {
+              if (mainSearchInputEl.value.trim().length > 0) {
+                mainSearchInputEl.value += " " + chipText;
+              } else {
+                mainSearchInputEl.value = chipText;
+              }
+              mainSearchInputEl.focus();
+            }
+          };
+          wordBankEl.appendChild(chip);
+        });
+      }
+
+      // If direct pick mode, show results right away for child to choose
+      if (lvl.directPickMode) {
+        searchCategoriesEl.classList.remove('show');
+        displayResults(lvl.results, true);
+      } else {
+        searchCategoriesEl.classList.add('show');
+      }
+    }
+
+    function updateStepPills() {
+      for (let i = 1; i <= 3; i++) {
+        const pill = document.getElementById('stepPill' + i);
+        pill.className = 'step-pill';
+        if (i - 1 < currentLevelIndex) {
+          pill.classList.add('done');
+        } else if (i - 1 === currentLevelIndex) {
+          pill.classList.add('active');
+        }
+      }
+    }
+
+    // Submit search via Input or Enter
+    function submitSearch() {
+      if (isAdvancing) return;
+      const act = activities[currentActivityIndex];
+      const lvl = act.levels[currentLevelIndex];
+
+      const inputVal = cleanGreek(mainSearchInputEl.value.trim());
+
+      if (lvl.directPickMode) {
+        displayResults(lvl.results, true);
+        return;
+      }
+
+      if (!inputVal) {
+        showFeedback("⚠️ Γράψε μια λέξη-κλειδί στο κουτί ή πάτησε ένα συννεφάκι από κάτω!", false);
+        return;
+      }
+
+      // Check if matches allowed keywords
+      const matches = lvl.allowedKeywords.some(kw => inputVal.includes(cleanGreek(kw)) || cleanGreek(kw).includes(inputVal));
+
+      if (matches) {
+        displayResults(lvl.results, false);
+        showFeedback("🎉 Μπράβο! Η μηχανή KidSearch βρήκε αποτελέσματα! Κάνε κλικ στο καταλληλότερο!", true, false);
+      } else {
+        resultsContainerEl.innerHTML = "";
+        resultsContainerEl.classList.remove('show');
+        showFeedback("🤔 Δεν βρέθηκε κάτι ακριβώς με αυτά τα λόγια. Δοκίμασε να χρησιμοποιήσεις τις λέξεις-κλειδιά που προτείνονται στα συννεφάκια!", false);
+      }
+    }
+
+    // Enter key listener
+    mainSearchInputEl.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        submitSearch();
+      }
+    });
+
+    function displayResults(resultsArray, isDirectMode) {
+      resultsContainerEl.innerHTML = "";
+      resultsContainerEl.classList.add('show');
+
+      resultsArray.forEach(res => {
+        const card = document.createElement('div');
+        card.className = "result-card";
+        card.innerHTML = `
+          <div class="res-url">🔗 ${res.url}</div>
+          <div class="res-title">${res.title}</div>
+          <div class="res-desc">${res.desc}</div>
+        `;
+        card.onclick = () => handleResultClick(res);
+        resultsContainerEl.appendChild(card);
+      });
+    }
+
+    function handleResultClick(res) {
+      if (isAdvancing) return;
+
+      const taskKey = `${currentActivityIndex}-${currentLevelIndex}`;
+
+      if (res.correct) {
+        if (!solvedTasks.has(taskKey)) {
+          solvedTasks.add(taskKey);
+          totalScore++;
+          starCounterEl.innerText = totalScore;
+        }
+        showFeedback("🌟 " + res.why, true, true);
+        triggerAutoAdvance();
+      } else {
+        showFeedback("❌ " + res.why, false);
+      }
+    }
+
+    function showFeedback(text, isOk, hasTimer = false) {
+      feedbackBannerEl.className = "feedback-banner show " + (isOk ? "correct" : "wrong");
+      feedbackTextEl.innerHTML = text;
+      if (!hasTimer) {
+        advanceCountdownEl.innerText = "";
+      }
+    }
+
+    function triggerAutoAdvance() {
+      isAdvancing = true;
+      let secondsLeft = 3;
+      advanceCountdownEl.innerText = `Επόμενο επίπεδο σε ${secondsLeft}... ⏳`;
+
+      const timer = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft > 0) {
+          advanceCountdownEl.innerText = `Επόμενο επίπεδο σε ${secondsLeft}... ⏳`;
+        } else {
+          clearInterval(timer);
+          advanceLevel();
+        }
+      }, 1000);
+    }
+
+    function advanceLevel() {
+      // If we are at level 1 or 2, auto advance to next level of this activity
+      if (currentLevelIndex < 2) {
+        currentLevelIndex++;
+        loadCurrentMission();
+      } else {
+        // Level 3 finished! Show completion banner and advance to next activity
+        actCompleteNoticeEl.classList.add('show');
+        setTimeout(() => {
+          if (currentActivityIndex < activities.length - 1) {
+            currentActivityIndex++;
+            currentLevelIndex = 0;
+            loadCurrentMission();
+          } else {
+            showFinalCongrats();
+          }
+        }, 1800);
+      }
+    }
+
+    function showFinalCongrats() {
+      document.getElementById('finalScoreModal').innerText = totalScore;
+      congratsModalEl.classList.add('show');
+    }
+
+    function restartEverything() {
+      congratsModalEl.classList.remove('show');
+      currentActivityIndex = 0;
+      currentLevelIndex = 0;
+      totalScore = 0;
+      solvedTasks.clear();
+      starCounterEl.innerText = "0";
+      loadCurrentMission();
+    }
+
+    function selectCategory(cat) {
+      document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+      if (cat === 'all') document.getElementById('tabAll').classList.add('active');
+      if (cat === 'images') document.getElementById('tabImages').classList.add('active');
+      if (cat === 'maps') document.getElementById('tabMaps').classList.add('active');
+      
+      const act = activities[currentActivityIndex];
+      const lvl = act.levels[currentLevelIndex];
+      if (lvl.results) {
+        displayResults(lvl.results, false);
+      }
+    }
+
+    // Helper: strip accents & uppercase
+    function cleanGreek(str) {
+      return str.toLowerCase()
+        .replace(/ά/g, 'α').replace(/έ/g, 'ε').replace(/ή/g, 'η').replace(/ί/g, 'ι')
+        .replace(/ό/g, 'ο').replace(/ύ/g, 'υ').replace(/ώ/g, 'ω')
+        .replace(/ΐ/g, 'ι').replace(/ΰ/g, 'υ');
+    }
+  </script>
+</body>
+</html>
