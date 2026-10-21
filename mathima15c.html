@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μάθημα 15: Είδη Εννοιολογικών Χαρτών</title>
+  <style>
+    :root {
+      --primary: #2980B9;
+      --secondary: #E67E22;
+      --success: #27AE60;
+      --danger: #C0392B;
+      --bg: #F4F6F9;
+      --card-bg: #FFFFFF;
+      --text: #2C3E50;
+    }
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { margin: 0; background-color: var(--bg); color: var(--text); padding: 15px; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header h1 { margin: 5px 0; color: #1B365D; font-size: 1.8rem; }
+    .header p { margin: 0; color: #666; font-size: 1rem; }
+    
+    .nav-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .nav-btn {
+      background: var(--card-bg);
+      border: 2px solid var(--primary);
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+    .nav-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .activity-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      padding: 20px;
+      min-height: 500px;
+    }
+    
+    .act-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #EEE;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+    .act-title { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
+    .level-badge { background: var(--secondary); color: white; padding: 4px 10px; border-radius: 12px; font-weight: bold; }
+
+    .instructions {
+      background: #E8F4FD;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .btn-action {
+      background: var(--success);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-block;
+      margin-top: 15px;
+    }
+    .btn-action:hover { opacity: 0.9; }
+    .feedback { margin-top: 15px; font-weight: bold; font-size: 1.1rem; min-height: 28px; }
+
+    /* Drag and drop κοινό */
+    .drag-items-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      min-height: 55px;
+      padding: 10px;
+      background: #F9FAFB;
+      border-radius: 8px;
+      border: 2px dashed #CCC;
+      margin-bottom: 20px;
+      justify-content: center;
+      align-items: center;
+    }
+    .draggable {
+      background: white;
+      border: 2px solid var(--primary);
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: grab;
+      font-weight: bold;
+      user-select: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .draggable:active { cursor: grabbing; }
+
+    .map-canvas {
+      position: relative;
+      background: #FAFAFA;
+      border: 1px solid #E0E0E0;
+      border-radius: 10px;
+      padding: 20px;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .drop-zone {
+      min-width: 120px;
+      min-height: 44px;
+      border: 2px dashed #AAA;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      padding: 6px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: #555;
+    }
+    .drop-zone.filled {
+      border-style: solid;
+      border-color: var(--primary);
+      background: #EAF2F8;
+      color: var(--primary);
+    }
+
+    .tree-row { display: flex; justify-content: space-around; width: 100%; margin: 15px 0; gap: 10px; }
+    
+    .web-map-container {
+      position: relative;
+      width: 100%;
+      height: 330px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #FAFAFA;
+      border: 1px solid #E0E0E0;
+      border-radius: 10px;
+    }
+    .center-node {
+      background: #FFEAA7;
+      border: 2px solid #E17055;
+      padding: 12px 18px;
+      border-radius: 50px;
+      font-weight: bold;
+      z-index: 2;
+    }
+    .web-node { position: absolute; }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .option-card {
+      background: white;
+      border: 2px solid #DDD;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .option-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+
+    /* ΔΡΑΣΤΗΡΙΟΤΗΤΑ 8 - CREATOR */
+    .creator-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+    .creator-controls input[type="text"] {
+      padding: 10px;
+      border: 2px solid #BDC3C7;
+      border-radius: 8px;
+      flex: 2;
+      min-width: 180px;
+      font-size: 1rem;
+    }
+    .creator-controls select {
+      padding: 10px;
+      border: 2px solid #BDC3C7;
+      border-radius: 8px;
+      flex: 1;
+      min-width: 140px;
+      font-size: 0.95rem;
+      background: white;
+    }
+    .creator-canvas-container {
+      position: relative;
+      width: 100%;
+      height: 420px;
+      border: 2px dashed #95A5A6;
+      border-radius: 10px;
+      background: #FFFFFF;
+      overflow: hidden;
+      touch-action: none;
+    }
+    .creator-svg-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .map-node {
+      position: absolute;
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: move;
+      user-select: none;
+      font-weight: bold;
+      z-index: 2;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 0.2s;
+    }
+    .map-node.type-main {
+      background: #FFEAA7;
+      border: 2px solid #D35400;
+      color: #A04000;
+      border-radius: 25px;
+    }
+    .map-node.type-sub {
+      background: #D4E6F1;
+      border: 2px solid #2980B9;
+      color: #1B4F72;
+    }
+    .map-node.selected-for-link {
+      outline: 3px dashed #E74C3C;
+    }
+    .del-node-btn {
+      background: #E74C3C;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 11px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Μάθημα 15: Είδη Εννοιολογικών Χαρτών</h1>
+    <p>Διαδραστικές Δραστηριότητες Πληροφορικής Γ' Δημοτικού</p>
+  </div>
+
+  <div class="nav-bar" id="navBar"></div>
+
+  <div class="activity-container" id="activityBox"></div>
+
+  <script>
+    let currentActivity = 0;
+    let activityLevel = [1, 1, 1, 1, 1, 1, 1, 1];
+
+    // Δεδομένα δραστηριοτήτων
+    const activities = [
+      // 1. Βρες το Είδος του Χάρτη
+      {
+        title: "1. Βρες το Είδος του Χάρτη",
+        render: function(lvl) {
+          const lvls = [
+            { desc: "Ένας χάρτης έχει στην κορυφή την έννοια «Σχολείο» και από κάτω διακλαδίζονται οι τάξεις: Α', Β', Γ', Δ', Ε', Στ'.", correct: "Ιεραρχικός Χάρτης" },
+            { desc: "Ένας χάρτης έχει στο κέντρο την έννοια «Μέσα Μετακίνησης» και γύρω-γύρω ακτινωτά: Μετρό, Λεωφορείο, Τραμ, Ποδήλατο.", correct: "Χάρτης Ιστού" },
+            { desc: "Ένας χάρτης έχει στην κορυφή τις «Περιφερειακές Συσκευές» και χωρίζεται σε «Συσκευές Εισόδου» και «Συσκευές Εξόδου».", correct: "Ιεραρχικός Χάρτης" }
+          ];
+          const curr = lvls[lvl - 1];
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Επίπεδο ${lvl}/3</span>
+            </div>
+            <div class="instructions">Διάβασε την περιγραφή και κάνε κλικ στο σωστό είδος εννοιολογικού χάρτη!</div>
+            <p style="font-size:1.15rem; margin:25px 0;"><strong>Περιγραφή:</strong> ${curr.desc}</p>
+            <div class="options-grid">
+              <div class="option-card" onclick="checkQ1('Ιεραρχικός Χάρτης', '${curr.correct}', ${lvl})">
+                <h3>🌳 Ιεραρχικός Χάρτης</h3>
+                <p>Κεντρική έννοια στην κορυφή και κλαδιά προς τα κάτω</p>
+              </div>
+              <div class="option-card" onclick="checkQ1('Χάρτης Ιστού', '${curr.correct}', ${lvl})">
+                <h3>🕸️ Χάρτης Ιστού</h3>
+                <p>Κεντρική έννοια στο κέντρο και ακτίνες ολόγυρα</p>
+              </div>
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 2. Drag & Drop: Ιεραρχικός Χάρτης Φρούτων
+      {
+        title: "2. Συμπλήρωσε τον Ιεραρχικό Χάρτη",
+        render: function(lvl) {
+          const data = lvl === 1 
+            ? {
+                title: "🍎 Φρούτα του Έτους",
+                items: ["Φθινόπωρο", "Χειμώνας", "Άνοιξη", "Καλοκαίρι"],
+                targets: ["Φθινόπωρο", "Χειμώνας", "Άνοιξη", "Καλοκαίρι"]
+              }
+            : {
+                title: "❄️ Φρούτα του Χειμώνα & ☀️ Καλοκαιριού",
+                items: ["Πορτοκάλι", "Μανταρίνι", "Καρπούζι", "Πεπόνι"],
+                targets: ["Πορτοκάλι", "Μανταρίνι", "Καρπούζι", "Πεπόνι"]
+              };
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Επίπεδο ${lvl}/2</span>
+            </div>
+            <div class="instructions">Σύρε τα πλακίδια στις σωστές κενές θέσεις του ιεραρχικού χάρτη.</div>
+            <div class="drag-items-pool" id="pool">
+              ${data.items.slice().sort(() => Math.random() - 0.5).map((it, i) => `
+                <div class="draggable" draggable="true" ondragstart="drag(event)" id="drag2-${i}">${it}</div>
+              `).join('')}
+            </div>
+            <div class="map-canvas">
+              <div class="drop-zone filled" style="background:#FFEAA7; color:#D35400;">${data.title}</div>
+              <div style="font-size:22px; margin:5px 0;">⬇️</div>
+              <div class="tree-row">
+                ${data.targets.map((tgt, i) => `
+                  <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)" data-expected="${tgt}">[ Κενό ${i+1} ]</div>
+                `).join('')}
+              </div>
+            </div>
+            <button class="btn-action" onclick="checkDND(2, ${lvl})">Έλεγχος Απαντήσεων</button>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 3. Χάρτης Ιστού: Μέσα Μετακίνησης
+      {
+        title: "3. Χάρτης Ιστού: Μέσα Μετακίνησης",
+        render: function(lvl) {
+          const data = lvl === 1
+            ? { items: ["Μετρό", "Λεωφορείο", "Ποδήλατο", "Μπανάνα"], valid: ["Μετρό", "Λεωφορείο", "Ποδήλατο"] }
+            : { items: ["Τραμ", "Ταξί", "Πατίνι", "Τετράδιο"], valid: ["Τραμ", "Ταξί", "Πατίνι"] };
+
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Επίπεδο ${lvl}/2</span>
+            </div>
+            <div class="instructions">Σύρε στον ιστό μόνο τα <strong>Μέσα Μετακίνησης</strong>. Προσοχή, υπάρχει παγίδα!</div>
+            <div class="drag-items-pool" id="pool">
+              ${data.items.slice().sort(() => Math.random() - 0.5).map((it, i) => `
+                <div class="draggable" draggable="true" ondragstart="drag(event)" id="drag3-${i}">${it}</div>
+              `).join('')}
+            </div>
+            <div class="web-map-container" id="webMap">
+              <div class="center-node">🚲 Μέσα Μετακίνησης</div>
+              <div class="drop-zone web-node" style="top:25px; left:60px;" ondrop="drop(event)" ondragover="allowDrop(event)">[Θέση 1]</div>
+              <div class="drop-zone web-node" style="top:25px; right:60px;" ondrop="drop(event)" ondragover="allowDrop(event)">[Θέση 2]</div>
+              <div class="drop-zone web-node" style="bottom:25px;" ondrop="drop(event)" ondragover="allowDrop(event)">[Θέση 3]</div>
+            </div>
+            <button class="btn-action" onclick="checkAct3(${lvl}, ${JSON.stringify(data.valid).replace(/"/g, '&quot;')})">Έλεγχος Ιστού</button>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 4. Πού μπαίνει η Έννοια;
+      {
+        title: "4. Πού μπαίνει η Έννοια;",
+        render: function(lvl) {
+          const qs = [
+            { text: "Η έννοια: <strong>«ΖΩΑ»</strong> σε έναν χάρτη με πουλιά, ψάρια και θηλαστικά.", correct: "Κέντρο ή Κορυφή" },
+            { text: "Η έννοια: <strong>«Γάτα»</strong> σε έναν χάρτη με θέμα τα κατοικίδια ζώα.", correct: "Διακλάδωση / Ακτινωτά" },
+            { text: "Η έννοια: <strong>«Ψηφιακές Συσκευές»</strong> σε έναν χάρτη με tablet, smartphone, laptop.", correct: "Κέντρο ή Κορυφή" }
+          ];
+          const q = qs[lvl - 1];
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Επίπεδο ${lvl}/3</span>
+            </div>
+            <div class="instructions">Πού ανήκει αυτή η έννοια; Είναι κεντρική ή ειδική;</div>
+            <p style="font-size:1.2rem; text-align:center; margin:30px 0;">${q.text}</p>
+            <div class="options-grid">
+              <div class="option-card" onclick="checkQ4('Κέντρο ή Κορυφή', '${q.correct}', ${lvl})">
+                <h3>👑 Κύρια / Κεντρική Έννοια</h3>
+                <p>Στην κορυφή του ιεραρχικού ή στο κέντρο του ιστού</p>
+              </div>
+              <div class="option-card" onclick="checkQ4('Διακλάδωση / Ακτινωτά', '${q.correct}', ${lvl})">
+                <h3>🌿 Ειδική Έννοια</h3>
+                <p>Στα κλαδιά ή στις εξωτερικές ακτίνες</p>
+              </div>
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 5. Βρες τον Εισβολέα
+      {
+        title: "5. Βρες τον «Εισβολέα»",
+        render: function(lvl) {
+          const cs = [
+            { title: "Χάρτης Ιστού: Μέσα Μετακίνησης στην Πόλη", items: ["Μετρό", "Λεωφορείο", "Πίτσα", "Ποδήλατο"], wrong: "Πίτσα" },
+            { title: "Ιεραρχικός Χάρτης: Φρούτα Χειμώνα", items: ["Πορτοκάλι", "Μανταρίνι", "Καρπούζι", "Μήλο"], wrong: "Καρπούζι" },
+            { title: "Χάρτης Ιστού: Ψηφιακές Συσκευές", items: ["Ταμπλέτα", "Υπολογιστής", "Τετράδιο", "Κινητό"], wrong: "Τετράδιο" }
+          ];
+          const c = cs[lvl - 1];
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Επίπεδο ${lvl}/3</span>
+            </div>
+            <div class="instructions">Κάνε κλικ στην έννοια που <strong>δεν ανήκει</strong> σε αυτόν τον χάρτη!</div>
+            <h3 style="text-align:center; color:var(--primary);">${c.title}</h3>
+            <div class="options-grid">
+              ${c.items.map(it => `
+                <div class="option-card" onclick="checkQ5('${it}', '${c.wrong}',${lvl})">
+                  <h3>${it}</h3>
+                </div>
+              `).join('')}
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 6. Σύνδεσε τις Έννοιες με Λέξεις
+      {
+        title: "6. Σύνδεσε τις Έννοιες με Λέξεις",
+        render: function(lvl) {
+          const pairs = [
+            { n1: "Η Ταμπλέτα", verb: "είναι είδος", n2: "Υπολογιστή" },
+            { n1: "Τα Δεδομένα", verb: "αποθηκεύονται στον", n2: "Δίσκο Αποθήκευσης" },
+            { n1: "Η Οθόνη Αφής", verb: "δέχεται οδηγίες με", n2: "το Δάχτυλο" }
+          ];
+          const p = pairs[lvl - 1];
+          const verbs = ["είναι είδος", "αποθηκεύονται στον", "δέχεται οδηγίες με", "τρέχει πιο γρήγορα από"].sort(() => Math.random() - 0.5);
+
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Επίπεδο ${lvl}/3</span>
+            </div>
+            <div class="instructions">Διάλεξε το κατάλληλο ρήμα που ενώνει σωστά τις δύο έννοιες:</div>
+            <div style="display:flex; justify-content:center; align-items:center; gap:15px; margin:35px 0;">
+              <div class="drop-zone filled">${p.n1}</div>
+              <div style="font-weight:bold; color:var(--primary); font-size:1.1rem;">➔ [ ? ] ➔</div>
+              <div class="drop-zone filled">${p.n2}</div>
+            </div>
+            <div class="options-grid">
+              ${verbs.map(v => `
+                <div class="option-card" onclick="checkQ6('${v}', '${p.verb}',${lvl})">
+                  <h3>${v}</h3>
+                </div>
+              `).join('')}
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 7. Ποιος Χάρτης Είμαι;
+      {
+        title: "7. Ποιος Χάρτης Είμαι;",
+        render: function(lvl) {
+          const qz = [
+            { text: "«Μοιάζω με ιστό αράχνης και οι γραμμές μου απλώνονται ακτινωτά γύρω από μία κεντρική έννοια!»", correct: "Χάρτης Ιστού" },
+            { text: "«Ξεκινάω από την κορυφή με μία γενική έννοια και κατεβαίνω επίπεδα σε πιο ειδικές έννοιες!»", correct: "Ιεραρχικός Χάρτης" },
+            { text: "«Με χρησιμοποιούν για να δείξουν ένα σχολείο και τις τάξεις του σε επίπεδα προς τα κάτω!»", correct: "Ιεραρχικός Χάρτης" }
+          ];
+          const q = qz[lvl - 1];
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Επίπεδο ${lvl}/3</span>
+            </div>
+            <div class="instructions">Διάβασε τα λόγια του χάρτη και βρες ποιος είναι!</div>
+            <p style="font-size:1.2rem; text-align:center; margin:30px 0;"><em>${q.text}</em></p>
+            <div class="options-grid">
+              <div class="option-card" onclick="checkQ7('Ιεραρχικός Χάρτης', '${q.correct}', ${lvl})">
+                <h3>🌳 Ιεραρχικός Χάρτης</h3>
+              </div>
+              <div class="option-card" onclick="checkQ7('Χάρτης Ιστού', '${q.correct}', ${lvl})">
+                <h3>🕸️ Χάρτης Ιστού</h3>
+              </div>
+            </div>
+            <div class="feedback" id="fb"></div>
+          `;
+        }
+      },
+
+      // 8. Φτιάξε τον Δικό σου Χάρτη (Διορθωμένο και Πλήρως Λειτουργικό)
+      {
+        title: "8. Φτιάξε τον Δικό σου Χάρτη!",
+        render: function() {
+          return `
+            <div class="act-header">
+              <span class="act-title">${this.title}</span>
+              <span class="level-badge">Ελεύθερη Δημιουργία</span>
+            </div>
+            <div class="instructions">
+              1. Πληκτρολόγησε μια έννοια και πάτησε <strong>«+ Προσθήκη»</strong>.<br>
+              2. <strong>Σύρε με το ποντίκι ή το δάχτυλο</strong> τις έννοιες μέσα στον καμβά για να φτιάξεις Ιεραρχικό χάρτη ή Χάρτη Ιστού!<br>
+              3. Κάνε κλικ σε δύο έννοιες στη σειρά για να σχεδιαστεί <strong>γραμμή σύνδεσης</strong> μεταξύ τους.
+            </div>
+            <div class="creator-controls">
+              <input type="text" id="nodeInput" placeholder="Π.χ. Υπολογιστής, Οθόνη, Φρούτα...">
+              <select id="nodeType">
+                <option value="main">Κεντρική Έννοια (Κίτρινο)</option>
+                <option value="sub">Ειδική Έννοια (Μπλε)</option>
+              </select>
+              <button class="btn-action" style="margin-top:0;" onclick="createNodeFromInput()">+ Προσθήκη</button>
+              <button class="btn-action" style="margin-top:0; background:#E74C3C;" onclick="resetCreatorCanvas()">Καθαρισμός Όλων</button>
+            </div>
+            <div class="creator-canvas-container" id="creatorContainer">
+              <svg class="creator-svg-layer" id="svgLayer"></svg>
+            </div>
+            <div class="feedback" id="fb8" style="color:var(--primary); font-size:0.95rem;">
+              💡 Συμβουλή: Σύρε τις έννοιες για να τις τοποθετήσεις εκεί που θέλεις!
+            </div>
+          `;
+        }
+      }
+    ];
+
+    // Πλοήγηση
+    function initNav() {
+      const nav = document.getElementById('navBar');
+      nav.innerHTML = activities.map((act, i) => `
+        <button class="nav-btn ${i === currentActivity ? 'active' : ''}" onclick="goToAct(${i})">
+          Δραστηριότητα ${i + 1}
+        </button>
+      `).join('');
+    }
+
+    function goToAct(i) {
+      currentActivity = i;
+      initNav();
+      renderCurrent();
+    }
+
+    function renderCurrent() {
+      const box = document.getElementById('activityBox');
+      box.innerHTML = activities[currentActivity].render(activityLevel[currentActivity]);
+      if (currentActivity === 7) {
+        initCreatorDefaults();
+      }
+    }
+
+    // Handlers Δραστηριοτήτων 1-7
+    function checkQ1(sel, cor, lvl) {
+      const fb = document.getElementById('fb');
+      if (sel === cor) {
+        fb.innerHTML = "<span style='color:var(--success)'>🎉 Μπράβο! Σωστή επιλογή!</span>";
+        setTimeout(() => {
+          if (lvl < 3) { activityLevel[0]++; renderCurrent(); }
+          else { fb.innerHTML = "<span style='color:var(--success)'>🏆 Ολοκλήρωσες όλα τα επίπεδα!</span>"; }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Ξανασκέψου το! Δες αν η έννοια είναι στην κορυφή ή στο κέντρο.</span>";
+      }
+    }
+
+    function allowDrop(e) { e.preventDefault(); }
+    function drag(e) { e.dataTransfer.setData("text", e.target.id); }
+    function drop(e) {
+      e.preventDefault();
+      const id = e.dataTransfer.getData("text");
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (e.target.classList.contains('drop-zone')) {
+        e.target.innerText = el.innerText;
+        e.target.setAttribute('data-val', el.innerText);
+        e.target.classList.add('filled');
+        el.style.display = 'none';
+      }
+    }
+
+    function checkDND(act, lvl) {
+      const zones = document.querySelectorAll('.map-canvas .drop-zone[data-expected]');
+      let ok = true;
+      let count = 0;
+      zones.forEach(z => {
+        const val = z.getAttribute('data-val');
+        const exp = z.getAttribute('data-expected');
+        if (val) count++;
+        if (val !== exp) ok = false;
+      });
+      const fb = document.getElementById('fb');
+      if (count === zones.length && ok) {
+        fb.innerHTML = "<span style='color:var(--success)'>🌟 Εξαιρετικά! Όλες οι έννοιες είναι στη σωστή θέση!</span>";
+        setTimeout(() => {
+          if (lvl < 2) { activityLevel[1]++; renderCurrent(); }
+          else { fb.innerHTML = "<span style='color:var(--success)'>🏆 Συγχαρητήρια! Τελείωσες τη δραστηριότητα!</span>"; }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>⚠️ Κάποιο στοιχείο λείπει ή βρίσκεται σε λάθος θέση.</span>";
+      }
+    }
+
+    function checkAct3(lvl, validList) {
+      const zones = document.querySelectorAll('#webMap .drop-zone');
+      let filled = 0;
+      let ok = true;
+      zones.forEach(z => {
+        const val = z.getAttribute('data-val');
+        if (val) {
+          filled++;
+          if (!validList.includes(val)) ok = false;
+        }
+      });
+      const fb = document.getElementById('fb');
+      if (filled === validList.length && ok) {
+        fb.innerHTML = "<span style='color:var(--success)'>🎯 Μπράβο! Όλα είναι σωστά μέσα μετακίνησης!</span>";
+        setTimeout(() => {
+          if (lvl < 2) { activityLevel[2]++; renderCurrent(); }
+          else { fb.innerHTML = "<span style='color:var(--success)'>🏆 Συγχαρητήρια για την ολοκλήρωση!</span>"; }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Έλεγξε ξανά τα πλαίσια. Μήπως έβαλες κάποιο που δεν ταιριάζει;</span>";
+      }
+    }
+
+    function checkQ4(sel, cor, lvl) {
+      const fb = document.getElementById('fb');
+      if (sel === cor) {
+        fb.innerHTML = "<span style='color:var(--success)'>🎉 Πολύ σωστά!</span>";
+        setTimeout(() => {
+          if (lvl < 3) { activityLevel[3]++; renderCurrent(); }
+          else { fb.innerHTML = "<span style='color:var(--success)'>🏆 Άριστα! Γνωρίζεις πού μπαίνει κάθε έννοια!</span>"; }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Δοκίμασε ξανά!</span>";
+      }
+    }
+
+    function checkQ5(sel, wrong, lvl) {
+      const fb = document.getElementById('fb');
+      if (sel === wrong) {
+        fb.innerHTML = "<span style='color:var(--success)'>🕵️ Μπράβο! Εντόπισες τον εισβολέα!</span>";
+        setTimeout(() => {
+          if (lvl < 3) { activityLevel[4]++; renderCurrent(); }
+          else { fb.innerHTML = "<span style='color:var(--success)'>🏆 Εξαιρετική παρατηρητικότητα!</span>"; }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Αυτό το στοιχείο ταιριάζει στον χάρτη. Ψάξε για το αταίριαστο!</span>";
+      }
+    }
+
+    function checkQ6(sel, cor, lvl) {
+      const fb = document.getElementById('fb');
+      if (sel === cor) {
+        fb.innerHTML = "<span style='color:var(--success)'>✨ Τέλεια σύνδεση εννοιών!</span>";
+        setTimeout(() => {
+          if (lvl < 3) { activityLevel[5]++; renderCurrent(); }
+          else { fb.innerHTML = "<span style='color:var(--success)'>🏆 Μπράβο! Ολοκλήρωσες όλες τις συνδέσεις!</span>"; }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Αυτή η λέξη δεν ταιριάζει. Δοκίμασε άλλη!</span>";
+      }
+    }
+
+    function checkQ7(sel, cor, lvl) {
+      const fb = document.getElementById('fb');
+      if (sel === cor) {
+        fb.innerHTML = "<span style='color:var(--success)'>🎉 Σωστά τον αναγνώρισες!</span>";
+        setTimeout(() => {
+          if (lvl < 3) { activityLevel[6]++; renderCurrent(); }
+          else { fb.innerHTML = "<span style='color:var(--success)'>🏆 Συγχαρητήρια!</span>"; }
+        }, 1200);
+      } else {
+        fb.innerHTML = "<span style='color:var(--danger)'>❌ Λάθος είδος χάρτη. Ξαναδιάβασε τα χαρακτηριστικά του!</span>";
+      }
+    }
+
+    // ==========================================
+    // ΚΩΔΙΚΑΣ ΔΡΑΣΤΗΡΙΟΤΗΤΑΣ 8 (CREATOR ENGINE)
+    // ==========================================
+    let nodesList = [];
+    let connections = [];
+    let selectedNodeForLink = null;
+
+    function initCreatorDefaults() {
+      nodesList = [];
+      connections = [];
+      selectedNodeForLink = null;
+      // Προσθήκη δύο αρχικών παραδειγμάτων
+      spawnNode("Κεντρική Έννοια", "main", 50, 40);
+      spawnNode("Ειδική Έννοια 1", "sub", 200, 160);
+      updateSvgLines();
+    }
+
+    function createNodeFromInput() {
+      const input = document.getElementById('nodeInput');
+      const val = input.value.trim();
+      if (!val) return;
+      const type = document.getElementById('nodeType').value;
+      const x = 30 + Math.random() * 80;
+      const y = 30 + Math.random() * 80;
+      spawnNode(val, type, x, y);
+      input.value = '';
+      updateSvgLines();
+    }
+
+    function spawnNode(text, type, x, y) {
+      const container = document.getElementById('creatorContainer');
+      const id = 'node_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+
+      const node = document.createElement('div');
+      node.className = `map-node type-${type}`;
+      node.id = id;
+      node.style.left = `${x}px`;
+      node.style.top = `${y}px`;
+
+      const span = document.createElement('span');
+      span.innerText = text;
+      node.appendChild(span);
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'del-node-btn';
+      delBtn.innerHTML = '&times;';
+      delBtn.title = 'Διαγραφή';
+      delBtn.onclick = (e) => {
+        e.stopPropagation();
+        deleteNode(id);
+      };
+      node.appendChild(delBtn);
+
+      // Σύνδεση γραμμών με κλικ
+      node.onclick = (e) => {
+        if (e.target.classList.contains('del-node-btn')) return;
+        handleNodeClickForLink(id);
+      };
+
+      container.appendChild(node);
+      nodesList.push({ id, el: node });
+
+      enableUnifiedDrag(node);
+    }
+
+    function deleteNode(id) {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+      nodesList = nodesList.filter(n => n.id !== id);
+      connections = connections.filter(c => c.from !== id && c.to !== id);
+      if (selectedNodeForLink === id) selectedNodeForLink = null;
+      updateSvgLines();
+    }
+
+    function resetCreatorCanvas() {
+      const container = document.getElementById('creatorContainer');
+      const nodes = container.querySelectorAll('.map-node');
+      nodes.forEach(n => n.remove());
+      nodesList = [];
+      connections = [];
+      selectedNodeForLink = null;
+      updateSvgLines();
+    }
+
+    function handleNodeClickForLink(id) {
+      const fb = document.getElementById('fb8');
+      if (!selectedNodeForLink) {
+        selectedNodeForLink = id;
+        document.getElementById(id).classList.add('selected-for-link');
+        fb.innerText = "👉 Τώρα κάνε κλικ σε μια δεύτερη έννοια για να τις ενώσεις με γραμμή!";
+      } else if (selectedNodeForLink === id) {
+        document.getElementById(id).classList.remove('selected-for-link');
+        selectedNodeForLink = null;
+        fb.innerText = "💡 Συμβουλή: Σύρε τις έννοιες για να τις τοποθετήσεις εκεί που θέλεις!";
+      } else {
+        const from = selectedNodeForLink;
+        const to = id;
+        document.getElementById(from).classList.remove('selected-for-link');
+        selectedNodeForLink = null;
+
+        // Έλεγχος αν υπάρχει ήδη
+        const exists = connections.some(c => (c.from === from && c.to === to) || (c.from === to && c.to === from));
+        if (!exists) {
+          connections.push({ from, to });
+          updateSvgLines();
+          fb.innerText = "✅ Η γραμμή δημιουργήθηκε!";
+        } else {
+          fb.innerText = "⚠️ Οι δύο έννοιες είναι ήδη ενωμένες.";
+        }
+      }
+    }
+
+    function updateSvgLines() {
+      const svg = document.getElementById('svgLayer');
+      if (!svg) return;
+      svg.innerHTML = '';
+
+      connections.forEach(conn => {
+        const el1 = document.getElementById(conn.from);
+        const el2 = document.getElementById(conn.to);
+        if (!el1 || !el2) return;
+
+        const x1 = el1.offsetLeft + el1.offsetWidth / 2;
+        const y1 = el1.offsetTop + el1.offsetHeight / 2;
+        const x2 = el2.offsetLeft + el2.offsetWidth / 2;
+        const y2 = el2.offsetTop + el2.offsetHeight / 2;
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("stroke", "#7F8C8D");
+        line.setAttribute("stroke-width", "3");
+        line.setAttribute("stroke-dasharray", "4");
+        svg.appendChild(line);
+      });
+    }
+
+    // Dragging για ποντίκι ΚΑΙ αφή (Touch)
+    function enableUnifiedDrag(elmnt) {
+      let startX = 0, startY = 0, initialLeft = 0, initialTop = 0;
+      let isDragging = false;
+
+      // Mouse Events
+      elmnt.addEventListener('mousedown', dragStart);
+      // Touch Events
+      elmnt.addEventListener('touchstart', dragStart, { passive: false });
+
+      function dragStart(e) {
+        if (e.target.classList.contains('del-node-btn')) return;
+        isDragging = true;
+        const evt = e.touches ? e.touches[0] : e;
+        startX = evt.clientX;
+        startY = evt.clientY;
+        initialLeft = elmnt.offsetLeft;
+        initialTop = elmnt.offsetTop;
+
+        document.addEventListener('mousemove', dragMove);
+        document.addEventListener('mouseup', dragEnd);
+        document.addEventListener('touchmove', dragMove, { passive: false });
+        document.addEventListener('touchend', dragEnd);
+      }
+
+      function dragMove(e) {
+        if (!isDragging) return;
+        if (e.cancelable) e.preventDefault();
+        const evt = e.touches ? e.touches[0] : e;
+        const dx = evt.clientX - startX;
+        const dy = evt.clientY - startY;
+
+        const container = document.getElementById('creatorContainer');
+        const maxW = container.clientWidth - elmnt.offsetWidth;
+        const maxH = container.clientHeight - elmnt.offsetHeight;
+
+        let newX = Math.max(0, Math.min(initialLeft + dx, maxW));
+        let newY = Math.max(0, Math.min(initialTop + dy, maxH));
+
+        elmnt.style.left = newX + 'px';
+        elmnt.style.top = newY + 'px';
+
+        updateSvgLines();
+      }
+
+      function dragEnd() {
+        isDragging = false;
+        document.removeEventListener('mousemove', dragMove);
+        document.removeEventListener('mouseup', dragEnd);
+        document.removeEventListener('touchmove', dragMove);
+        document.removeEventListener('touchend', dragEnd);
+      }
+    }
+
+    // Αρχική φόρτωση
+    initNav();
+    renderCurrent();
+  </script>
+</body>
+</html>
