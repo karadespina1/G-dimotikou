@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μάθημα 1: Συνθήκες και Αποφάσεις (Αν... Τότε) - Γ΄ Δημοτικού</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700;800&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --secondary: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg: #f0fdf4;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #bae6fd;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 50%, #fef3c7 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* Activity Navigation Bar */
+    .activity-nav-bar {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.1);
+      border: 2px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-buttons-track {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+
+    .btn-act-jump {
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.86rem;
+      color: #334155;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .btn-act-jump:hover {
+      background: #e0f2fe;
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .btn-act-jump.current {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+    }
+
+    /* HUD */
+    .mission-hud {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 1.1rem 1.4rem;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.1);
+      border: 2px solid var(--border);
+    }
+
+    .hud-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 0.8rem;
+    }
+
+    .activity-badge {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      background: #e0f2fe;
+      padding: 5px 14px;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stars-box {
+      font-weight: 900;
+      font-size: 1.05rem;
+      color: #b45309;
+      background: #fef3c7;
+      padding: 4px 14px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .level-stepper {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 0.8rem;
+    }
+
+    .step-pill {
+      flex: 1;
+      height: 10px;
+      border-radius: 10px;
+      background: #e2e8f0;
+      transition: all 0.4s ease;
+    }
+
+    .step-pill.done { background: var(--success); }
+    .step-pill.active {
+      background: var(--warning);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+      transform: scaleY(1.3);
+    }
+
+    .task-dialogue {
+      background: #f8fafc;
+      border-left: 5px solid var(--primary);
+      border-radius: 0 14px 14px 0;
+      padding: 0.8rem 1.1rem;
+      font-size: 1.03rem;
+      line-height: 1.5;
+    }
+    .task-dialogue strong { color: var(--primary); font-weight: 800; }
+
+    /* Main Activity Card Window */
+    .game-window {
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.12);
+      border: 3px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 530px;
+    }
+
+    .game-topbar {
+      background: #f0fdf4;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #bbf7d0;
+    }
+
+    .game-title {
+      font-weight: 800;
+      color: #166534;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .game-viewport {
+      padding: 1.8rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #ffffff;
+      overflow-y: auto;
+    }
+
+    .stage-container {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    /* Simulation UI: Wardrobe & Weather Room */
+    .weather-room {
+      width: 100%;
+      background: #f8fafc;
+      border: 3px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 1.2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      align-items: center;
+    }
+
+    .window-box {
+      background: #e0f2fe;
+      border: 4px solid #38bdf8;
+      border-radius: 18px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 180px;
+      position: relative;
+    }
+
+    .weather-icon-large {
+      font-size: 4.5rem;
+      animation: floatIcon 3s ease-in-out infinite;
+    }
+
+    @keyframes floatIcon {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .heron-avatar {
+      font-size: 4.5rem;
+      transition: all 0.3s;
+    }
+
+    /* Drag & Click Item Slots */
+    .gear-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .gear-item {
+      background: white;
+      border: 3px solid #cbd5e1;
+      border-radius: 16px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s;
+    }
+    .gear-item:hover {
+      border-color: var(--primary);
+      transform: scale(1.05);
+      background: #f0f9ff;
+    }
+    .gear-item.selected {
+      border-color: var(--success);
+      background: #dcfce7;
+      transform: scale(1.08);
+    }
+    .gear-icon { font-size: 2.8rem; }
+    .gear-label { font-size: 0.85rem; font-weight: 800; color: #334155; }
+
+    /* Logic Puzzle Blocks (If ... Then blockly style) */
+    .code-block-wrap {
+      width: 100%;
+      background: #f8fafc;
+      border: 2px dashed #94a3b8;
+      border-radius: 16px;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .logic-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 900;
+      font-size: 1.05rem;
+      padding: 8px 16px;
+      border-radius: 12px;
+    }
+    .pill-if { background: #fed7aa; color: #9a3412; }
+    .pill-then { background: #bbf7d0; color: #166534; }
+
+    .drop-slot {
+      background: white;
+      border: 2px dashed #0284c7;
+      border-radius: 10px;
+      padding: 8px 16px;
+      min-width: 160px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #0369a1;
+      cursor: pointer;
+    }
+    .drop-slot.filled {
+      border-style: solid;
+      background: #e0f2fe;
+    }
+
+    /* Board game path simulation */
+    .board-track {
+      width: 100%;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      padding: 10px 0;
+      overflow-x: auto;
+    }
+
+    .tile-step {
+      width: 65px;
+      height: 75px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.85rem;
+      border: 3px solid #cbd5e1;
+      position: relative;
+    }
+    .tile-blue { background: #dbeafe; border-color: #3b82f6; color: #1d4ed8; }
+    .tile-yellow { background: #fef9c3; border-color: #eab308; color: #a16207; }
+    .tile-ladder { background: #ffedd5; border-color: #f97316; color: #c2410c; }
+    .tile-green { background: #dcfce7; border-color: #22c55e; color: #15803d; }
+    .player-pawn {
+      position: absolute;
+      top: -15px;
+      font-size: 1.6rem;
+      animation: bounce 0.6s infinite alternate;
+    }
+
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-6px); }
+    }
+
+    /* Button Choices */
+    .choice-grid {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-decision {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      font-family: inherit;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #1e293b;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+    .btn-decision:hover {
+      background: #f0f9ff;
+      border-color: var(--primary);
+      transform: translateX(4px);
+    }
+    .btn-decision.correct {
+      background: #dcfce7 !important;
+      border-color: #86efac !important;
+      color: #166534 !important;
+    }
+    .btn-decision.wrong {
+      background: #fee2e2 !important;
+      border-color: #fca5a5 !important;
+      color: #991b1b !important;
+    }
+
+    /* Feedback Banner */
+    .feedback-banner {
+      width: 100%;
+      max-width: 680px;
+      margin-top: 1rem;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 0.98rem;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      animation: popIn 0.3s ease;
+    }
+    .feedback-banner.show { display: flex; }
+
+    @keyframes popIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .feedback-banner.correct {
+      background: #dcfce7;
+      color: #166534;
+      border: 2px solid #86efac;
+    }
+
+    .feedback-banner.wrong {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 2px solid #fca5a5;
+    }
+
+    .auto-advance-indicator {
+      font-size: 0.82rem;
+      background: rgba(0,0,0,0.07);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .act-complete-notice {
+      display: none;
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      color: #92400e;
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-top: 10px;
+      font-weight: 800;
+      text-align: center;
+      width: 100%;
+      max-width: 680px;
+    }
+    .act-complete-notice.show { display: block; }
+
+    /* Modal */
+    .congrats-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .congrats-modal.show { display: flex; }
+
+    .congrats-card {
+      background: white;
+      border-radius: 28px;
+      padding: 2.5rem;
+      max-width: 520px;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      border: 4px solid var(--primary);
+    }
+
+    .congrats-card h2 {
+      font-family: 'Comfortaa', cursive;
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 0.8rem;
+    }
+
+    .btn-restart {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 28px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 1.5rem;
+    }
+    .btn-restart:hover { background: var(--primary-dark); }
+
+    @media (max-width: 640px) {
+      body { padding: 0.5rem; }
+      .game-viewport { padding: 1.2rem 0.8rem; }
+      .weather-room { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- Activity Jump Bar -->
+    <div class="activity-nav-bar">
+      <div class="nav-title">
+        <span>🧭 Ελεύθερη Επιλογή Δραστηριότητας (Κάνε κλικ για να πας κατευθείαν):</span>
+        <span id="levelLabelSmall" style="color: var(--primary); font-weight: 900;"></span>
+      </div>
+      <div class="nav-buttons-track" id="activityNavTrack"></div>
+    </div>
+
+    <!-- HUD -->
+    <div class="mission-hud">
+      <div class="hud-header">
+        <span class="activity-badge" id="hudActivityBadge">ΔΡΑΣΤΗΡΙΟΤΗΤΑ 1 ΑΠΟ 8</span>
+        <div class="stars-box">
+          ⭐ Αστέρια: <span id="starCounter">0</span> / 24
+        </div>
+      </div>
+
+      <div class="level-stepper">
+        <div class="step-pill active" id="stepPill1"></div>
+        <div class="step-pill" id="stepPill2"></div>
+        <div class="step-pill" id="stepPill3"></div>
+      </div>
+
+      <div class="task-dialogue" id="taskPrompt"></div>
+    </div>
+
+    <!-- Main Game Window -->
+    <div class="game-window">
+      <div class="game-topbar">
+        <div class="game-title">
+          <span>🧠 Εργαστήριο Αποφάσεων: Συνθήκες & «Αν... Τότε»</span>
+        </div>
+        <div style="font-weight: 800; font-size: 0.85rem; color: #15803d;">
+          Μάθημα 1
+        </div>
+      </div>
+
+      <div class="game-viewport">
+        <div class="stage-container" id="stageContainer"></div>
+
+        <div class="feedback-banner" id="feedbackBanner">
+          <span id="feedbackText"></span>
+          <span class="auto-advance-indicator" id="advanceCountdown"></span>
+        </div>
+
+        <div class="act-complete-notice" id="actCompleteNotice">
+          🏆 Μπράβο! Ολοκλήρωσες και τα 3 επίπεδα αυτής της δραστηριότητας! Ετοιμάσου για την επόμενη...
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Congrats Modal -->
+  <div class="congrats-modal" id="congratsModal">
+    <div class="congrats-card">
+      <div style="font-size: 4rem; margin-bottom: 10px;">🌟🏆🎉</div>
+      <h2>Συγχαρητήρια, Μικρέ Προγραμματιστή!</h2>
+      <p style="font-size: 1.12rem; color: #475569; line-height: 1.6;">
+        Ολοκλήρωσες όλες τις δραστηριότητες του <strong>Μαθήματος 1</strong>!<br>
+        Έμαθες να ελέγχεις τις συνθήκες, να προβλέπεις όλα τα ενδεχόμενα και να παίρνεις τις σωστές αποφάσεις με το <strong>«Αν... Τότε»</strong>!
+      </p>
+      <div style="font-size: 1.4rem; font-weight: 900; color: #b45309; margin-top: 1rem;">
+        Συνολικό Σκορ: <span id="finalScoreModal">24</span> / 24 Αστέρια ⭐
+      </div>
+      <button class="btn-restart" onclick="restartEverything()">Παίξε Ξανά από την Αρχή</button>
+    </div>
+  </div>
+
+  <script>
+    /* ========================================================
+       DATA MODEL: ΜΑΘΗΜΑ 1 (8 ΔΡΑΣΤΗΡΙΟΤΗΤΕΣ x 3 ΕΠΙΠΕΔΑ)
+       Βασισμένο στο σχολικό βιβλίο (σελ. 10-14):
+       1. Η Ντουλάπα του Ήρωνα (Καιρικές συνθήκες & εξοπλισμός)
+       2. Σύνθετες Συνθήκες (Συνδυασμοί: Βρέχει ΚΑΙ κάνει κρύο)
+       3. Το Επιτραπέζιο Παιχνίδι (Κανόνες με ζάρι & χρωματιστά κουτάκια)
+       4. Ντετέκτιβ Συνθηκών (Εντοπισμός της συνθήκης μετά το «Αν»)
+       5. Σχεδιάζω την Εβδομάδα μου (Αποφάσεις στην καθημερινότητα)
+       6. Ο Θησέας στον Λαβύρινθο (Κανόνες κίνησης αν συναντήσει εμπόδιο)
+       7. Το Έξυπνο Φανάρι (Αν κόκκινο -> σταμάτα, αν πράσινο -> πέρνα)
+       8. Οι Υπολογιστές Αποφασίζουν (Απόφαση αλγορίθμου)
+       ======================================================== */
+    const activities = [
+      {
+        id: 1,
+        shortName: "1. Η Ντουλάπα του Ήρωνα",
+        title: "Η Ντουλάπα του Ήρωνα (Καιρικές Συνθήκες)",
+        renderType: "weather-closet",
+        levels: [
+          {
+            prompt: "Κοίτα έξω από το παράθυρο: <strong>Βρέχει δυνατά!</strong> 🌧️ Βοήθησε τον Ήρωνα να πάρει τη σωστή απόφαση. Κάνε κλικ στο κατάλληλο αντικείμενο:",
+            weatherIcon: "🌧️",
+            weatherName: "Βρέχει!",
+            targetGear: "umbrella",
+            items: [
+              { id: 'sunglasses', icon: "🕶️", label: "Γυαλιά Ηλίου" },
+              { id: 'umbrella', icon: "☂️", label: "Ομπρέλα / Αδιάβροχο", isCorrect: true },
+              { id: 'fan', icon: "🪭", label: "Βεντάλια" }
+            ],
+            why: "Μπράβο! Αν βρέχει, τότε παίρνουμε ομπρέλα ή αδιάβροχο!"
+          },
+          {
+            prompt: "Ο καιρός άλλαξε! Έξω έχει <strong>δυνατό ήλιο</strong> ☀️. Ποια είναι η σωστή απόφαση;",
+            weatherIcon: "☀️",
+            weatherName: "Έχει Ήλιο!",
+            targetGear: "sunglasses",
+            items: [
+              { id: 'sunglasses', icon: "🕶️", label: "Γυαλιά Ηλίου / Καπέλο", isCorrect: true },
+              { id: 'scarf', icon: "🧣", label: "Μάλλινο Κασκόλ" },
+              { id: 'boots', icon: "🥾", label: "Χιονομπότες" }
+            ],
+            why: "Εξαιρετικά! Αν έχει ήλιο, τότε φοράμε γυαλιά ηλίου και καπέλο!"
+          },
+          {
+            prompt: "Τώρα έξω φυσάει <strong>πολύς δυνατός αέρας</strong> 💨. Τι φοράει ο Ήρωνας;",
+            weatherIcon: "💨",
+            weatherName: "Έχει Αέρα!",
+            targetGear: "windbreaker",
+            items: [
+              { id: 'windbreaker', icon: "🧥", label: "Αντιανεμικό Μπουφάν", isCorrect: true },
+              { id: 'swimsuit', icon: "🩳", label: "Μαγιό" }
+            ],
+            why: "Τέλεια! Αν έχει δυνατό αέρα, τότε φοράμε αντιανεμικό!"
+          }
+        ]
+      },
+
+      {
+        id: 2,
+        shortName: "2. Σύνθετες Συνθήκες",
+        title: "Συνδυασμοί: «Αν βρέχει ΚΑΙ κάνει κρύο...»",
+        renderType: "composite-closet",
+        levels: [
+          {
+            prompt: "Στη σελίδα 11 του βιβλίου, ο Ήρωνας κάνει συνδυασμούς: <strong>Αν βρέχει ΚΑΙ κάνει κρύο</strong> 🌧️🥶, ποια 2 πράγματα πρέπει να πάρει μαζί του;",
+            weatherIcon: "🌧️🥶",
+            weatherName: "Βροχή & Κρύο!",
+            needTwo: true,
+            requiredGears: ["umbrella", "scarf"],
+            items: [
+              { id: 'umbrella', icon: "☂️", label: "Ομπρέλα" },
+              { id: 'scarf', icon: "🧣", label: "Κασκόλ & Σκούφος" },
+              { id: 'fan', icon: "🪭", label: "Βεντάλια" }
+            ],
+            why: "Μπράβο! Αν βρέχει ΚΑΙ κάνει κρύο, τότε παίρνουμε ομπρέλα, κασκόλ και σκούφο!"
+          },
+          {
+            prompt: "Συνδυασμός καλοκαιριού: <strong>Αν έχει ήλιο ΚΑΙ πολλή ζέστη</strong> ☀️🥵, τι επιλέγουμε;",
+            weatherIcon: "☀️🥵",
+            weatherName: "Ήλιος & Ζέστη!",
+            needTwo: true,
+            requiredGears: ["cap", "water"],
+            items: [
+              { id: 'cap', icon: "🧢", label: "Καπέλο Ηλίου" },
+              { id: 'water', icon: "🧊", label: "Δροσερό Νερό" },
+              { id: 'coat', icon: "🧥", label: "Χοντρό Παλτό" }
+            ],
+            why: "Σωστά! Αν έχει ήλιο και ζέστη, τότε φοράμε καπέλο και πίνουμε δροσερό νερό!"
+          },
+          {
+            prompt: "Τι σημαίνει η λέξη <strong>«Ενδεχόμενο»</strong> όπως έμαθε ο Ήρωνας;",
+            renderType: "quiz",
+            choices: [
+              { text: "🎲 Κάτι που μπορεί να συμβεί (π.χ. μπορεί να βρέξει αύριο)!", correct: true, why: "Ακριβώς! Όπως λέει το βιβλίο: Ενδεχόμενο είναι κάτι που μπορεί να συμβεί!" },
+              { text: "🔒 Κάτι που είναι κλειδωμένο με κωδικό.", correct: false, why: "Όχι, αυτό είναι συνθηματικό/κωδικός, όχι ενδεχόμενο!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 3,
+        shortName: "3. Επιτραπέζιο Παιχνίδι",
+        title: "Παιχνίδια με Συνθήκες & Κανόνες",
+        renderType: "board-game",
+        levels: [
+          {
+            prompt: "Κανόνας Επιτραπεζίου (σελ. 13): <em>«Αν είσαι στο μπλε τετράγωνο, τότε πήγαινε 2 βήματα πίσω!»</em>. Το πιόνι πάτησε στο ΜΠΛΕ 🔵. Τι θα συμβεί;",
+            choices: [
+              { text: "⬅️ Το πιόνι πηγαίνει 2 βήματα πίσω!", correct: true, why: "Μπράβο! Η συνθήκη (είσαι στο μπλε) ίσχυσε, άρα εκτελείται η απόφαση (2 πίσω)!" },
+              { text: "🏆 Κερδίζει αυτόματα το παιχνίδι.", correct: false, why: "Όχι, ο κανόνας του μπλε λέει καθαρά: 2 πίσω!" }
+            ]
+          },
+          {
+            prompt: "Κανόνας: <em>«Αν έριξες 3 στο ζάρι 🎲, τότε ξαναπαίζεις!»</em>. Η Υπατία έριξε 3. Τι κάνει;",
+            choices: [
+              { text: "🎲 Ξαναρίχνει το ζάρι και ξαναπαίζει!", correct: true, why: "Σωστά! Αφού έφερε 3, ισχύει η συνθήκη και ξαναπαίζει!" },
+              { text: "😴 Χάνει τη σειρά της και περιμένει.", correct: false, why: "Όχι, αυτό θα συνέβαινε αν πατούσε στο κίτρινο τετράγωνο!" }
+            ]
+          },
+          {
+            prompt: "Κανόνας: <em>«Αν είσαι σε σκάλα 🪜, πήγαινε εκεί που οδηγεί, αλλιώς προχώρα 1 μπροστά.»</em> Αν ΔΕΝ είσαι σε σκάλα, τι κάνεις;",
+            choices: [
+              { text: "➡️ Προχωράς 1 βήμα μπροστά!", correct: true, why: "Εξαιρετικά! Το «αλλιώς» μάς λέει τι κάνουμε όταν η συνθήκη ΔΕΝ ισχύει!" },
+              { text: "🪜 Ανεβαίνεις στον αέρα χωρίς σκάλα.", correct: false, why: "Αφού δεν έχει σκάλα, εκτελείται η οδηγία του 'αλλιώς'!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 4,
+        shortName: "4. Ντετέκτιβ Συνθηκών",
+        title: "Πού κρύβεται η Συνθήκη;",
+        renderType: "quiz",
+        levels: [
+          {
+            prompt: "Ο Τάλως λέει: 💬 <em>«Θα βρεις τη συνθήκη αμέσως μετά τη λέξη 'Αν'!»</em>. Στην πρόταση: <strong>«Αν τελειώσεις νωρίς τα μαθήματά σου, τότε θα παίξεις»</strong>, ποια είναι η συνθήκη;",
+            choices: [
+              { text: "🔍 «τελειώσεις νωρίς τα μαθήματά σου»", correct: true, why: "Μπράβο! Αυτό που εξετάζουμε αν ισχύει μετά το 'Αν', είναι η συνθήκη!" },
+              { text: "🎮 «θα παίξεις το αγαπημένο σου παιχνίδι»", correct: false, why: "Αυτή είναι η απόφαση / ενέργεια (μετά το τότε), όχι η συνθήκη!" }
+            ]
+          },
+          {
+            prompt: "Στην πρόταση: <strong>«Αν δείξει την αγαπημένη σου σειρά, τότε θα δεις άλλο ένα επεισόδιο»</strong>, ποια είναι η συνθήκη;",
+            choices: [
+              { text: "📺 «δείξει την αγαπημένη σου σειρά»", correct: true, why: "Σωστά! Εξετάζουμε αν είναι αλήθεια ότι δείχνει τη σειρά!" },
+              { text: "🍿 «τότε θα δεις άλλο ένα επεισόδιο»", correct: false, why: "Αυτό είναι το αποτέλεσμα της απόφασης!" }
+            ]
+          },
+          {
+            prompt: "Τι ονομάζουμε <strong>«Συνθήκη»</strong> στον προγραμματισμό και στη ζωή μας;",
+            choices: [
+              { text: "⚖️ Αυτό που ελέγχουμε αν ισχύει (αν είναι αλήθεια ή όχι) για να πάρουμε απόφαση!", correct: true, why: "Ακριβώς! Όπως λέει το βιβλίο στη σελίδα 12: Αυτό που εξετάζουμε αν ισχύει το ονομάζουμε συνθήκη!" },
+              { text: "🔌 Το καλώδιο του ρεύματος.", correct: false, why: "Το καλώδιο είναι υλικό εξάρτημα, όχι λογική συνθήκη!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 5,
+        shortName: "5. Αποφάσεις στην Καθημερινότητα",
+        title: "Σχεδιάζω την Εβδομάδα μου",
+        renderType: "quiz",
+        levels: [
+          {
+            prompt: "Σελίδα 12: <em>«Αν έρθει ο παππούς να σε επισκεφθεί αύριο, τότε...»</em> Ποια είναι η πιο λογική απόφαση;",
+            choices: [
+              { text: "🌳 ...τότε θα πάτε μαζί βόλτα στο πάρκο!", correct: true, why: "Όμορφα! Μια υπέροχη απόφαση βασισμένη στην επίσκεψη του παππού!" },
+              { text: "❄️ ...τότε θα ανάψουμε το κλιματιστικό στο κρύο.", correct: false, why: "Αυτό δεν έχει σχέση με την επίσκεψη!" }
+            ]
+          },
+          {
+            prompt: "Σκέψου το σχολείο: <strong>«Αν αύριο έχουμε Γυμναστική, τότε...»</strong>",
+            choices: [
+              { text: "👟 ...τότε θα φορέσω φόρμα και αθλητικά παπούτσια!", correct: true, why: "Μπράβο! Παίρνουμε απόφαση για το τι θα φορέσουμε ανάλογα με το πρόγραμμα!" },
+              { text: "🎨 ...τότε θα πάρω μόνο νερομπογιές.", correct: false, why: "Στη γυμναστική χρειαζόμαστε αθλητικά παπούτσια!" }
+            ]
+          },
+          {
+            prompt: "Όταν παίρνουμε μια απόφαση με το «Αν... τότε», εξετάζουμε πάντα:",
+            choices: [
+              { text: "🔮 Όλα τα ενδεχόμενα (τι θα κάνουμε αν ισχύει και τι αν δεν ισχύει)!", correct: true, why: "Έτσι σκέφτονται οι έξυπνοι άνθρωποι και οι προγραμματιστές!" },
+              { text: "🙈 Τίποτα, αποφασίζουμε στην τύχη.", correct: false, why: "Στον προγραμματισμό δεν αφήνουμε τίποτα στην τύχη!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 6,
+        shortName: "6. Ο Θησέας στον Λαβύρινθο",
+        title: "Ο Θησέας στον Λαβύρινθο (Άσκηση Αντιστοίχισης)",
+        renderType: "quiz",
+        levels: [
+          {
+            prompt: "Στο ψηφιακό υλικό του μαθήματος (σελ. 14), ο Θησέας κινείται στον λαβύρινθο. Κανόνας: <strong>«Αν μπροστά σου υπάρχει τοίχος, τότε...»</strong>",
+            choices: [
+              { text: "🔄 ...τότε στρίψε δεξιά ή αριστερά!", correct: true, why: "Μπράβο! Αν βρει τοίχο, δεν μπορεί να περάσει μέσα από τις πέτρες, πρέπει να στρίψει!" },
+              { text: "🧱 ...τότε πέσε πάνω στον τοίχο με δύναμη.", correct: false, why: "Όχι βέβαια, θα χτυπήσει!" }
+            ]
+          },
+          {
+            prompt: "Κανόνας 2: <strong>«Αν δεις τον μίτο της Αριάδνης στο πάτωμα, τότε...»</strong>",
+            choices: [
+              { text: "🧶 ...τότε ακολούθησε την κλωστή για να βρεις την έξοδο!", correct: true, why: "Σωστά! Ο μίτος οδηγεί με ασφάλεια έξω από τον λαβύρινθο!" },
+              { text: "✂️ ...τότε κόψε την κλωστή και πέτα την.", correct: false, why: "Αν την κόψει, θα χαθεί μέσα στον λαβύρινθο!" }
+            ]
+          },
+          {
+            prompt: "Ποια είναι η συνθήκη που ελέγχει αν ο Θησέας νίκησε;",
+            choices: [
+              { text: "🚪 «Αν έφτασε στην έξοδο του λαβύρινθου»", correct: true, why: "Ακριβώς! Μόλις φτάσει στην έξοδο, το παιχνίδι ολοκληρώνεται με νίκη!" },
+              { text: "😴 «Αν πείνασε το μεσημέρι»", correct: false, why: "Αυτό δεν καθορίζει τη νίκη του παιχνιδιού!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 7,
+        shortName: "7. Το Έξυπνο Φανάρι",
+        title: "Κανόνες Κυκλοφορίας: Το Έξυπνο Φανάρι",
+        renderType: "traffic-light",
+        levels: [
+          {
+            prompt: "Ο Σταμάτης και η Γρηγορία θέλουν να περάσουν απέναντι. Το φανάρι των πεζών ανάβει <strong>ΚΟΚΚΙΝΟ</strong> (Σταμάτης) 🛑. Ποια είναι η απόφαση;",
+            trafficColor: "red",
+            choices: [
+              { text: "🛑 Σταματάμε στο πεζοδρόμιο και περιμένουμε!", correct: true, why: "Μπράβο! Αν το φανάρι είναι κόκκινο, τότε σταματάμε πάντα!" },
+              { text: "🏃 Τρέχουμε γρήγορα ανάμεσα στα αυτοκίνητα.", correct: false, why: "Ποτέ! Είναι εξαιρετικά επικίνδυνο!" }
+            ]
+          },
+          {
+            prompt: "Τώρα το φανάρι των πεζών ανάβει <strong>ΠΡΑΣΙΝΟ</strong> (Γρηγόρης) 🟢. Ποια είναι η απόφαση;",
+            trafficColor: "green",
+            choices: [
+              { text: "🚶 Ελέγχουμε αριστερά-δεξιά και περνάμε με ασφάλεια!", correct: true, why: "Σωστά! Αν το φανάρι είναι πράσινο, τότε περνάμε προσεκτικά!" },
+              { text: "🛑 Καθόμαστε στο πεζοδρόμιο μέχρι να ξανανάψει κόκκινο.", correct: false, why: "Το πράσινο είναι για να περάσουμε!" }
+            ]
+          },
+          {
+            prompt: "Πώς γράφεται ο κανόνας του φωτεινού σηματοδότη με προγραμματιστικό τρόπο;",
+            choices: [
+              { text: "💻 «Αν φανάρι = πράσινο, τότε πέρνα, αλλιώς σταμάτα!»", correct: true, why: "Εξαιρετικά! Αυτή είναι η κλασική δομή απόφασης στον προγραμματισμό!" },
+              { text: "🎨 «Ζωγράφισε το φανάρι με νερομπογιά»", correct: false, why: "Αυτό είναι οδηγία ζωγραφικής, όχι κανόνας κυκλοφορίας!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 8,
+        shortName: "8. Οι Υπολογιστές Αποφασίζουν",
+        title: "Πώς σκέφτεται ο Υπολογιστής;",
+        renderType: "quiz",
+        levels: [
+          {
+            prompt: "Στο ηλεκτρονικό παιχνίδι, ο υπολογιστής ελέγχει: <strong>«Αν ο ήρωας άγγιξε το φρούτο 🍎, τότε...»</strong>",
+            choices: [
+              { text: "⭐ ...τότε πρόσθεσε έναν πόντο στο σκορ!", correct: true, why: "Μπράβο! Ο υπολογιστής εκτελεί αυτόματα την εντολή προσθήκης πόντου!" },
+              { text: "🔌 ...τότε σβήσε την οθόνη του υπολογιστή.", correct: false, why: "Όχι, το παιχνίδι συνεχίζεται κανονικά με περισσότερους πόντους!" }
+            ]
+          },
+          {
+            prompt: "Κανόνας 2: <strong>«Αν ο ήρωας άγγιξε το φαντασματάκι 👻, τότε...»</strong>",
+            choices: [
+              { text: "❤️ ...τότε αφαίρεσε μία ζωή από τον παίκτη!", correct: true, why: "Σωστά! Όπως θα μάθουμε και στο Scratch, ο υπολογιστής ελέγχει τις συγκρούσεις!" },
+              { text: "🎁 ...τότε δώσε του ένα μεγάλο δώρο.", correct: false, why: "Το φαντασματάκι είναι εμπόδιο, αφαιρεί ζωή!" }
+            ]
+          },
+          {
+            prompt: "Τι μάθαμε τελικά σε αυτό το 1ο μάθημα;",
+            choices: [
+              { text: "🌟 Ότι οι αποφάσεις μας στη ζωή και στον προγραμματισμό βασίζονται σε ΣΥΝΘΗΚΕΣ με το «Αν... Τότε»!", correct: true, why: "Συγχαρητήρια! Ολοκλήρωσες πανηγυρικά το Μάθημα 1!" },
+              { text: "😴 Ότι οι υπολογιστές δεν παίρνουν ποτέ αποφάσεις.", correct: false, why: "Ακριβώς το αντίθετο: οι υπολογιστές παίρνουν εκατομμύρια αποφάσεις το δευτερόλεπτο!" }
+            ]
+          }
+        ]
+      }
+    ];
+
+    /* ================= APP STATE ================= */
+    let currentActIndex = 0;
+    let currentLvlIndex = 0;
+    let score = 0;
+    let isAdvancing = false;
+    let solvedTasks = new Set();
+
+    // Composite wardrobe selection state
+    let selectedGears = [];
+
+    // DOM Elements
+    const navTrackEl = document.getElementById('activityNavTrack');
+    const hudBadgeEl = document.getElementById('hudActivityBadge');
+    const starCounterEl = document.getElementById('starCounter');
+    const taskPromptEl = document.getElementById('taskPrompt');
+    const stageContainerEl = document.getElementById('stageContainer');
+    const feedbackBannerEl = document.getElementById('feedbackBanner');
+    const feedbackTextEl = document.getElementById('feedbackText');
+    const advanceCountdownEl = document.getElementById('advanceCountdown');
+    const actCompleteNoticeEl = document.getElementById('actCompleteNotice');
+    const levelLabelSmallEl = document.getElementById('levelLabelSmall');
+    const congratsModalEl = document.getElementById('congratsModal');
+
+    function buildNav() {
+      navTrackEl.innerHTML = "";
+      activities.forEach((act, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "btn-act-jump" + (idx === currentActIndex ? " current" : "");
+        btn.id = "actBtn" + idx;
+        btn.innerHTML = `<span>${act.shortName}</span>`;
+        btn.onclick = () => jumpToAct(idx);
+        navTrackEl.appendChild(btn);
+      });
+    }
+
+    function jumpToAct(idx) {
+      if (isAdvancing) return;
+      currentActIndex = idx;
+      currentLvlIndex = 0;
+      selectedGears = [];
+      updateNavHighlight();
+      loadMission();
+    }
+
+    function updateNavHighlight() {
+      activities.forEach((_, idx) => {
+        const btn = document.getElementById("actBtn" + idx);
+        if (btn) {
+          if (idx === currentActIndex) btn.classList.add("current");
+          else btn.classList.remove("current");
+        }
+      });
+    }
+
+    buildNav();
+    loadMission();
+
+    function loadMission() {
+      isAdvancing = false;
+      selectedGears = [];
+      const act = activities[currentActIndex];
+      const lvl = act.levels[currentLvlIndex];
+
+      hudBadgeEl.innerText = `ΜΑΘΗΜΑ 1 • ΔΡΑΣΤΗΡΙΟΤΗΤΑ ${act.id} ΑΠΟ 8: ${act.title.toUpperCase()}`;
+      levelLabelSmallEl.innerText = `Επίπεδο ${currentLvlIndex + 1} από 3`;
+      updateStepPills();
+      updateNavHighlight();
+
+      taskPromptEl.innerHTML = `<strong>Επίπεδο ${currentLvlIndex + 1}:</strong> ${lvl.prompt}`;
+
+      feedbackBannerEl.classList.remove('show', 'correct', 'wrong');
+      advanceCountdownEl.innerText = "";
+      actCompleteNoticeEl.classList.remove('show');
+
+      renderStage(act, lvl);
+    }
+
+    function updateStepPills() {
+      for (let i = 1; i <= 3; i++) {
+        const pill = document.getElementById('stepPill' + i);
+        pill.className = 'step-pill';
+        if (i - 1 < currentLvlIndex) pill.classList.add('done');
+        else if (i - 1 === currentLvlIndex) pill.classList.add('active');
+      }
+    }
+
+    /* ================= RENDER DIVERSE STAGES ================= */
+    function renderStage(act, lvl) {
+      stageContainerEl.innerHTML = "";
+
+      // 1. WEATHER CLOSET (Activity 1)
+      if (act.renderType === "weather-closet" && lvl.items) {
+        renderWeatherClosetStage(lvl);
+        return;
+      }
+
+      // 2. COMPOSITE WEATHER CLOSET (Activity 2 - Multiple selection)
+      if (act.renderType === "composite-closet" && lvl.items) {
+        renderCompositeClosetStage(lvl);
+        return;
+      }
+
+      // 3. TRAFFIC LIGHT (Activity 7)
+      if (act.renderType === "traffic-light") {
+        renderTrafficLightStage(lvl);
+        return;
+      }
+
+      // 4. BOARD GAME (Activity 3)
+      if (act.renderType === "board-game") {
+        renderBoardGameStage(lvl);
+        return;
+      }
+
+      // Default: Multi-Choice Decision (Activities 4, 5, 6, 8)
+      if (lvl.choices) {
+        renderChoiceButtons(lvl.choices, stageContainerEl);
+      }
+    }
+
+    /* Weather Closet Builder */
+    function renderWeatherClosetStage(lvl) {
+      const room = document.createElement('div');
+      room.className = "weather-room";
+
+      room.innerHTML = `
+        <div class="window-box">
+          <div style="font-weight:800; font-size:0.85rem; color:#0369a1; margin-bottom:4px;">Έλεγχος Καιρού:</div>
+          <div class="weather-icon-large">${lvl.weatherIcon}</div>
+          <div style="font-weight:900; color:#0c4a6e; margin-top:6px;">${lvl.weatherName}</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="font-weight:800; font-size:0.85rem; color:#475569; margin-bottom:6px;">Ο Ήρωνας:</div>
+          <div class="heron-avatar" id="heronAvatar">🧒</div>
+          <div id="heronGearEquipped" style="font-size:2.2rem; min-height:40px;"></div>
+        </div>
+      `;
+
+      stageContainerEl.appendChild(room);
+
+      const gearTitle = document.createElement('div');
+      gearTitle.style.cssText = "font-weight:800; color:#475569; font-size:0.95rem;";
+      gearTitle.innerText = "Διάλεξε από την ντουλάπα:";
+      stageContainerEl.appendChild(gearTitle);
+
+      const grid = document.createElement('div');
+      grid.className = "gear-grid";
+
+      lvl.items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = "gear-item";
+        card.innerHTML = `
+          <div class="gear-icon">${item.icon}</div>
+          <div class="gear-label">${item.label}</div>
+        `;
+        card.onclick = () => {
+          if (isAdvancing) return;
+          const equipped = document.getElementById('heronGearEquipped');
+          if (equipped) equipped.innerText = item.icon;
+
+          if (item.isCorrect) {
+            card.classList.add('selected');
+            handleSuccess(lvl.why);
+          } else {
+            showFeedback("❌ Αυτό δεν ταιριάζει με τον καιρό που βλέπεις έξω! Δοκίμασε άλλο!", false);
+          }
+        };
+        grid.appendChild(card);
+      });
+
+      stageContainerEl.appendChild(grid);
+    }
+
+    /* Composite Closet Stage (Pick 2 items) */
+    function renderCompositeClosetStage(lvl) {
+      const room = document.createElement('div');
+      room.className = "weather-room";
+
+      room.innerHTML = `
+        <div class="window-box">
+          <div style="font-weight:800; font-size:0.85rem; color:#0369a1; margin-bottom:4px;">Συνδυασμός Καιρού:</div>
+          <div class="weather-icon-large">${lvl.weatherIcon}</div>
+          <div style="font-weight:900; color:#0c4a6e; margin-top:6px;">${lvl.weatherName}</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="font-weight:800; font-size:0.85rem; color:#475569; margin-bottom:6px;">Ο Ήρωνας:</div>
+          <div class="heron-avatar">🧒</div>
+          <div id="heronGearEquippedMulti" style="font-size:2.2rem; min-height:40px;"></div>
+        </div>
+      `;
+
+      stageContainerEl.appendChild(room);
+
+      const gearTitle = document.createElement('div');
+      gearTitle.style.cssText = "font-weight:800; color:#475569; font-size:0.95rem;";
+      gearTitle.innerText = "Κάνε κλικ σε 2 πράγματα που χρειάζεται:";
+      stageContainerEl.appendChild(gearTitle);
+
+      const grid = document.createElement('div');
+      grid.className = "gear-grid";
+
+      lvl.items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = "gear-item";
+        card.id = "gear-" + item.id;
+        card.innerHTML = `
+          <div class="gear-icon">${item.icon}</div>
+          <div class="gear-label">${item.label}</div>
+        `;
+        card.onclick = () => {
+          if (isAdvancing) return;
+
+          if (!selectedGears.includes(item.id)) {
+            selectedGears.push(item.id);
+            card.classList.add('selected');
+          } else {
+            selectedGears = selectedGears.filter(id => id !== item.id);
+            card.classList.remove('selected');
+          }
+
+          const equipped = document.getElementById('heronGearEquippedMulti');
+          if (equipped) {
+            equipped.innerText = selectedGears.map(id => {
+              const it = lvl.items.find(x => x.id === id);
+              return it ? it.icon : '';
+            }).join(' ');
+          }
+
+          // Check if both correct are selected
+          if (selectedGears.length === 2) {
+            const hasAll = lvl.requiredGears.every(g => selectedGears.includes(g));
+            if (hasAll) {
+              handleSuccess(lvl.why);
+            } else {
+              showFeedback("⚠️ Σχεδόν! Ένα από τα δύο δεν ταιριάζει με τη συνθήκη! Δοκίμασε άλλο συνδυασμό!", false);
+            }
+          }
+        };
+        grid.appendChild(card);
+      });
+
+      stageContainerEl.appendChild(grid);
+    }
+
+    /* Traffic Light Stage */
+    function renderTrafficLightStage(lvl) {
+      const tfBox = document.createElement('div');
+      tfBox.style.cssText = "background:#1e293b; border-radius:24px; padding:1.2rem; display:flex; flex-direction:column; gap:12px; align-items:center; box-shadow:0 10px 25px rgba(0,0,0,0.2);";
+
+      const isRed = lvl.trafficColor === 'red';
+      tfBox.innerHTML = `
+        <div style="width:70px; height:70px; border-radius:50%; background:${isRed ? '#ef4444' : '#334155'}; box-shadow:${isRed ? '0 0 25px #ef4444' : 'none'}; display:flex; align-items:center; justify-content:center; font-size:2rem;">
+          ${isRed ? '🛑' : ''}
+        </div>
+        <div style="width:70px; height:70px; border-radius:50%; background:${!isRed ? '#22c55e' : '#334155'}; box-shadow:${!isRed ? '0 0 25px #22c55e' : 'none'}; display:flex; align-items:center; justify-content:center; font-size:2rem;">
+          ${!isRed ? '🚶' : ''}
+        </div>
+      `;
+
+      stageContainerEl.appendChild(tfBox);
+
+      if (lvl.choices) {
+        renderChoiceButtons(lvl.choices, stageContainerEl);
+      }
+    }
+
+    /* Board Game Stage */
+    function renderBoardGameStage(lvl) {
+      const track = document.createElement('div');
+      track.className = "board-track";
+
+      track.innerHTML = `
+        <div class="tile-step tile-green">ΑΡΧΗ</div>
+        <div class="tile-step tile-blue">
+          <span class="player-pawn">♟️</span>
+          <span>ΜΠΛΕ</span>
+          <span style="font-size:0.65rem;">-2</span>
+        </div>
+        <div class="tile-step tile-yellow">
+          <span>ΚΙΤΡΙΝΟ</span>
+          <span style="font-size:0.65rem;">Σειρά</span>
+        </div>
+        <div class="tile-step tile-ladder">
+          <span>🪜</span>
+          <span style="font-size:0.65rem;">Σκάλα</span>
+        </div>
+        <div class="tile-step tile-green">ΤΕΛΟΣ</div>
+      `;
+
+      stageContainerEl.appendChild(track);
+
+      if (lvl.choices) {
+        renderChoiceButtons(lvl.choices, stageContainerEl);
+      }
+    }
+
+    function renderChoiceButtons(choicesArray, container) {
+      const choiceGrid = document.createElement('div');
+      choiceGrid.className = "choice-grid";
+
+      choicesArray.forEach(choice => {
+        const btn = document.createElement('button');
+        btn.className = "btn-decision";
+        btn.innerHTML = `<span>${choice.text}</span>`;
+        btn.onclick = () => {
+          if (isAdvancing) return;
+          if (choice.correct) {
+            btn.classList.add('correct');
+            handleSuccess(choice.why);
+          } else {
+            btn.classList.add('wrong');
+            showFeedback("❌ " + choice.why, false);
+            setTimeout(() => btn.classList.remove('wrong'), 1300);
+          }
+        };
+        choiceGrid.appendChild(btn);
+      });
+
+      container.appendChild(choiceGrid);
+    }
+
+    function handleSuccess(msg) {
+      const taskKey = `${currentActIndex}-${currentLvlIndex}`;
+      if (!solvedTasks.has(taskKey)) {
+        solvedTasks.add(taskKey);
+        score++;
+        starCounterEl.innerText = score;
+      }
+      showFeedback("🌟 " + msg, true, true);
+      triggerAutoAdvance();
+    }
+
+    function showFeedback(text, isOk, hasTimer = false) {
+      feedbackBannerEl.className = "feedback-banner show " + (isOk ? "correct" : "wrong");
+      feedbackTextEl.innerHTML = text;
+      if (!hasTimer) {
+        advanceCountdownEl.innerText = "";
+      }
+    }
+
+    function triggerAutoAdvance() {
+      isAdvancing = true;
+      let secondsLeft = 3;
+      advanceCountdownEl.innerText = `Επόμενο επίπεδο σε ${secondsLeft}... ⏳`;
+
+      const timer = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft > 0) {
+          advanceCountdownEl.innerText = `Επόμενο επίπεδο σε ${secondsLeft}... ⏳`;
+        } else {
+          clearInterval(timer);
+          advanceLevel();
+        }
+      }, 1000);
+    }
+
+    function advanceLevel() {
+      if (currentLvlIndex < 2) {
+        currentLvlIndex++;
+        loadMission();
+      } else {
+        actCompleteNoticeEl.classList.add('show');
+        setTimeout(() => {
+          if (currentActIndex < activities.length - 1) {
+            currentActIndex++;
+            currentLvlIndex = 0;
+            loadMission();
+          } else {
+            showFinalCongrats();
+          }
+        }, 1800);
+      }
+    }
+
+    function showFinalCongrats() {
+      document.getElementById('finalScoreModal').innerText = score;
+      congratsModalEl.classList.add('show');
+    }
+
+    function restartEverything() {
+      congratsModalEl.classList.remove('show');
+      currentActIndex = 0;
+      currentLvlIndex = 0;
+      score = 0;
+      solvedTasks.clear();
+      starCounterEl.innerText = "0";
+      loadMission();
+    }
+  </script>
+</body>
+</html>
