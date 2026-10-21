@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μάθημα 22: Animation Studio & TuxPaint Player - Γ΄ Δημοτικού</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700;800&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #d97706;
+      --primary-hover: #b45309;
+      --secondary: #ec4899;
+      --teal: #0d9488;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg: #fffbeb;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #fed7aa;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #fef3c7 0%, #fce7f3 50%, #e0e7ff 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    /* Activity Jump Bar */
+    .activity-nav-bar {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.1);
+      border: 2px solid #fde68a;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-buttons-track {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+
+    .btn-act-jump {
+      background: #fffdf5;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.86rem;
+      color: #7c2d12;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-act-jump:hover {
+      background: #fef3c7;
+      border-color: #f59e0b;
+      transform: translateY(-2px);
+    }
+
+    .btn-act-jump.current {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+    }
+
+    /* HUD Box */
+    .mission-hud {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 1.1rem 1.4rem;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.1);
+      border: 2px solid #fde68a;
+    }
+
+    .hud-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 0.8rem;
+    }
+
+    .activity-badge {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--primary);
+      background: #fef3c7;
+      padding: 5px 14px;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stars-box {
+      font-weight: 900;
+      font-size: 1.05rem;
+      color: #9d174d;
+      background: #fce7f3;
+      padding: 4px 14px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .level-stepper {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 0.8rem;
+    }
+
+    .step-pill {
+      flex: 1;
+      height: 10px;
+      border-radius: 10px;
+      background: #e2e8f0;
+      transition: all 0.4s ease;
+    }
+
+    .step-pill.done { background: var(--success); }
+    .step-pill.active {
+      background: var(--warning);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+      transform: scaleY(1.3);
+    }
+
+    .task-dialogue {
+      background: #fffdf5;
+      border-left: 5px solid var(--primary);
+      border-radius: 0 14px 14px 0;
+      padding: 0.8rem 1.1rem;
+      font-size: 1.03rem;
+      line-height: 1.5;
+    }
+    .task-dialogue strong { color: var(--primary); font-weight: 800; }
+
+    /* Interactive Studio Window */
+    .studio-window {
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.12);
+      border: 3px solid #fed7aa;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 550px;
+    }
+
+    .studio-topbar {
+      background: #fff7ed;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #fed7aa;
+    }
+
+    .studio-title {
+      font-weight: 800;
+      color: #9a3412;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .studio-viewport {
+      padding: 1.6rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #ffffff;
+      overflow-y: auto;
+    }
+
+    .interactive-stage {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    /* --- SIMULATOR: TuxPaint Heart Maker & Live Animated GIF Player --- */
+    .tux-sim-box {
+      width: 100%;
+      background: #fafaf9;
+      border: 3px solid #e7e5e4;
+      border-radius: 20px;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .tux-split-layout {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .tux-panel {
+      background: white;
+      border: 2px solid #e7e5e4;
+      border-radius: 18px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .panel-header-badge {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .badge-paint { background: #e0f2fe; color: #0369a1; }
+    .badge-preview { background: #fdf2f8; color: #be185d; }
+
+    .drawing-paper {
+      width: 140px;
+      height: 140px;
+      background: #fafaf9;
+      border: 3px dashed #cbd5e1;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+      user-select: none;
+    }
+
+    .animation-screen {
+      width: 140px;
+      height: 140px;
+      background: #0f172a;
+      border: 3px solid #334155;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
+      position: relative;
+      user-select: none;
+    }
+
+    .screen-pulse-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: #ef4444;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tools-palette {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .color-swatches {
+      display: flex;
+      gap: 8px;
+    }
+
+    .color-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .color-btn:hover { transform: scale(1.15); }
+    .color-btn.active { transform: scale(1.2); border-color: #0f172a; }
+
+    .btn-tux-save {
+      background: #0284c7;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 8px 18px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
+    }
+    .btn-tux-save:hover { background: #0369a1; }
+
+    /* Filmstrip */
+    .frames-filmstrip {
+      width: 100%;
+      background: white;
+      border: 2px solid #e7e5e4;
+      border-radius: 14px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow-x: auto;
+    }
+
+    .strip-label {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #57534e;
+      white-space: nowrap;
+    }
+
+    .strip-frames-track {
+      display: flex;
+      gap: 8px;
+    }
+
+    .strip-thumb {
+      width: 44px;
+      height: 44px;
+      background: #fafaf9;
+      border: 2px solid #d6d3d1;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      animation: popIn 0.3s ease;
+    }
+
+    /* Tux Dialog Simulator Overlay */
+    .tux-dialog-prompt {
+      background: #fef08a;
+      border: 2px solid #eab308;
+      border-radius: 14px;
+      padding: 10px 14px;
+      color: #854d0e;
+      font-weight: 800;
+      font-size: 0.92rem;
+      text-align: center;
+      width: 100%;
+      display: none;
+    }
+    .tux-dialog-prompt.show { display: block; }
+
+    .tux-dialog-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-dialog-choice {
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 2px solid #ca8a04;
+      background: white;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .btn-dialog-choice:hover { background: #fef9c3; }
+
+    /* Flipbook preview box */
+    .flipbook-box {
+      width: 170px;
+      height: 170px;
+      border: 4px solid var(--primary);
+      border-radius: 24px;
+      background: #fffbeb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4.8rem;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.05), 0 8px 20px rgba(217, 119, 6, 0.15);
+      user-select: none;
+    }
+
+    .speed-slider-wrap {
+      width: 100%;
+      max-width: 450px;
+      background: #fff7ed;
+      padding: 1rem 1.4rem;
+      border-radius: 16px;
+      border: 2px solid #fed7aa;
+      text-align: center;
+    }
+    .speed-slider-wrap label {
+      display: block;
+      font-weight: 800;
+      color: #7c2d12;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+    .speed-slider-wrap input[type=range] {
+      width: 100%;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+
+    /* Timeline Sequencer */
+    .timeline-container {
+      width: 100%;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .frame-card {
+      width: 95px;
+      height: 125px;
+      background: white;
+      border: 3px solid #cbd5e1;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 4px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s;
+    }
+    .frame-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(217, 119, 6, 0.2);
+    }
+    .frame-visual { font-size: 2.8rem; line-height: 1; margin: auto; }
+    .frame-num {
+      font-size: 0.75rem;
+      font-weight: 800;
+      background: #e2e8f0;
+      padding: 2px 8px;
+      border-radius: 10px;
+      color: #475569;
+    }
+
+    /* Choice List */
+    .choice-grid {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-studio-choice {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      font-family: inherit;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #1e293b;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+    .btn-studio-choice:hover {
+      background: #fff7ed;
+      border-color: #f59e0b;
+      transform: translateX(4px);
+    }
+    .btn-studio-choice.correct {
+      background: #dcfce7 !important;
+      border-color: #86efac !important;
+      color: #166534 !important;
+    }
+    .btn-studio-choice.wrong {
+      background: #fee2e2 !important;
+      border-color: #fca5a5 !important;
+      color: #991b1b !important;
+    }
+
+    /* Feedback */
+    .feedback-banner {
+      width: 100%;
+      max-width: 680px;
+      margin-top: 1rem;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 0.98rem;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      animation: popIn 0.3s ease;
+    }
+    .feedback-banner.show { display: flex; }
+
+    @keyframes popIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .feedback-banner.correct {
+      background: #dcfce7;
+      color: #166534;
+      border: 2px solid #86efac;
+    }
+
+    .feedback-banner.wrong {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 2px solid #fca5a5;
+    }
+
+    .auto-advance-indicator {
+      font-size: 0.82rem;
+      background: rgba(0,0,0,0.07);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .act-complete-notice {
+      display: none;
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      color: #92400e;
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-top: 10px;
+      font-weight: 800;
+      text-align: center;
+      width: 100%;
+      max-width: 680px;
+    }
+    .act-complete-notice.show { display: block; }
+
+    /* Modal */
+    .congrats-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .congrats-modal.show { display: flex; }
+
+    .congrats-card {
+      background: white;
+      border-radius: 28px;
+      padding: 2.5rem;
+      max-width: 520px;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      border: 4px solid #f59e0b;
+    }
+
+    .congrats-card h2 {
+      font-family: 'Comfortaa', cursive;
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 0.8rem;
+    }
+
+    .btn-restart {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 28px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 1.5rem;
+    }
+    .btn-restart:hover { background: var(--primary-hover); }
+
+    @media (max-width: 640px) {
+      body { padding: 0.5rem; }
+      .studio-viewport { padding: 1.2rem 0.8rem; }
+      .tux-split-layout { grid-template-columns: 1fr; }
+      .frame-card { width: 75px; height: 105px; }
+      .frame-visual { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- Activity Jump Bar -->
+    <div class="activity-nav-bar">
+      <div class="nav-title">
+        <span>🎬 Ελεύθερη Επιλογή Δραστηριότητας (Κάνε κλικ για να μεταβείς άμεσα):</span>
+        <span id="levelLabelSmall" style="color: var(--primary); font-weight: 900;"></span>
+      </div>
+      <div class="nav-buttons-track" id="activityNavTrack"></div>
+    </div>
+
+    <!-- HUD -->
+    <div class="mission-hud">
+      <div class="hud-header">
+        <span class="activity-badge" id="hudActivityBadge">ΔΡΑΣΤΗΡΙΟΤΗΤΑ 1 ΑΠΟ 8</span>
+        <div class="stars-box">
+          ⭐ Αστέρια: <span id="starCounter">0</span> / 24
+        </div>
+      </div>
+
+      <div class="level-stepper">
+        <div class="step-pill active" id="stepPill1"></div>
+        <div class="step-pill" id="stepPill2"></div>
+        <div class="step-pill" id="stepPill3"></div>
+      </div>
+
+      <div class="task-dialogue" id="taskPrompt"></div>
+    </div>
+
+    <!-- Studio Window -->
+    <div class="studio-window">
+      <div class="studio-topbar">
+        <div class="studio-title">
+          <span>🎨 Animation Studio & TuxPaint Workshop</span>
+        </div>
+        <div style="font-weight: 800; font-size: 0.85rem; color: #b45309;">
+          Μάθημα 22
+        </div>
+      </div>
+
+      <div class="studio-viewport">
+        <div class="interactive-stage" id="stageContainer"></div>
+
+        <div class="feedback-banner" id="feedbackBanner">
+          <span id="feedbackText"></span>
+          <span class="auto-advance-indicator" id="advanceCountdown"></span>
+        </div>
+
+        <div class="act-complete-notice" id="actCompleteNotice">
+          🏆 Μπράβο! Ολοκλήρωσες και τα 3 επίπεδα αυτής της δραστηριότητας! Ετοιμάσου για την επόμενη...
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Congrats Modal -->
+  <div class="congrats-modal" id="congratsModal">
+    <div class="congrats-card">
+      <div style="font-size: 4rem; margin-bottom: 10px;">🌟🎞️🎉</div>
+      <h2>Συγχαρητήρια, Μικρέ Animator!</h2>
+      <p style="font-size: 1.12rem; color: #475569; line-height: 1.6;">
+        Ολοκλήρωσες όλες τις δραστηριότητες του <strong>Μαθήματος 22</strong>!<br>
+        Έμαθες πώς οι στατικές εικόνες γίνονται κινούμενο σχέδιο, είδες ζωντανά το animation που έφτιαξες στην οθόνη του TuxPaint και έγινες αληθινός ψηφιακός δημιουργός!
+      </p>
+      <div style="font-size: 1.4rem; font-weight: 900; color: #b45309; margin-top: 1rem;">
+        Συνολικό Σκορ: <span id="finalScoreModal">24</span> / 24 Αστέρια ⭐
+      </div>
+      <button class="btn-restart" onclick="restartEverything()">Παίξε Ξανά από την Αρχή</button>
+    </div>
+  </div>
+
+  <script>
+    /* ========================================================
+       DATA MODEL: ΜΑΘΗΜΑ 22 (8 ΔΡΑΣΤΗΡΙΟΤΗΤΕΣ x 3 ΕΠΙΠΕΔΑ)
+       ======================================================== */
+    const activities = [
+      {
+        id: 1,
+        shortName: "1. Μαγικό Flipbook",
+        title: "Το Μαγικό Flipbook (Οφθαλμαπάτη)",
+        renderType: "flipbook",
+        levels: [
+          {
+            prompt: "Ο Ήρωνας ρωτάει: 💬 <em>«Πώς γίνεται εικόνες που δεν κουνιούνται να μοιάζουν με βίντεο;»</em> Σύρε το ρυθμιστή ταχύτητας στα δεξιά (γρήγορα) για να δεις τη γατούλα να χορεύει!",
+            frames: ["🐱", "😸", "😽", "😻"],
+            choices: [
+              { text: "✨ Το μάτι μας ξεγελιέται και νομίζουμε ότι βλέπουμε κίνηση (animation)!", correct: true, why: "Μπράβο! Αυτή είναι η αρχή του animation: γρήγορη προβολή διαδοχικών εικόνων!" },
+              { text: "🛑 Ο υπολογιστής χαλάει και αναβοσβήνει.", correct: false, why: "Όχι, δεν χαλάει! Είναι το φαινόμενο της οφθαλμαπάτης της κίνησης!" }
+            ]
+          },
+          {
+            prompt: "Αν βάλουμε το ρυθμιστή πολύ αργά (στα αριστερά), τι θα συμβεί;",
+            frames: ["🐱", "😸", "😽", "😻"],
+            choices: [
+              { text: "🐢 Βλέπουμε απλώς ξεχωριστές στατικές φωτογραφίες μία-μία, χωρίς κίνηση.", correct: true, why: "Σωστά! Για να υπάρξει η ψευδαίσθηση της κίνησης, η προβολή πρέπει να είναι πολύ γρήγορη!" },
+              { text: "🚀 Η γάτα θα τρέξει πιο γρήγορα από το φως.", correct: false, why: "Αν αλλάζουν αργά, δεν υπάρχει καθόλου κίνηση!" }
+            ]
+          },
+          {
+            prompt: "Για να φαίνεται η κίνηση φυσική και απαλή, οι διαδοχικές εικόνες πρέπει:",
+            choices: [
+              { text: "👍 Να μοιάζουν πολύ μεταξύ τους και να αλλάζουν μόνο ελάχιστα!", correct: true, why: "Ακριβώς! Όπως λέει το βιβλίο, κάθε εικόνα διαφέρει ελάχιστα από την προηγούμενη!" },
+              { text: "👎 Να είναι τελείως άσχετες (π.χ. μία γάτα, ένα αεροπλάνο, μία πίτσα).", correct: false, why: "Αν είναι άσχετες, δεν σχηματίζεται ιστορία κίνησης!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 2,
+        shortName: "2. Σκηνοθέτης (Σειρά)",
+        title: "Χρονολόγιο: Βάλε τα καρέ στη σειρά!",
+        renderType: "sequencer",
+        levels: [
+          {
+            prompt: "Βοήθησε την Υπατία να βάλει στη σωστή σειρά ένα λουλούδι που ανθίζει! Κάνε κλικ στο καρέ που πρέπει να μπει <strong>ΠΡΩΤΟ (1ο)</strong>:",
+            targetItem: "seed",
+            items: [
+              { id: 'bloom', icon: "🌸", label: "Ανθισμένο Λουλούδι" },
+              { id: 'sprout', icon: "🌱", label: "Μικρό Βλασταράκι" },
+              { id: 'seed', icon: "🌰", label: "Σπόρος στο χώμα" }
+            ],
+            why: "Μπράβο! Πρώτα φυτεύουμε τον σπόρο στο χώμα!"
+          },
+          {
+            prompt: "Ποιο καρέ πρέπει να μπει <strong>ΔΕΥΤΕΡΟ (2ο)</strong> καθώς μεγαλώνει;",
+            targetItem: "sprout",
+            items: [
+              { id: 'sprout', icon: "🌱", label: "Μικρό Βλασταράκι" },
+              { id: 'bloom', icon: "🌸", label: "Ανθισμένο Λουλούδι" }
+            ],
+            why: "Εξαιρετικά! Ο σπόρος βγάζει πρώτα ένα πράσινο βλασταράκι!"
+          },
+          {
+            prompt: "Και ποιο είναι το <strong>ΤΕΛΕΥΤΑΙΟ (3ο)</strong> καρέ που ολοκληρώνει το κινούμενο σχέδιο;",
+            targetItem: "bloom",
+            items: [
+              { id: 'bloom', icon: "🌸", label: "Ολάνθιστο Λουλούδι!" }
+            ],
+            why: "Τέλεια! Το λουλούδι άνθισε! Το κινούμενο σχέδιο των 3 εικόνων είναι έτοιμο!"
+          }
+        ]
+      },
+
+      {
+        id: 3,
+        shortName: "3. Προσομοίωση TuxPaint",
+        title: "Προσομοίωση TuxPaint: Φτιάξε Καρδιά & Δες την Κίνηση!",
+        renderType: "tuxpaint-sim",
+        levels: [
+          {
+            prompt: "Βήμα 1: Επίλεξε ένα χρώμα από την παλέτα (αριστερά) και πάτησε <strong>«Αποθήκευση»</strong> για να σώσεις την 1η σου εικόνα!",
+            targetColor: "any",
+            why: "Μπράβο! Αποθήκευσες την 1η εικόνα! Παρατήρησε δεξιά την οθόνη του Animation!"
+          },
+          {
+            prompt: "Βήμα 2: Διάλεξε άλλο χρώμα και πάτα <strong>«Αποθήκευση»</strong>. Πρόσεξε να διαλέξεις <strong>«Όχι, σε ΝΕΟ αρχείο!»</strong>",
+            needDialogDecision: true,
+            why: "Εξαιρετικά! Έσωσες και 2ο καρέ! Δες δεξιά στην οθόνη: η καρδιά ξεκίνησε να αναβοσβήνει ζωντανά!"
+          },
+          {
+            prompt: "Βήμα 3: Φτιάξε και αποθήκευσε ακόμα ένα χρώμα για να γίνει το animation ακόμα πιο πλούσιο με 3 καρέ!",
+            needFinalFrame: true,
+            why: "Τέλειο! Έχεις ένα ολοκληρωμένο κινούμενο σχέδιο που χτυπάει με 3 χρώματα στη δεξιά οθόνη!"
+          }
+        ]
+      },
+
+      {
+        id: 4,
+        shortName: "4. Slideshow & GIF",
+        title: "Προβολή Διαφανειών & Εξαγωγή GIF",
+        renderType: "slideshow-sim",
+        levels: [
+          {
+            prompt: "Πατάμε «Άνοιγμα» στο TuxPaint. Ποιο μαγικό κουμπί πατάμε για να δούμε τις καρδιές να αναβοσβήνουν;",
+            choices: [
+              { text: "🎞️ «Προβολή Διαφανειών» (Slideshow)", correct: true, why: "Μπράβο! Το κουμπί Προβολή Διαφανειών μας επιτρέπει να δούμε τη σειρά των εικόνων!" },
+              { text: "🖨️ «Εκτύπωση»", correct: false, why: "Η εκτύπωση τυπώνει στο χαρτί, δεν φτιάχνει animation!" }
+            ]
+          },
+          {
+            prompt: "Ποιο κουμπί πατάμε για να μετατρέψουμε τη σειρά των εικόνων σε έτοιμο αρχείο κινούμενου σχεδίου;",
+            choices: [
+              { text: "✨ Το κουμπί GIF!", correct: true, why: "Σωστά! Το κουμπί GIF δημιουργεί την έτοιμη κινούμενη εικόνα!" },
+              { text: "❌ Το κουμπί Έξοδος", correct: false, why: "Η Έξοδος κλείνει το πρόγραμμα χωρίς να φτιάξει το GIF!" }
+            ]
+          },
+          {
+            prompt: "Για να χτυπάει η καρδιά όμορφα και ρυθμικά, πώς ρυθμίζουμε την ταχύτητα εναλλαγής;",
+            choices: [
+              { text: "🚀 Στη μεγαλύτερη ταχύτητα εναλλαγής εικόνων!", correct: true, why: "Έτσι ακριβώς! Όπως λέει το βιβλίο, επιλέγουμε τη μεγαλύτερη ταχύτητα!" },
+              { text: "🐌 Σε μία εικόνα κάθε 20 λεπτά.", correct: false, why: "Αν αλλάζει κάθε 20 λεπτά, δεν φαίνεται κίνηση!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 5,
+        shortName: "5. Ιστορία Walt Disney",
+        title: "Ήξερες ότι... Walt Disney (1937)",
+        renderType: "quiz",
+        levels: [
+          {
+            prompt: "Στο βιβλίο μάθαμε για έναν διάσημο δημιουργό κινουμένων σχεδίων. Ποια ήταν η πρώτη ταινία κινουμένων σχεδίων μεγάλου μήκους το 1937;",
+            choices: [
+              { text: "🍎 Η Χιονάτη και οι επτά νάνοι (από τον Γουόλτ Ντίσνεϊ)", correct: true, why: "Μπράβο! Το 1937 ο Walt Disney έφερε στη μεγάλη οθόνη τη Χιονάτη και τους επτά νάνους!" },
+              { text: "🚗 Τα Αυτοκίνητα (Cars)", correct: false, why: "Τα Cars έγιναν πολλά χρόνια αργότερα με υπολογιστές!" }
+            ]
+          },
+          {
+            prompt: "Πώς ζωγράφιζαν τότε τις ταινίες κινουμένων σχεδίων πριν υπάρξουν υπολογιστές;",
+            choices: [
+              { text: "✍️ Χιλιάδες ζωγράφοι σχεδίαζαν με το χέρι χιλιάδες διαφάνειες μία προς μία!", correct: true, why: "Απίστευτο κι όμως αληθινό! Χρειάζονταν εκατοντάδες χιλιάδες ζωγραφιές στο χέρι!" },
+              { text: "🤖 Έβαζαν ρομπότ να τα κάνουν όλα αυτόματα.", correct: false, why: "Το 1937 δεν υπήρχαν υπολογιστές και ρομπότ για τέτοια δουλειά!" }
+            ]
+          },
+          {
+            prompt: "Σήμερα με ποιο πρόγραμμα ζωγραφικής μαθαίνουμε να φτιάχνουμε animation στο σχολείο;",
+            choices: [
+              { text: "🐧 Με το πρόγραμμα TuxPaint!", correct: true, why: "Σωστά! Το TuxPaint έχει ειδική λειτουργία προβολής διαφανειών και εξαγωγής GIF!" },
+              { text: "🌐 Με το Google Search.", correct: false, why: "Το Google είναι μηχανή αναζήτησης, δεν είναι πρόγραμμα ζωγραφικής!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 6,
+        shortName: "6. Ντετέκτιβ Αρχείων",
+        title: "Πού αποθηκεύτηκε το GIF μου;",
+        renderType: "quiz",
+        levels: [
+          {
+            prompt: "Το TuxPaint έβγαλε το μήνυμα: <em>«Your slideshow GIF has been exported!»</em>. Σε ποιον φάκελο του υπολογιστή θα το βρούμε;",
+            choices: [
+              { text: "📁 Στον φάκελο «Εικόνες» (Pictures) του υπολογιστή μας!", correct: true, why: "Μπράβο! Το βιβλίο αναφέρει ρητά ότι η κινούμενη εικόνα βρίσκεται στον φάκελο Εικόνες!" },
+              { text: "🗑️ Στον Κάδο Ανακύκλωσης", correct: false, why: "Στον κάδο πάνε τα σκουπίδια, όχι οι δημιουργίες μας!" }
+            ]
+          },
+          {
+            prompt: "Ποια εφαρμογή των Windows χρησιμοποιούμε για να δούμε τους φακέλους και να εντοπίσουμε το αρχείο μας;",
+            choices: [
+              { text: "📂 Εξερευνητής Αρχείων (File Explorer)", correct: true, why: "Σωστά! Όπως μάθαμε στην Ενότητα 3, με τον Εξερευνητή αρχείων βρίσκουμε τα πάντα!" },
+              { text: "🎮 Ένα ηλεκτρονικό παιχνίδι", correct: false, why: "Τα παιχνίδια είναι για διασκέδαση, όχι για διαχείριση αρχείων!" }
+            ]
+          },
+          {
+            prompt: "Πώς μπορούμε να δούμε το κινούμενο σχέδιο GIF που φτιάξαμε;",
+            choices: [
+              { text: "🖱️ Κάνουμε διπλό κλικ πάνω στο αρχείο GIF!", correct: true, why: "Ακριβώς! Με διπλό κλικ ανοίγει και παίζει αυτόματα στην οθόνη!" },
+              { text: "🔌 Βγάζουμε το καλώδιο από την πρίζα.", correct: false, why: "Αν βγάλεις την πρίζα, θα σβήσει ο υπολογιστής!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 7,
+        shortName: "7. Το Χαλασμένο Καρέ",
+        title: "Βρες το Λάθος στο Animation!",
+        renderType: "bugspot",
+        levels: [
+          {
+            prompt: "Ο Ήρωνας έφτιαξε ένα ανθρωπάκι που περπατάει, αλλά κάτι πήγε λάθος! Κάνε κλικ στο καρέ που είναι <strong>ΑΝΑΠΟΔΑ</strong> ή χαλασμένο:",
+            targetItem: "frame-broken",
+            items: [
+              { id: 'f1', icon: "🚶", label: "Βήμα 1" },
+              { id: 'frame-broken', icon: "🤸", label: "Τούμπα!", isBroken: true },
+              { id: 'f3', icon: "🚶‍♂️", label: "Βήμα 3" }
+            ],
+            why: "Μπράβο! Το μεσαίο καρέ κάνει το ανθρωπάκι να πέφτει ξαφνικά ανάποδα! Το διορθώσαμε!"
+          },
+          {
+            prompt: "Σε ένα κινούμενο σχέδιο με ένα μπαλόνι που φουσκώνει, ποιο καρέ είναι στη <strong>λάθος θέση</strong>;",
+            targetItem: "balloon-wrong",
+            items: [
+              { id: 'b1', icon: "🎈", label: "Μικρό" },
+              { id: 'balloon-wrong', icon: "💥", label: "Έσκασε νωρίς!", isBroken: true },
+              { id: 'b3', icon: "🎈", label: "Μεγάλο" }
+            ],
+            why: "Σωστά! Δεν μπορεί να σκάσει πριν καν προλάβει να φουσκώσει τελείως!"
+          },
+          {
+            prompt: "Γιατί είναι σημαντικός ο έλεγχος των καρέ πριν την εξαγωγή του GIF;",
+            choices: [
+              { text: "👀 Για να βεβαιωθούμε ότι η ιστορία έχει ομαλή και φυσική συνέχεια!", correct: true, why: "Εξαιρετικά! Ένας σωστός σκηνοθέτης ελέγχει πάντα τα καρέ ένα προς ένα!" },
+              { text: "🎨 Για να αλλάξουμε το χρώμα του πληκτρολογίου.", correct: false, why: "Το πληκτρολόγιο δεν αλλάζει χρώμα από τα καρέ!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 8,
+        shortName: "8. Ο Μικρός Animator",
+        title: "Σχεδιάζω τη Δική μου Ιστορία!",
+        renderType: "quiz",
+        levels: [
+          {
+            prompt: "Στη σελίδα 87 του βιβλίου, σας ζητείται να σχεδιάσετε τη δική σας ιστορία. Ποια ιδέα είναι τέλεια για animation 6 εικόνων;",
+            choices: [
+              { text: "🌱 Ένας σπόρος που φυτρώνει, ψηλώνει και βγάζει ένα κόκκινο λουλούδι!", correct: true, why: "Υπέροχη ιδέα! Κάθε εικόνα δείχνει το λουλούδι λίγο πιο ψηλό!" },
+              { text: "🧱 Μία πέτρα που κάθεται ακίνητη στο πάτωμα για πάντα.", correct: false, why: "Αν δεν κινείται τίποτα, δεν είναι κινούμενο σχέδιο!" }
+            ]
+          },
+          {
+            prompt: "Ποιο είναι το πρώτο βήμα που προτείνει το βιβλίο πριν πάμε στον υπολογιστή;",
+            choices: [
+              { text: "📝 Σχεδιάζουμε τα 6 καρέ πρώτα στο χαρτί με μολύβι (storyboard)!", correct: true, why: "Μπράβο! Όπως λέει το βιβλίο: «Σχεδίασέ τες στο χαρτί και στη συνέχεια στον υπολογιστή»!" },
+              { text: "🏃 Τρέχουμε γύρω από το θρανίο χωρίς σχέδιο.", correct: false, why: "Πρώτα σχεδιάζουμε στο χαρτί και μετά υλοποιούμε!" }
+            ]
+          },
+          {
+            prompt: "Τι κερδίζεις όταν φτιάχνεις τα δικά σου κινούμενα σχέδια;",
+            choices: [
+              { text: "🌟 Γίνεσαι δημιουργός ψηφιακού περιεχομένου και εκφράζεις τη φαντασία σου!", correct: true, why: "Συγχαρητήρια! Έμαθες να χρησιμοποιείς την τεχνολογία δημιουργικά και υπεύθυνα!" },
+              { text: "😴 Τίποτα, είναι απλά χαμένος χρόνος.", correct: false, why: "Η δημιουργικότητα και η πληροφορική σου δίνουν υπερδυνάμεις!" }
+            ]
+          }
+        ]
+      }
+    ];
+
+    /* ================= APP STATE ================= */
+    let currentActIndex = 0;
+    let currentLvlIndex = 0;
+    let score = 0;
+    let isAdvancing = false;
+    let flipbookInterval = null;
+    let tuxAnimInterval = null;
+    let solvedTasks = new Set();
+
+    // Tux Paint Simulator internal state
+    let simColor = "red";
+    let simHearts = []; // saved frame icons
+
+    // DOM
+    const navTrackEl = document.getElementById('activityNavTrack');
+    const hudBadgeEl = document.getElementById('hudActivityBadge');
+    const starCounterEl = document.getElementById('starCounter');
+    const taskPromptEl = document.getElementById('taskPrompt');
+    const stageContainerEl = document.getElementById('stageContainer');
+    const feedbackBannerEl = document.getElementById('feedbackBanner');
+    const feedbackTextEl = document.getElementById('feedbackText');
+    const advanceCountdownEl = document.getElementById('advanceCountdown');
+    const actCompleteNoticeEl = document.getElementById('actCompleteNotice');
+    const levelLabelSmallEl = document.getElementById('levelLabelSmall');
+    const congratsModalEl = document.getElementById('congratsModal');
+
+    function buildNav() {
+      navTrackEl.innerHTML = "";
+      activities.forEach((act, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "btn-act-jump" + (idx === currentActIndex ? " current" : "");
+        btn.id = "actBtn" + idx;
+        btn.innerHTML = `<span>${act.shortName}</span>`;
+        btn.onclick = () => jumpToAct(idx);
+        navTrackEl.appendChild(btn);
+      });
+    }
+
+    function jumpToAct(idx) {
+      if (isAdvancing) return;
+      currentActIndex = idx;
+      currentLvlIndex = 0;
+      updateNavHighlight();
+      loadMission();
+    }
+
+    function updateNavHighlight() {
+      activities.forEach((_, idx) => {
+        const btn = document.getElementById("actBtn" + idx);
+        if (btn) {
+          if (idx === currentActIndex) btn.classList.add("current");
+          else btn.classList.remove("current");
+        }
+      });
+    }
+
+    buildNav();
+    loadMission();
+
+    function loadMission() {
+      isAdvancing = false;
+      clearInterval(flipbookInterval);
+      clearInterval(tuxAnimInterval);
+
+      const act = activities[currentActIndex];
+      const lvl = act.levels[currentLvlIndex];
+
+      hudBadgeEl.innerText = `ΜΑΘΗΜΑ 22 • ΔΡΑΣΤΗΡΙΟΤΗΤΑ ${act.id} ΑΠΟ 8: ${act.title.toUpperCase()}`;
+      levelLabelSmallEl.innerText = `Επίπεδο ${currentLvlIndex + 1} από 3`;
+      updateStepPills();
+      updateNavHighlight();
+
+      taskPromptEl.innerHTML = `<strong>Επίπεδο ${currentLvlIndex + 1}:</strong> ${lvl.prompt}`;
+
+      feedbackBannerEl.classList.remove('show', 'correct', 'wrong');
+      advanceCountdownEl.innerText = "";
+      actCompleteNoticeEl.classList.remove('show');
+
+      renderStage(act, lvl);
+    }
+
+    function updateStepPills() {
+      for (let i = 1; i <= 3; i++) {
+        const pill = document.getElementById('stepPill' + i);
+        pill.className = 'step-pill';
+        if (i - 1 < currentLvlIndex) pill.classList.add('done');
+        else if (i - 1 === currentLvlIndex) pill.classList.add('active');
+      }
+    }
+
+    /* ================= RENDER STAGES ================= */
+    function renderStage(act, lvl) {
+      stageContainerEl.innerHTML = "";
+
+      // 1. TUXPAINT SIMULATOR WITH LIVE GIF PLAYER
+      if (act.renderType === "tuxpaint-sim") {
+        renderTuxPaintSimulator(lvl);
+        return;
+      }
+
+      // 2. SLIDESHOW QUIZ
+      if (act.renderType === "slideshow-sim") {
+        renderSlideshowStage(lvl);
+        return;
+      }
+
+      // 3. FLIPBOOK SIMULATOR
+      if (act.renderType === "flipbook" && lvl.frames) {
+        const wrap = document.createElement('div');
+        wrap.className = "interactive-stage";
+
+        const flipBox = document.createElement('div');
+        flipBox.className = "flipbook-box";
+        flipBox.id = "flipBox";
+        flipBox.innerText = lvl.frames[0];
+        wrap.appendChild(flipBox);
+
+        let frameIdx = 0;
+        let speedMs = 500;
+        flipbookInterval = setInterval(() => {
+          frameIdx = (frameIdx + 1) % lvl.frames.length;
+          flipBox.innerText = lvl.frames[frameIdx];
+        }, speedMs);
+
+        const sliderWrap = document.createElement('div');
+        sliderWrap.className = "speed-slider-wrap";
+        sliderWrap.innerHTML = `
+          <label>🎚️ Ταχύτητα Εναλλαγής Εικόνων (Σύρε δεξιά για γρήγορα):</label>
+          <input type="range" min="1" max="10" value="2" id="speedSlider">
+        `;
+        wrap.appendChild(sliderWrap);
+
+        stageContainerEl.appendChild(wrap);
+
+        if (lvl.choices) {
+          renderChoiceButtons(lvl.choices, stageContainerEl);
+        }
+
+        const slider = document.getElementById('speedSlider');
+        slider.oninput = (e) => {
+          const val = parseInt(e.target.value);
+          clearInterval(flipbookInterval);
+          speedMs = Math.max(80, 700 - (val * 60));
+          flipbookInterval = setInterval(() => {
+            frameIdx = (frameIdx + 1) % lvl.frames.length;
+            flipBox.innerText = lvl.frames[frameIdx];
+          }, speedMs);
+        };
+        return;
+      }
+
+      // 4. TIMELINE SEQUENCER
+      if (act.renderType === "sequencer" && lvl.items) {
+        const timeWrap = document.createElement('div');
+        timeWrap.className = "timeline-container";
+
+        lvl.items.forEach((item) => {
+          const frame = document.createElement('div');
+          frame.className = "frame-card";
+          frame.innerHTML = `
+            <div class="frame-num">Καρέ</div>
+            <div class="frame-visual">${item.icon}</div>
+            <div style="font-size:0.78rem; text-align:center; font-weight:800; color:#475569;">${item.label}</div>
+          `;
+          frame.onclick = () => {
+            if (isAdvancing) return;
+            if (item.id === lvl.targetItem) {
+              frame.style.borderColor = "var(--success)";
+              frame.style.background = "#dcfce7";
+              handleSuccess(lvl.why);
+            } else {
+              frame.style.borderColor = "var(--danger)";
+              frame.style.background = "#fee2e2";
+              showFeedback("❌ Σκέψου τη φυσική σειρά που μεγαλώνει ένα φυτό! Δοκίμασε ξανά!", false);
+              setTimeout(() => {
+                frame.style.borderColor = "#cbd5e1";
+                frame.style.background = "white";
+              }, 1000);
+            }
+          };
+          timeWrap.appendChild(frame);
+        });
+
+        stageContainerEl.appendChild(timeWrap);
+        return;
+      }
+
+      // 5. BUG SPOTTER
+      if (act.renderType === "bugspot" && lvl.items) {
+        const timeWrap = document.createElement('div');
+        timeWrap.className = "timeline-container";
+
+        lvl.items.forEach((item) => {
+          const frame = document.createElement('div');
+          frame.className = "frame-card";
+          frame.innerHTML = `
+            <div class="frame-num">Έλεγχος</div>
+            <div class="frame-visual">${item.icon}</div>
+            <div style="font-size:0.78rem; text-align:center; font-weight:800; color:#475569;">${item.label}</div>
+          `;
+          frame.onclick = () => {
+            if (isAdvancing) return;
+            if (item.id === lvl.targetItem) {
+              frame.style.borderColor = "var(--success)";
+              frame.style.background = "#dcfce7";
+              handleSuccess(lvl.why);
+            } else {
+              frame.style.borderColor = "var(--danger)";
+              frame.style.background = "#fee2e2";
+              showFeedback("❌ Αυτό το καρέ είναι μια χαρά! Ψάξε αυτό που χαλάει την ομαλή κίνηση!", false);
+              setTimeout(() => {
+                frame.style.borderColor = "#cbd5e1";
+                frame.style.background = "white";
+              }, 1000);
+            }
+          };
+          timeWrap.appendChild(frame);
+        });
+
+        stageContainerEl.appendChild(timeWrap);
+        return;
+      }
+
+      // 6. MULTI-CHOICE DECISION
+      if (lvl.choices) {
+        renderChoiceButtons(lvl.choices, stageContainerEl);
+      }
+    }
+
+    /* --- TuxPaint Simulator Builder with LIVE GIF Animation Screen --- */
+    function renderTuxPaintSimulator(lvl) {
+      const box = document.createElement('div');
+      box.className = "tux-sim-box";
+
+      const heartIcons = { red:"❤️", green:"💚", blue:"💙", purple:"💜", yellow:"💛" };
+
+      box.innerHTML = `
+        <div class="tux-split-layout">
+          <!-- Left: Painting Paper -->
+          <div class="tux-panel">
+            <span class="panel-header-badge badge-paint">1. Καμβάς TuxPaint</span>
+            <div class="drawing-paper" id="paperHeart">${heartIcons[simColor]}</div>
+            <div class="tools-palette">
+              <div class="color-swatches">
+                <div class="color-btn ${simColor==='red'?'active':''}" style="background:#ef4444;" onclick="pickSimColor('red')"></div>
+                <div class="color-btn ${simColor==='green'?'active':''}" style="background:#10b981;" onclick="pickSimColor('green')"></div>
+                <div class="color-btn ${simColor==='blue'?'active':''}" style="background:#3b82f6;" onclick="pickSimColor('blue')"></div>
+                <div class="color-btn ${simColor==='purple'?'active':''}" style="background:#a855f7;" onclick="pickSimColor('purple')"></div>
+                <div class="color-btn ${simColor==='yellow'?'active':''}" style="background:#eab308;" onclick="pickSimColor('yellow')"></div>
+              </div>
+              <button class="btn-tux-save" onclick="handleSimSaveClick()">
+                💾 Αποθήκευση
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Live GIF Animation Screen -->
+          <div class="tux-panel">
+            <span class="panel-header-badge badge-preview">2. Ζωντανό Αποτέλεσμα (GIF)</span>
+            <div class="animation-screen" id="liveAnimScreen">
+              <div class="screen-pulse-badge">🔴 LIVE</div>
+              <div id="liveAnimIcon" style="line-height:1;">${simHearts.length > 0 ? simHearts[0] : "⏳"}</div>
+              <div id="liveAnimStatus" style="font-size:0.75rem; color:#94a3b8; font-weight:800; margin-top:8px;">
+                ${simHearts.length > 1 ? "Παίζει αυτόματα!" : "(Αποθήκευσε καρέ)"}
+              </div>
+            </div>
+            <div style="font-size:0.82rem; font-weight:800; color:#64748b; text-align:center;">
+              Ό,τι αποθηκεύεις εμφανίζεται εδώ σε κίνηση!
+            </div>
+          </div>
+        </div>
+
+        <!-- Tux Overwrite Warning Dialog -->
+        <div class="tux-dialog-prompt" id="tuxDialogPrompt">
+          <div>⚠️ Να αντικαταστήσω τη ζωγραφιά με τις αλλαγές που έκανες;</div>
+          <div class="tux-dialog-buttons">
+            <button class="btn-dialog-choice" onclick="handleDialogDecision(false)">❌ Ναι, αντικατάστησε την παλιά</button>
+            <button class="btn-dialog-choice" style="background:#dcfce7; border-color:#86efac; color:#166534;" onclick="handleDialogDecision(true)">✅ Όχι, κάνε αποθήκευση σε νέο αρχείο!</button>
+          </div>
+        </div>
+
+        <!-- Filmstrip -->
+        <div class="frames-filmstrip">
+          <span class="strip-label">🎞️ Καρέ στο Φιλμ:</span>
+          <div class="strip-frames-track" id="stripTrack"></div>
+        </div>
+      `;
+
+      stageContainerEl.appendChild(box);
+      updateFilmstrip();
+      startTuxLivePlayer();
+    }
+
+    function pickSimColor(c) {
+      simColor = c;
+      const paper = document.getElementById('paperHeart');
+      const heartIcons = { red:"❤️", green:"💚", blue:"💙", purple:"💜", yellow:"💛" };
+      if (paper) paper.innerText = heartIcons[c];
+
+      document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = event.target;
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    function handleSimSaveClick() {
+      if (isAdvancing) return;
+      const act = activities[currentActIndex];
+      const lvl = act.levels[currentLvlIndex];
+      const heartIcons = { red:"❤️", green:"💚", blue:"💙", purple:"💜", yellow:"💛" };
+
+      if (currentLvlIndex === 0) {
+        simHearts.push(heartIcons[simColor]);
+        updateFilmstrip();
+        startTuxLivePlayer();
+        handleSuccess(lvl.why);
+      } else if (currentLvlIndex === 1 || currentLvlIndex === 2) {
+        const dialog = document.getElementById('tuxDialogPrompt');
+        if (dialog) dialog.classList.add('show');
+      }
+    }
+
+    function handleDialogDecision(isNewFile) {
+      if (isAdvancing) return;
+      const act = activities[currentActIndex];
+      const lvl = act.levels[currentLvlIndex];
+      const heartIcons = { red:"❤️", green:"💚", blue:"💙", purple:"💜", yellow:"💛" };
+      const dialog = document.getElementById('tuxDialogPrompt');
+
+      if (isNewFile) {
+        if (dialog) dialog.classList.remove('show');
+        simHearts.push(heartIcons[simColor]);
+        updateFilmstrip();
+        startTuxLivePlayer();
+        handleSuccess(lvl.why);
+      } else {
+        showFeedback("❌ Προσοχή! Αν αντικαταστήσεις την παλιά ζωγραφιά, θα χαθεί το προηγούμενο καρέ! Πάτα «Όχι, σε νέο αρχείο»!", false);
+      }
+    }
+
+    function updateFilmstrip() {
+      const track = document.getElementById('stripTrack');
+      if (!track) return;
+      track.innerHTML = "";
+      if (simHearts.length === 0) {
+        track.innerHTML = `<span style="font-size:0.8rem; color:#a8a29e;">(Κανένα καρέ ακόμα)</span>`;
+      } else {
+        simHearts.forEach(h => {
+          const t = document.createElement('div');
+          t.className = "strip-thumb";
+          t.innerText = h;
+          track.appendChild(t);
+        });
+      }
+    }
+
+    function startTuxLivePlayer() {
+      clearInterval(tuxAnimInterval);
+      const iconEl = document.getElementById('liveAnimIcon');
+      const statusEl = document.getElementById('liveAnimStatus');
+      if (!iconEl) return;
+
+      if (simHearts.length === 0) {
+        iconEl.innerText = "⏳";
+        if (statusEl) statusEl.innerText = "(Αποθήκευσε 1ο καρέ)";
+        return;
+      }
+
+      if (simHearts.length === 1) {
+        iconEl.innerText = simHearts[0];
+        if (statusEl) statusEl.innerText = "(Χρειάζεται και 2ο καρέ)";
+        return;
+      }
+
+      // Loop through frames to show live GIF animation
+      let idx = 0;
+      if (statusEl) statusEl.innerText = "🎬 Το GIF παίζει ζωντανά!";
+      tuxAnimInterval = setInterval(() => {
+        idx = (idx + 1) % simHearts.length;
+        iconEl.innerText = simHearts[idx];
+      }, 250); // fast 250ms flip
+    }
+
+    function renderSlideshowStage(lvl) {
+      if (lvl.choices) {
+        renderChoiceButtons(lvl.choices, stageContainerEl);
+      }
+    }
+
+    function renderChoiceButtons(choicesArray, container) {
+      const choiceGrid = document.createElement('div');
+      choiceGrid.className = "choice-grid";
+
+      choicesArray.forEach(choice => {
+        const btn = document.createElement('button');
+        btn.className = "btn-studio-choice";
+        btn.innerHTML = `<span>${choice.text}</span>`;
+        btn.onclick = () => {
+          if (isAdvancing) return;
+          if (choice.correct) {
+            btn.classList.add('correct');
+            handleSuccess(choice.why);
+          } else {
+            btn.classList.add('wrong');
+            showFeedback("❌ " + choice.why, false);
+            setTimeout(() => btn.classList.remove('wrong'), 1300);
+          }
+        };
+        choiceGrid.appendChild(btn);
+      });
+
+      container.appendChild(choiceGrid);
+    }
+
+    function handleSuccess(msg) {
+      const taskKey = `${currentActIndex}-${currentLvlIndex}`;
+      if (!solvedTasks.has(taskKey)) {
+        solvedTasks.add(taskKey);
+        score++;
+        starCounterEl.innerText = score;
+      }
+      showFeedback("🌟 " + msg, true, true);
+      triggerAutoAdvance();
+    }
+
+    function showFeedback(text, isOk, hasTimer = false) {
+      feedbackBannerEl.className = "feedback-banner show " + (isOk ? "correct" : "wrong");
+      feedbackTextEl.innerHTML = text;
+      if (!hasTimer) {
+        advanceCountdownEl.innerText = "";
+      }
+    }
+
+    function triggerAutoAdvance() {
+      isAdvancing = true;
+      let secondsLeft = 3;
+      advanceCountdownEl.innerText = `Επόμενο επίπεδο σε ${secondsLeft}... ⏳`;
+
+      const timer = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft > 0) {
+          advanceCountdownEl.innerText = `Επόμενο επίπεδο σε ${secondsLeft}... ⏳`;
+        } else {
+          clearInterval(timer);
+          advanceLevel();
+        }
+      }, 1000);
+    }
+
+    function advanceLevel() {
+      if (currentLvlIndex < 2) {
+        currentLvlIndex++;
+        loadMission();
+      } else {
+        actCompleteNoticeEl.classList.add('show');
+        setTimeout(() => {
+          if (currentActIndex < activities.length - 1) {
+            currentActIndex++;
+            currentLvlIndex = 0;
+            loadMission();
+          } else {
+            showFinalCongrats();
+          }
+        }, 1800);
+      }
+    }
+
+    function showFinalCongrats() {
+      document.getElementById('finalScoreModal').innerText = score;
+      congratsModalEl.classList.add('show');
+    }
+
+    function restartEverything() {
+      congratsModalEl.classList.remove('show');
+      currentActIndex = 0;
+      currentLvlIndex = 0;
+      score = 0;
+      simHearts = [];
+      solvedTasks.clear();
+      starCounterEl.innerText = "0";
+      loadMission();
+    }
+  </script>
+</body>
+</html>
