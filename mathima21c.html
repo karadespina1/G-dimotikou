@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μάθημα 21: Επιλέγω το Κατάλληλο Αποτέλεσμα - KidSearch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700;800&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --accent: #4f46e5;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #cbd5e1;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 50%, #fef3c7 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    /* Jump Bar */
+    .activity-nav-bar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.08);
+      border: 2px solid #bae6fd;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-buttons-track {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+
+    .btn-act-jump {
+      background: #f8fafc;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.86rem;
+      color: #334155;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-act-jump:hover {
+      background: #e0f2fe;
+      border-color: #7dd3fc;
+      transform: translateY(-2px);
+    }
+
+    .btn-act-jump.current {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+    }
+
+    /* Mission HUD */
+    .mission-hud {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 1rem 1.4rem;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.1);
+      border: 2px solid #bae6fd;
+    }
+
+    .hud-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 0.8rem;
+    }
+
+    .activity-badge {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--primary);
+      background: #e0f2fe;
+      padding: 5px 14px;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stars-box {
+      font-weight: 900;
+      font-size: 1.05rem;
+      color: #b45309;
+      background: #fef3c7;
+      padding: 4px 14px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .level-stepper {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 0.8rem;
+    }
+
+    .step-pill {
+      flex: 1;
+      height: 10px;
+      border-radius: 10px;
+      background: #cbd5e1;
+      transition: all 0.4s ease;
+    }
+
+    .step-pill.done { background: var(--success); }
+    .step-pill.active {
+      background: var(--warning);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+      transform: scaleY(1.3);
+    }
+
+    .task-dialogue {
+      background: #f8fafc;
+      border-left: 5px solid var(--primary);
+      border-radius: 0 14px 14px 0;
+      padding: 0.8rem 1.1rem;
+      font-size: 1.02rem;
+      line-height: 1.5;
+    }
+    .task-dialogue strong { color: var(--primary); font-weight: 800; }
+
+    /* Browser Window */
+    .browser-window {
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.15);
+      border: 3px solid #cbd5e1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 530px;
+    }
+
+    .browser-topbar {
+      background: #e2e8f0;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 2px solid #cbd5e1;
+    }
+
+    .traffic-lights { display: flex; gap: 7px; }
+    .traffic-lights span { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .tl-red { background: #f87171; }
+    .tl-yellow { background: #fbbf24; }
+    .tl-green { background: #4ade80; }
+
+    .browser-url-bar {
+      flex: 1;
+      background: white;
+      border-radius: 50px;
+      padding: 5px 14px;
+      font-size: 0.82rem;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #94a3b8;
+    }
+
+    .search-viewport {
+      padding: 1.8rem 1.6rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #ffffff;
+      overflow-y: auto;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.2rem;
+    }
+
+    .engine-logo {
+      font-family: 'Comfortaa', cursive;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+    .logo-k { color: #0284c7; }
+    .logo-i { color: #ef4444; }
+    .logo-d { color: #f59e0b; }
+    .logo-s { color: #10b981; }
+    .logo-e { color: #4f46e5; }
+    .logo-tag {
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .search-box-wrap {
+      width: 100%;
+      max-width: 650px;
+      position: relative;
+      margin-bottom: 0.8rem;
+    }
+
+    .search-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: 50px;
+      padding: 6px 10px 6px 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      transition: all 0.2s ease;
+    }
+
+    .search-bar:focus-within {
+      background: white;
+      border-color: var(--primary);
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.15);
+    }
+
+    .search-bar input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 1.05rem;
+      font-family: inherit;
+      font-weight: 700;
+      color: #0f172a;
+      padding: 6px 8px;
+    }
+
+    .btn-search {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 9px 20px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .btn-search:hover { background: var(--primary-hover); transform: scale(1.03); }
+
+    .search-count-header {
+      width: 100%;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      display: none;
+      font-weight: 600;
+    }
+    .search-count-header.show { display: block; }
+
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 1.2rem;
+      max-width: 680px;
+    }
+
+    .bank-chip {
+      background: #f1f5f9;
+      border: 2px solid #cbd5e1;
+      border-radius: 50px;
+      padding: 6px 14px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #334155;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s;
+    }
+    .bank-chip:hover {
+      background: #e0f2fe;
+      border-color: #7dd3fc;
+      transform: translateY(-2px);
+    }
+
+    .search-categories {
+      display: none;
+      gap: 12px;
+      border-bottom: 2px solid #e2e8f0;
+      width: 100%;
+      max-width: 720px;
+      margin-bottom: 1.2rem;
+      padding-bottom: 6px;
+    }
+    .search-categories.show { display: flex; }
+
+    .cat-tab {
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .cat-tab.active {
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .results-container {
+      width: 100%;
+      max-width: 720px;
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+      animation: fadeIn 0.3s ease;
+    }
+    .results-container.show { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-card {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .result-card:hover {
+      border-color: var(--primary);
+      background: #f0f9ff;
+      transform: translateX(4px);
+    }
+
+    .res-url {
+      font-size: 0.8rem;
+      color: #059669;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .res-title {
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: #0369a1;
+      line-height: 1.3;
+      margin-bottom: 6px;
+    }
+    .res-desc {
+      font-size: 0.9rem;
+      color: #475569;
+      line-height: 1.45;
+    }
+
+    .feedback-banner {
+      width: 100%;
+      max-width: 720px;
+      margin-top: 1rem;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 0.98rem;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      animation: popIn 0.3s ease;
+    }
+    .feedback-banner.show { display: flex; }
+
+    @keyframes popIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .feedback-banner.correct {
+      background: #dcfce7;
+      color: #166534;
+      border: 2px solid #86efac;
+    }
+
+    .feedback-banner.wrong {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 2px solid #fca5a5;
+    }
+
+    .auto-advance-indicator {
+      font-size: 0.82rem;
+      background: rgba(0,0,0,0.07);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .act-complete-notice {
+      display: none;
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      color: #92400e;
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-top: 10px;
+      font-weight: 800;
+      text-align: center;
+      width: 100%;
+      max-width: 720px;
+    }
+    .act-complete-notice.show { display: block; }
+
+    /* Modal */
+    .congrats-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .congrats-modal.show { display: flex; }
+
+    .congrats-card {
+      background: white;
+      border-radius: 28px;
+      padding: 2.5rem;
+      max-width: 520px;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      border: 4px solid #38bdf8;
+    }
+
+    .congrats-card h2 {
+      font-family: 'Comfortaa', cursive;
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 0.8rem;
+    }
+
+    .btn-restart {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 28px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 1.5rem;
+    }
+    .btn-restart:hover { background: var(--primary-hover); }
+
+    @media (max-width: 640px) {
+      body { padding: 0.5rem; }
+      .search-viewport { padding: 1.5rem 1rem; }
+      .engine-logo { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- Activity Jump Bar -->
+    <div class="activity-nav-bar">
+      <div class="nav-title">
+        <span>🚀 Ελεύθερη Επιλογή Δραστηριότητας (Κάνε κλικ για να μεταβείς άμεσα):</span>
+        <span id="levelLabelSmall" style="color: var(--primary); font-weight: 900;"></span>
+      </div>
+      <div class="nav-buttons-track" id="activityNavTrack"></div>
+    </div>
+
+    <!-- HUD -->
+    <div class="mission-hud">
+      <div class="hud-header">
+        <span class="activity-badge" id="hudActivityBadge">ΔΡΑΣΤΗΡΙΟΤΗΤΑ 1 ΑΠΟ 8</span>
+        <div class="stars-box">
+          ⭐ Αστέρια: <span id="starCounter">0</span> / 24
+        </div>
+      </div>
+
+      <div class="level-stepper">
+        <div class="step-pill active" id="stepPill1"></div>
+        <div class="step-pill" id="stepPill2"></div>
+        <div class="step-pill" id="stepPill3"></div>
+      </div>
+
+      <div class="task-dialogue" id="taskPrompt"></div>
+    </div>
+
+    <!-- Browser Window -->
+    <div class="browser-window">
+      <div class="browser-topbar">
+        <div class="traffic-lights">
+          <span class="tl-red"></span>
+          <span class="tl-yellow"></span>
+          <span class="tl-green"></span>
+        </div>
+        <div class="browser-url-bar">
+          <span>🔒</span>
+          <span id="browserUrl">https://www.kidsearch.gr</span>
+        </div>
+      </div>
+
+      <div class="search-viewport">
+
+        <div class="logo-container">
+          <div class="engine-logo">
+            <span class="logo-k">K</span><span class="logo-i">i</span><span class="logo-d">d</span><span class="logo-s">S</span><span class="logo-e">e</span><span class="logo-a">a</span><span class="logo-r">r</span><span class="logo-c">c</span><span class="logo-s">h</span>
+          </div>
+          <span class="logo-tag">Μάθημα 21</span>
+        </div>
+
+        <div class="search-box-wrap">
+          <div class="search-bar">
+            <span>🔎</span>
+            <input type="text" id="mainSearchInput" placeholder="Πληκτρολόγησε λέξεις-κλειδιά..." autocomplete="off">
+            <button class="btn-search" onclick="submitSearch()">Αναζήτηση</button>
+          </div>
+        </div>
+
+        <div class="search-count-header" id="searchCountHeader">
+          Περίπου 850.000 αποτελέσματα (0,32 δευτερόλεπτα)
+        </div>
+
+        <div class="word-bank" id="wordBank"></div>
+
+        <div class="search-categories" id="searchCategories">
+          <div class="cat-tab active" id="tabAll" onclick="selectCat('all')">🌐 Όλα</div>
+          <div class="cat-tab" id="tabImages" onclick="selectCat('images')">🖼️ Εικόνες</div>
+          <div class="cat-tab" id="tabMaps" onclick="selectCat('maps')">🗺️ Χάρτες</div>
+        </div>
+
+        <div class="results-container" id="resultsContainer"></div>
+
+        <div class="feedback-banner" id="feedbackBanner">
+          <span id="feedbackText"></span>
+          <span class="auto-advance-indicator" id="advanceCountdown"></span>
+        </div>
+
+        <div class="act-complete-notice" id="actCompleteNotice">
+          🏆 Μπράβο! Ολοκλήρωσες και τα 3 επίπεδα αυτής της δραστηριότητας! Ετοιμάσου για την επόμενη...
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="congrats-modal" id="congratsModal">
+    <div class="congrats-card">
+      <div style="font-size: 4rem; margin-bottom: 10px;">🏆🌟🎉</div>
+      <h2>Συγχαρητήρια, Μικρέ Ερευνητή!</h2>
+      <p style="font-size: 1.12rem; color: #475569; line-height: 1.6;">
+        Ολοκλήρωσες με επιτυχία το <strong>Μάθημα 21</strong>!<br>
+        Έμαθες να διαβάζεις τις περιγραφές, να ελέγχεις την εγκυρότητα των πηγών και να ξεχωρίζεις το κατάλληλο αποτέλεσμα ανάμεσα σε χιλιάδες σελίδες!
+      </p>
+      <div style="font-size: 1.4rem; font-weight: 900; color: #b45309; margin-top: 1rem;">
+        Συνολικό Σκορ: <span id="finalScoreModal">24</span> / 24 Αστέρια ⭐
+      </div>
+      <button class="btn-restart" onclick="restartEverything()">Παίξε Ξανά</button>
+    </div>
+  </div>
+
+  <script>
+    /* ========================================================
+       DATA MODEL: ΜΑΘΗΜΑ 21 (8 ΔΡΑΣΤΗΡΙΟΤΗΤΕΣ x 3 ΑΥΤΟΜΑΤΑ ΕΠΙΠΕΔΑ)
+       Βασισμένο στις έννοιες:
+       - Επιλογή κατάλληλου αποτελέσματος
+       - Περίπου 850.000 αποτελέσματα & σειρά κατάταξης
+       - Προεπισκόπηση περιεχομένου (διάβασμα περιγραφής)
+       - Πηγή και εγκυρότητα (πανεπιστήμια, υπουργεία vs ανώνυμα)
+       - Σύγκριση αποτελεσμάτων (όχι μόνο το 1ο)
+       - Χρήση κατηγορίας Χάρτες / Εικόνες
+       ======================================================== */
+    const activities = [
+      {
+        id: 1,
+        shortName: "1. Το Πρώτο Αποτέλεσμα",
+        title: "Γιατί εμφανίστηκε πρώτο;",
+        levels: [
+          {
+            prompt: "Ο Ήρωνας ρωτάει: 💬 <em>«Στην αναζήτηση βγήκαν 850.000 σελίδες! Γιατί μία σελίδα μπαίνει στην 1η θέση;»</em> Διάλεξε τη σωστή εξήγηση:",
+            directPickMode: true,
+            results: [
+              { id: 'rank-why-good', title: "⭐ Επειδή είναι πιο σχετική και την έχουν επισκεφτεί πολλοί χρήστες!", url: "κανόνας κατάταξης μηχανής", desc: "Η μηχανή μετράει πόσο ταιριάζουν οι λέξεις-κλειδιά και πόσο δημοφιλής και αξιόπιστη είναι η σελίδα.", correct: true, why: "Μπράβο! Οι μηχανές βάζουν πρώτες τις σελίδες που ταιριάζουν καλύτερα και έχουν πολλές επισκέψεις!" },
+              { id: 'rank-why-bad', title: "🎲 Μπαίνει στην τύχη επειδή έτσι διάλεξε ο υπολογιστής", url: "τυχαία επιλογή", desc: "Δεν υπάρχει κανένας έλεγχος.", correct: false, why: "Όχι, οι μηχανές αναζήτησης ακολουθούν αυστηρούς κανόνες και υπολογισμούς, τίποτα δεν είναι στην τύχη!" }
+            ]
+          },
+          {
+            prompt: "💬 <em>«Πρέπει να κάνω κλικ ΑΜΕΣΩΣ στο πρώτο αποτέλεσμα χωρίς να κοιτάξω τα άλλα;»</em>",
+            directPickMode: true,
+            results: [
+              { id: 'click-compare', title: "👀 Όχι! Διαβάζουμε και συγκρίνουμε τουλάχιστον 2-3 αποτελέσματα πρώτα!", url: "έξυπνη αναζήτηση", desc: "Κοιτάμε την περιγραφή και τη διεύθυνση για να βρούμε αυτό που πραγματικά μας ταιριάζει.", correct: true, why: "Σωστά! Ένας καλός ερευνητής συγκρίνει τα αποτελέσματα πριν πατήσει!" },
+              { id: 'click-fast', title: "⚡ Ναι, πατάμε κατευθείαν το 1ο για να τελειώνουμε γρήγορα!", url: "βιαστική επιλογή", desc: "Χωρίς να διαβάσουμε τι γράφει.", correct: false, why: "Η βιασύνη μπορεί να μας οδηγήσει σε λάθος ή ελλιπείς πληροφορίες!" }
+            ]
+          },
+          {
+            prompt: "Αν τα πρώτα αποτελέσματα δεν μας καλύπτουν, τι είναι καλύτερο να κάνουμε;",
+            directPickMode: true,
+            results: [
+              { id: 'fix-keywords', title: "🔑 Αλλάζουμε ή συμπληρώνουμε τις λέξεις-κλειδιά μας με πιο συγκεκριμένες!", url: "βελτίωση αναζήτησης", desc: "Π.χ. αντί για «μουσεία», γράφουμε «αρχαιολογικό μουσείο αθήνας ώρες».", correct: true, why: "Εξαιρετικά! Όσο πιο ακριβείς λέξεις δίνουμε, τόσο καλύτερα αποτελέσματα παίρνουμε!" },
+              { id: 'give-up', title: "❌ Κλείνουμε τον υπολογιστή και λέμε ότι δεν υπάρχει απάντηση", url: "παραίτηση", desc: "Δεν προσπαθούμε άλλο.", correct: false, why: "Μην τα παρατάς! Μια μικρή αλλαγή στις λέξεις-κλειδιά κάνει θαύματα!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 2,
+        shortName: "2. Διάβασε την Περιγραφή",
+        title: "Προεπισκόπηση Περιεχομένου",
+        levels: [
+          {
+            prompt: "Η Υπατία ψάχνει: <em>«δικαιώματα των παιδιών»</em>. Διάβασε τις περιγραφές και κάνε κλικ στη σελίδα που περιγράφει <strong>τη Σύμβαση των Δικαιωμάτων</strong>:",
+            directPickMode: true,
+            results: [
+              { id: 'rights-doc', title: "📜 Συνήγορος του Παιδιού: Τα Δικαιώματα των Παιδιών", url: "www.0-18.gr", desc: "Μάθετε για τη Διεθνή Σύμβαση, την εκπαίδευση, την υγεία και την προστασία όλων των παιδιών του κόσμου.", correct: true, why: "Τέλεια επιλογή! Η περιγραφή δείχνει ότι περιέχει επίσημα τα δικαιώματα!" },
+              { id: 'rights-toys', title: "🧸 Παιχνίδια και Δώρα για Παιδιά - Προσφορές", url: "www.paidika-paixnidia.gr", desc: "Αγοράστε κούκλες, αυτοκινητάκια και επιτραπέζια στις καλύτερες τιμές.", correct: false, why: "Αυτό είναι ηλεκτρονικό κατάστημα παιχνιδιών, δεν αναφέρει τα δικαιώματα των παιδιών!" }
+            ]
+          },
+          {
+            prompt: "Θέλουμε ένα <strong>σύντομο βίντεο</strong> που να εξηγεί τα δικαιώματα. Ποιο αποτέλεσμα επιλέγουμε;",
+            directPickMode: true,
+            results: [
+              { id: 'rights-video', title: "🎬 Βίντεο: Τι είναι τα Δικαιώματα του Παιδιού; (Κινούμενα Σχέδια)", url: "www.youtube.com/watch?v=rights", desc: "Ένα διασκεδαστικό κινούμενο σχέδιο διάρκειας 3 λεπτών ειδικά για μαθητές Δημοτικού.", correct: true, why: "Μπράβο! Το αποτέλεσμα περιγράφει ακριβώς ένα εκπαιδευτικό βίντεο κινουμένων σχεδίων!" },
+              { id: 'rights-law', title: "⚖️ Νόμος 2101/1992 - Εφημερίδα Κυβερνήσεως", url: "www.et.gr", desc: "Νομικό κείμενο 40 σελίδων με δύσκολους νομικούς όρους.", correct: false, why: "Αυτό είναι ένα δύσκολο νομικό κείμενο για δικηγόρους, όχι βίντεο για παιδιά!" }
+            ]
+          },
+          {
+            prompt: "Τι προσέχουμε πάντα σε κάθε αποτέλεσμα πριν κάνουμε κλικ;",
+            directPickMode: true,
+            results: [
+              { id: 'check-snippet', title: "🔍 Τον τίτλο, τη διεύθυνση URL και τις 2 γραμμές της περιγραφής", url: "προεπισκόπηση", desc: "Μας δίνουν μια γρήγορη ιδέα για το αν το περιεχόμενο απαντάει στην ανάγκη μας.", correct: true, why: "Σωστά! Η προεπισκόπηση μας γλιτώνει χρόνο και μας προστατεύει από λάθος σελίδες!" },
+              { id: 'check-nothing', title: "⚡ Μόνο τα χρώματα που έχει το εικονίδιο", url: "ασήμαντο", desc: "Χωρίς να διαβάσουμε λέξη.", correct: false, why: "Τα χρώματα δεν λένε τι περιέχει η σελίδα, τα γράμματα το λένε!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 3,
+        shortName: "3. Πηγή & Εγκυρότητα",
+        title: "Έλεγχος Αξιοπιστίας Πηγής",
+        levels: [
+          {
+            prompt: "Για μια εργασία για τα <strong>Ολυμπιακά Αθλήματα</strong>, ποια πηγή είναι η πιο <strong>έγκυρη</strong>;",
+            directPickMode: true,
+            results: [
+              { id: 'src-olympic-official', title: "🥇 Ελληνική Ολυμπιακή Επιτροπή - Επίσημος Ιστότοπος", url: "www.hoc.gr", desc: "Επίσημες πληροφορίες για τους Ολυμπιακούς Αγώνες, την ιστορία και τα ολυμπιακά αθλήματα.", correct: true, why: "Άριστα! Η Ελληνική Ολυμπιακή Επιτροπή είναι ο επίσημος και πιο αξιόπιστος φορέας!" },
+              { id: 'src-olympic-chat', title: "💬 «Η γνώμη μου για τα αθλήματα» - Προσωπικό Ιστολόγιο", url: "www.my-opinions-blog.gr", desc: "Ένας ανώνυμος χρήστης γράφει ποιο άθλημα του αρέσει και ποιο όχι.", correct: false, why: "Αυτό είναι απλά μια προσωπική γνώμη ενός χρήστη, όχι ελεγμένη ιστορική πηγή!" }
+            ]
+          },
+          {
+            prompt: "Ποια κατάληξη διεύθυνσης δείχνει συνήθως <strong>επίσημο σχολείο ή εκπαιδευτικό φορέα</strong> στην Ελλάδα;",
+            directPickMode: true,
+            results: [
+              { id: 'domain-sch', title: "🎓 .sch.gr (Πανελλήνιο Σχολικό Δίκτυο)", url: "www.dim-ath.sch.gr", desc: "Επίσημη διεύθυνση που δίνεται αποκλειστικά σε δημόσια και ιδιωτικά σχολεία.", correct: true, why: "Μπράβο! Το «sch.gr» είναι το σήμα κατατεθέν του Πανελλήνιου Σχολικού Δικτύου!" },
+              { id: 'domain-com', title: "🛒 .shop / .com με διαφημίσεις", url: "www.agoraste-online.shop", desc: "Σελίδες φτιαγμένες κυρίως για πωλήσεις προϊόντων.", correct: false, why: "Αυτές οι σελίδες είναι εμπορικές, δεν ανήκουν στο σχολικό δίκτυο!" }
+            ]
+          },
+          {
+            prompt: "Αν μια πληροφορία φαίνεται παράξενη ή απίστευτη, τι κάνουμε;",
+            directPickMode: true,
+            results: [
+              { id: 'cross-check', title: "🔎 Την διασταυρώνουμε ελέγχοντας και μια 2η αξιόπιστη πηγή (π.χ. βιβλίο ή άλλη επίσημη σελίδα)", url: "έλεγχος εγκυρότητας", desc: "Αν το επιβεβαιώνουν δύο σοβαρές πηγές, τότε είναι σίγουρο.", correct: true, why: "Σωστά! Η διασταύρωση πηγών είναι το πιο σημαντικό εργαλείο των επιστημόνων!" },
+              { id: 'believe-blind', title: "📢 Την πιστεύουμε αμέσως και την λέμε σε όλους", url: "διάδοση φημών", desc: "Χωρίς κανέναν έλεγχο.", correct: false, why: "Προσοχή! Έτσι εξαπλώνονται οι ψεύτικες ειδήσεις (fake news)!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 4,
+        shortName: "4. Βρες τη Διαδρομή (Χάρτες)",
+        title: "Χρήση της Κατηγορίας «Χάρτες»",
+        levels: [
+          {
+            prompt: "Ο Ήρωνας θέλει να δει πώς θα πάει από το σπίτι του στο Εθνικό Αρχαιολογικό Μουσείο. Ποια καρτέλα πρέπει να πατήσει;",
+            directPickMode: true,
+            results: [
+              { id: 'cat-maps-pick', title: "🗺️ Καρτέλα «Χάρτες»", url: "kidsearch.gr/maps", desc: "Δείχνει τη διαδρομή στους δρόμους, στάσεις λεωφορείων και πόση ώρα χρειάζεται με τα πόδια.", correct: true, why: "Σωστά! Όπως λέει και το βιβλίο, επιλέγουμε «Χάρτες» για να βρούμε τη διαδρομή!" },
+              { id: 'cat-news-pick', title: "📰 Καρτέλα «Ειδήσεις»", url: "kidsearch.gr/news", desc: "Δείχνει άρθρα εφημερίδων.", correct: false, why: "Οι ειδήσεις δεν έχουν πλοήγηση σε δρόμους και χάρτη!" }
+            ]
+          },
+          {
+            prompt: "Πληκτρολόγησε στο κουτί: <strong>μουσείο χάρτης</strong> και πάτησε Αναζήτηση!",
+            allowedKeywords: ["μουσειο χαρτης", "μουσειο διαδρομη", "χαρτης μουσειου"],
+            chips: ["μουσείο", "χάρτης", "διαδρομή"],
+            results: [
+              { id: 'map-result-ok', title: "🗺️ Διαδρομή προς: Εθνικό Αρχαιολογικό Μουσείο (Πατησίων 44)", url: "maps.google.com/namuseum", desc: "Βρίσκεται κοντά στον σταθμό Βικτώρια. Εκτιμώμενος χρόνος διαδρομής: 15 λεπτά.", correct: true, why: "Μπράβο! Ο χάρτης σου έδειξε την οδό Πατησίων 44 και τον σταθμό του ηλεκτρικού!" }
+            ]
+          },
+          {
+            prompt: "Ποιο μέσο από τον χάρτη μας δείχνει ότι είναι πιο κοντά στο μουσείο;",
+            directPickMode: true,
+            results: [
+              { id: 'metro-walk', title: "🚇 Σταθμός Ηλεκτρικού/Μετρό: Βικτώρια ή Ομόνοια και λίγο περπάτημα", url: "οδηγίες πρόσβασης", desc: "Εύκολη και γρήγορη πρόσβαση χωρίς κίνηση.", correct: true, why: "Τέλεια! Ο χάρτης επιβεβαιώνει ότι ο σταθμός Βικτώρια είναι σε απόσταση λίγων λεπτών!" },
+              { id: 'airplane', title: "✈️ Αεροπλάνο", url: "άσχετη διαδρομή", desc: "Δεν προσγειώνονται αεροπλάνα στην οδό Πατησίων!", correct: false, why: "Μέσα στην πόλη κινούμαστε με μετρό, λεωφορείο ή με τα πόδια!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 5,
+        shortName: "5. Μνημεία Πολιτισμού",
+        title: "Αναζήτηση Μνημείων Ελλάδας",
+        levels: [
+          {
+            prompt: "Στο σχολείο κάνουμε έρευνα για τα <strong>Μνημεία Παγκόσμιας Κληρονομιάς</strong> της Ελλάδας. Πληκτρολόγησε: <strong>μνημεία ελλάδας</strong>",
+            allowedKeywords: ["μνημεια ελλαδας", "μνημεια πολιτιστικης κληρονομιας", "μνημεια"],
+            chips: ["μνημεία", "ελλάδας", "UNESCO"],
+            results: [
+              { id: 'monuments-unesco', title: "🏛️ Μνημεία Παγκόσμιας Κληρονομιάς της UNESCO στην Ελλάδα", url: "www.culture.gov.gr/unesco", desc: "Ακρόπολη, Δελφοί, Επίδαυρος, Μετέωρα, Μυστράς και άλλα σπουδαία μνημεία της χώρας μας.", correct: true, why: "Εξαιρετικά! Βρήκες την επίσημη λίστα του Υπουργείου Πολιτισμού και της UNESCO!" }
+            ]
+          },
+          {
+            prompt: "Η εργασία μας ζητάει στοιχεία για το αρχαίο θέατρο της <strong>Επιδαύρου</strong>. Πώς περιορίζουμε τα αποτελέσματα;",
+            directPickMode: true,
+            results: [
+              { id: 'narrow-epidavros', title: "🎯 Πληκτρολογούμε πιο συγκεκριμένα: «αρχαίο θέατρο επιδαύρου ιστορία»", url: "περιορισμός αναζήτησης", desc: "Η μηχανή θα φέρει μόνο σελίδες για την Επίδαυρο και όχι για όλα τα μνημεία γενικά.", correct: true, why: "Σωστά! Προσθέτοντας το όνομα «Επίδαυρος» περιορίζουμε τα αποτελέσματα ακριβώς εκεί που θέλουμε!" },
+              { id: 'broad-search', title: "🔍 Ξαναγράφουμε σκέτο: «θέατρα»", url: "πολύ γενικό", desc: "Θα φέρει κινηματογράφους και σύγχρονα θέατρα από όλο τον κόσμο.", correct: false, why: "Αυτό θα φέρει πάρα πολλά άσχετα θέατρα!" }
+            ]
+          },
+          {
+            prompt: "Ποια πληροφορία για την Επίδαυρο είναι η πιο εντυπωσιακή που θα σημειώσεις στην εργασία σου;",
+            directPickMode: true,
+            results: [
+              { id: 'acoustics', title: "🎭 Η καταπληκτική ακουστική του: ακόμα και στο τελευταίο διάζωμα ακούγεται ένας ψίθυρος!", url: "ιστορικά στοιχεία", desc: "Ένα από τα μεγαλύτερα θαύματα της αρχαίας ελληνικής αρχιτεκτονικής.", correct: true, why: "Μπράβο! Αυτό είναι το πιο διάσημο χαρακτηριστικό του θεάτρου της Επιδαύρου!" },
+              { id: 'cars-parking', title: "🚗 Πόσα αυτοκίνητα χωράνε στο πάρκινγκ", url: "ασήμαντη λεπτομέρεια", desc: "Δεν έχει σχέση με την πολιτιστική κληρονομιά.", correct: false, why: "Αυτό δεν αφορά την ιστορία του μνημείου!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 6,
+        shortName: "6. Σύγκριση Αποτελεσμάτων",
+        title: "Σύγκρινε πριν Διαλέξεις",
+        levels: [
+          {
+            prompt: "Ο Ήρωνας θέλει να μάθει για τον διάσημο συνθέτη <strong>Μίκη Θεοδωράκη</strong>. Εμφανίζονται 2 σελίδες. Ποια επιλέγουμε;",
+            directPickMode: true,
+            results: [
+              { id: 'mikis-bio', title: "🎼 Μίκης Θεοδωράκης: Η Ζωή και τα Σπουδαία Έργα του", url: "www.music-history.gr", desc: "Βιογραφία, τα τραγούδια για παιδιά και η παγκόσμια μουσική του κληρονομιά.", correct: true, why: "Μπράβο! Αυτή η σελίδα περιέχει ολοκληρωμένη βιογραφία και το έργο του συνθέτη!" },
+              { id: 'mikis-clickbait', title: "⚡ «Δεν θα πιστέψετε τι είπε ο Μίκης!» - Σκανδαλοθηρικό Άρθρο", url: "www.gossip-news.gr", desc: "Ένα άρθρο με παραπλανητικό τίτλο μόνο για να κάνεις κλικ.", correct: false, why: "Προσοχή στα άρθρα-παγίδες (clickbait) με περίεργους τίτλους! Δεν έχουν εκπαιδευτική αξία." }
+            ]
+          },
+          {
+            prompt: "Σε μία σελίδα διαβάζουμε ότι ο συνθέτης γεννήθηκε στη Χίο και σε μία άλλη στην Κρήτη. Πώς το λύνουμε;",
+            directPickMode: true,
+            results: [
+              { id: 'check-encyclopedia', title: "📚 Ελέγχουμε την ψηφιακή εγκυκλοπαίδεια ή το βιβλίο Μουσικής του σχολείου!", url: "διασταύρωση", desc: "Μια επίσημη εγκυκλοπαίδεια έχει εξακριβωμένες ημερομηνίες και τόπο γέννησης (Χίος, 1925).", correct: true, why: "Σωστά! Όταν δύο σελίδες διαφωνούν, εμπιστευόμαστε το σχολικό βιβλίο ή έγκυρη εγκυκλοπαίδεια!" },
+              { id: 'coin-flip', title: "🪙 Ρίχνουμε κέρμα: κορώνα ή γράμματα;", url: "τύχη", desc: "Διαλέγουμε στην τύχη.", correct: false, why: "Η ιστορία δεν μαθαίνεται με κέρματα, αλλά με έρευνα!" }
+            ]
+          },
+          {
+            prompt: "Ποια είναι η καλύτερη συνήθεια όταν κάνουμε εργασία με πληροφορίες από το διαδίκτυο;",
+            directPickMode: true,
+            results: [
+              { id: 'cite-sources', title: "✍️ Στο τέλος της εργασίας γράφουμε τις πηγές (ποιες ιστοσελίδες διαβάσαμε)!", url: "βιβλιογραφία / πηγές", desc: "Έτσι δείχνουμε σεβασμό και αποδεικνύουμε ότι κάναμε σωστή έρευνα.", correct: true, why: "Άριστα! Η αναφορά των πηγών είναι ο κανόνας των υπεύθυνων ψηφιακών πολιτών!" },
+              { id: 'hide-sources', title: "🙈 Κρύβουμε από πού τα βρήκαμε και λέμε ότι τα σκεφτήκαμε μόνοι μας", url: "αντιγραφή", desc: "Χωρίς αναφορά πηγών.", correct: false, why: "Πρέπει πάντα να αναφέρουμε από πού πήραμε τις πληροφορίες μας!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 7,
+        shortName: "7. Περιορισμός Αναζήτησης",
+        title: "Πώς Περιορίζω τα Αποτελέσματα;",
+        levels: [
+          {
+            prompt: "Η Υπατία ψάχνει για <strong>«αθλήματα»</strong> και εμφανίζονται 20.000.000 σελίδες! Πώς θα βρει μόνο τα <strong>χειμερινά αθλήματα</strong>;",
+            directPickMode: true,
+            results: [
+              { id: 'winter-sports-kw', title: "❄️ Προσθέτει τη λέξη «χειμερινά»: «χειμερινά αθλήματα»", url: "εξειδίκευση όρου", desc: "Έτσι αποκλείονται το ποδόσφαιρο, το τένις και εμφανίζονται μόνο το σκι, το πατινάζ κ.ά.", correct: true, why: "Ακριβώς! Προσθέτοντας μια λέξη-κλειδί περιορίζουμε τα εκατομμύρια αποτελέσματα σε λίγα και χρήσιμα!" },
+              { id: 'sports-scroll', title: "📜 Κάνει κύλιση με τη ροδέλα μέχρι τη σελίδα 500", url: "ατελείωτο scroll", desc: "Χάνοντας άπειρο χρόνο.", correct: false, why: "Κανείς δεν κοιτάζει 500 σελίδες! Αλλάζουμε τις λέξεις-κλειδιά!" }
+            ]
+          },
+          {
+            prompt: "Πληκτρολόγησε στο κουτί: <strong>χειμερινά ολυμπιακά αθλήματα</strong>",
+            allowedKeywords: ["χειμερινα ολυμπιακα αθληματα", "χειμερινα αθληματα"],
+            chips: ["χειμερινά", "ολυμπιακά", "αθλήματα"],
+            results: [
+              { id: 'winter-olympics-res', title: "🎿 Χειμερινοί Ολυμπιακοί Αγώνες: Τα 16 Αθλήματα του Χιονιού & Πάγου", url: "www.olympics.com/el/winter", desc: "Αλπικό σκι, καλλιτεχνικό πατινάζ, χόκεϊ επί πάγου, σνόουμπορντ και άλλα.", correct: true, why: "Μπράβο! Η αναζήτηση περιορίστηκε ακριβώς στα αθλήματα του πάγου και του χιονιού!" }
+            ]
+          },
+          {
+            prompt: "Αν γνωρίζουμε από πριν μία αξιόπιστη ιστοσελίδα (π.χ. της ΕΡΤ ή του Υπουργείου), τι μας συμβουλεύει το βιβλίο;",
+            directPickMode: true,
+            results: [
+              { id: 'site-specific', title: "🌐 Να περιορίσουμε την αναζήτηση κατευθείαν μέσα σε αυτή τη συγκεκριμένη τοποθεσία!", url: "συμβουλή βιβλίου", desc: "Έτσι είμαστε σίγουροι ότι τα αποτελέσματα προέρχονται μόνο από έμπιστη πηγή.", correct: true, why: "Σωστά! Η αναζήτηση σε συγκεκριμένες γνωστές τοποθεσίες μάς προστατεύει από αναξιόπιστες σελίδες!" },
+              { id: 'random-site', title: "🎲 Να ψάχνουμε πάντα σε άγνωστες σελίδες στην τύχη", url: "επισφαλής πρακτική", desc: "Χωρίς έλεγχο.", correct: false, why: "Προτιμούμε πάντα σελίδες με κύρος και αξιοπιστία!" }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 8,
+        shortName: "8. Ο Έξυπνος Ερευνητής",
+        title: "Κανόνες Επιλογής Αποτελεσμάτων",
+        levels: [
+          {
+            prompt: "Έλεγχος γνώσεων: Ποιο από τα παρακάτω ΔΕΝ είναι σωστή συμβουλή για την επιλογή αποτελεσμάτων;",
+            directPickMode: true,
+            results: [
+              { id: 'bad-rule', title: "❌ «Διαλέγω πάντα την πρώτη σελίδα με κλειστά μάτια χωρίς να διαβάσω τίποτα»", url: "λανθασμένη πρακτική", desc: "Αυτός δεν είναι σωστός κανόνας έρευνας!", correct: true, why: "Μπράβο! Το εντόπισες! Αυτό είναι μεγάλο λάθος! Πρέπει πάντα να διαβάζουμε και να συγκρίνουμε!" },
+              { id: 'good-rule', title: "✔️ «Ελέγχω την πηγή και προτιμώ σελίδες από μουσεία, πανεπιστήμια και εφημερίδες»", url: "σωστός κανόνας", desc: "Αυτή είναι η επίσημη συμβουλή του σχολικού βιβλίου.", correct: false, why: "Αυτή είναι μια πολύ σωστή συμβουλή, ψάχνουμε το λάθος!" }
+            ]
+          },
+          {
+            prompt: "Τι σημαίνει η φράση του βιβλίου <em>«Προσεκτική ανάγνωση περιεχομένου»</em>;",
+            directPickMode: true,
+            results: [
+              { id: 'careful-reading', title: "📖 Διαβάζω προσεκτικά το κείμενο για να βεβαιωθώ ότι απαντάει στις απορίες μου!", url: "κατανόηση κειμένου", desc: "Δεν μένω μόνο στην εικόνα ή στον τίτλο, αλλά κατανοώ το νόημα.", correct: true, why: "Έτσι ακριβώς! Η ουσία της έρευνας είναι να καταλάβουμε αυτό που διαβάζουμε!" },
+              { id: 'quick-glance', title: "👀 Κοιτάζω μόνο αν έχει ωραία γράμματα και φεύγω", url: "επιφανειακή ματιά", desc: "Χωρίς να διαβάσω το νόημα.", correct: false, why: "Τα όμορφα γράμματα δεν σημαίνουν απαραίτητα σωστή πληροφορία!" }
+            ]
+          },
+          {
+            prompt: "Τελική αποστολή: Έγινες ένας υπεύθυνος ερευνητής του διαδικτύου! Ποιο είναι το σύνθημά σου;",
+            directPickMode: true,
+            results: [
+              { id: 'final-motto', title: "🌟 «Σκέφτομαι, Διαβάζω την Περιγραφή, Συγκρίνω τις Πηγές και Επιλέγω Έξυπνα!»", url: "σύνθημα μαθητή Γ' Δημοτικού", desc: "Ο χρυσός κανόνας του μαθήματος 21 για ασφαλή και επιτυχημένη αναζήτηση!", correct: true, why: "Συγχαρητήρια! Κατέκτησες όλες τις δεξιότητες του Μαθήματος 21!" },
+              { id: 'wrong-motto', title: "😴 «Πατάω ό,τι να 'ναι και πιστεύω τα πάντα»", url: "παραπλανημένο σύνθημα", desc: "Στάση που οδηγεί σε λάθη.", correct: false, why: "Όχι βέβαια! Τώρα πια ξέρεις πώς να ερευνάς σωστά!" }
+            ]
+          }
+        ]
+      }
+    ];
+
+    /* ================= APP STATE ================= */
+    let currentActivityIndex = 0;
+    let currentLevelIndex = 0; // 0, 1, 2
+    let totalScore = 0;
+    let isAdvancing = false;
+    let solvedTasks = new Set();
+
+    // DOM Elements
+    const activityNavTrackEl = document.getElementById('activityNavTrack');
+    const taskPromptEl = document.getElementById('taskPrompt');
+    const hudActivityBadgeEl = document.getElementById('hudActivityBadge');
+    const starCounterEl = document.getElementById('starCounter');
+    const wordBankEl = document.getElementById('wordBank');
+    const mainSearchInputEl = document.getElementById('mainSearchInput');
+    const resultsContainerEl = document.getElementById('resultsContainer');
+    const feedbackBannerEl = document.getElementById('feedbackBanner');
+    const feedbackTextEl = document.getElementById('feedbackText');
+    const advanceCountdownEl = document.getElementById('advanceCountdown');
+    const searchCategoriesEl = document.getElementById('searchCategories');
+    const browserUrlEl = document.getElementById('browserUrl');
+    const congratsModalEl = document.getElementById('congratsModal');
+    const actCompleteNoticeEl = document.getElementById('actCompleteNotice');
+    const levelLabelSmallEl = document.getElementById('levelLabelSmall');
+    const searchCountHeaderEl = document.getElementById('searchCountHeader');
+
+    function buildNavButtons() {
+      activityNavTrackEl.innerHTML = "";
+      activities.forEach((act, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "btn-act-jump" + (idx === currentActivityIndex ? " current" : "");
+        btn.id = "navBtn" + idx;
+        btn.innerHTML = `<span>${act.shortName}</span>`;
+        btn.onclick = () => jumpToActivity(idx);
+        activityNavTrackEl.appendChild(btn);
+      });
+    }
+
+    function jumpToActivity(idx) {
+      if (isAdvancing) return;
+      currentActivityIndex = idx;
+      currentLevelIndex = 0;
+      updateNavHighlight();
+      loadCurrentMission();
+    }
+
+    function updateNavHighlight() {
+      activities.forEach((_, idx) => {
+        const btn = document.getElementById("navBtn" + idx);
+        if (btn) {
+          if (idx === currentActivityIndex) btn.classList.add("current");
+          else btn.classList.remove("current");
+        }
+      });
+    }
+
+    buildNavButtons();
+    loadCurrentMission();
+
+    function loadCurrentMission() {
+      isAdvancing = false;
+      const act = activities[currentActivityIndex];
+      const lvl = act.levels[currentLevelIndex];
+
+      hudActivityBadgeEl.innerText = `ΜΑΘΗΜΑ 21 • ΔΡΑΣΤΗΡΙΟΤΗΤΑ ${act.id} ΑΠΟ 8: ${act.title.toUpperCase()}`;
+      levelLabelSmallEl.innerText = `Επίπεδο ${currentLevelIndex + 1} από 3`;
+      updateStepPills();
+      updateNavHighlight();
+
+      taskPromptEl.innerHTML = `<strong>Επίπεδο ${currentLevelIndex + 1}:</strong> ${lvl.prompt}`;
+
+      mainSearchInputEl.value = "";
+      resultsContainerEl.innerHTML = "";
+      resultsContainerEl.classList.remove('show');
+      feedbackBannerEl.classList.remove('show', 'correct', 'wrong');
+      advanceCountdownEl.innerText = "";
+      actCompleteNoticeEl.classList.remove('show');
+      searchCountHeaderEl.classList.remove('show');
+
+      browserUrlEl.innerText = `https://www.kidsearch.gr/lesson-21/activity-${act.id}/level-${currentLevelIndex + 1}`;
+
+      wordBankEl.innerHTML = "";
+      if (lvl.chips && lvl.chips.length > 0) {
+        lvl.chips.forEach(chipText => {
+          const chip = document.createElement('div');
+          chip.className = "bank-chip";
+          chip.innerText = chipText;
+          chip.onclick = () => {
+            if (lvl.directPickMode) {
+              mainSearchInputEl.value = chipText;
+              submitSearch();
+            } else {
+              if (mainSearchInputEl.value.trim().length > 0) {
+                mainSearchInputEl.value += " " + chipText;
+              } else {
+                mainSearchInputEl.value = chipText;
+              }
+              mainSearchInputEl.focus();
+            }
+          };
+          wordBankEl.appendChild(chip);
+        });
+      }
+
+      if (lvl.directPickMode) {
+        searchCategoriesEl.classList.remove('show');
+        displayResults(lvl.results, true);
+      } else {
+        searchCategoriesEl.classList.add('show');
+      }
+    }
+
+    function updateStepPills() {
+      for (let i = 1; i <= 3; i++) {
+        const pill = document.getElementById('stepPill' + i);
+        pill.className = 'step-pill';
+        if (i - 1 < currentLevelIndex) {
+          pill.classList.add('done');
+        } else if (i - 1 === currentLevelIndex) {
+          pill.classList.add('active');
+        }
+      }
+    }
+
+    function submitSearch() {
+      if (isAdvancing) return;
+      const act = activities[currentActivityIndex];
+      const lvl = act.levels[currentLevelIndex];
+
+      const inputVal = cleanGreek(mainSearchInputEl.value.trim());
+
+      if (lvl.directPickMode) {
+        displayResults(lvl.results, true);
+        return;
+      }
+
+      if (!inputVal) {
+        showFeedback("⚠️ Γράψε μια λέξη-κλειδί στο κουτί ή πάτησε ένα συννεφάκι από κάτω!", false);
+        return;
+      }
+
+      const matches = lvl.allowedKeywords.some(kw => inputVal.includes(cleanGreek(kw)) || cleanGreek(kw).includes(inputVal));
+
+      if (matches) {
+        searchCountHeaderEl.classList.add('show');
+        displayResults(lvl.results, false);
+        showFeedback("🎉 Μπράβο! Η μηχανή εμφάνισε τα αποτελέσματα! Διάβασε την περιγραφή και κάνε κλικ στο καταλληλότερο!", true, false);
+      } else {
+        searchCountHeaderEl.classList.remove('show');
+        resultsContainerEl.innerHTML = "";
+        resultsContainerEl.classList.remove('show');
+        showFeedback("🤔 Δεν βρέθηκε σχετικό αποτέλεσμα με αυτές τις λέξεις. Δοκίμασε να χρησιμοποιήσεις τις λέξεις στα συννεφάκια!", false);
+      }
+    }
+
+    mainSearchInputEl.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        submitSearch();
+      }
+    });
+
+    function displayResults(resultsArray, isDirectMode) {
+      resultsContainerEl.innerHTML = "";
+      resultsContainerEl.classList.add('show');
+
+      resultsArray.forEach(res => {
+        const card = document.createElement('div');
+        card.className = "result-card";
+        card.innerHTML = `
+          <div class="res-url">🔗 ${res.url}</div>
+          <div class="res-title">${res.title}</div>
+          <div class="res-desc">${res.desc}</div>
+        `;
+        card.onclick = () => handleResultClick(res);
+        resultsContainerEl.appendChild(card);
+      });
+    }
+
+    function handleResultClick(res) {
+      if (isAdvancing) return;
+
+      const taskKey = `${currentActivityIndex}-${currentLevelIndex}`;
+
+      if (res.correct) {
+        if (!solvedTasks.has(taskKey)) {
+          solvedTasks.add(taskKey);
+          totalScore++;
+          starCounterEl.innerText = totalScore;
+        }
+        showFeedback("🌟 " + res.why, true, true);
+        triggerAutoAdvance();
+      } else {
+        showFeedback("❌ " + res.why, false);
+      }
+    }
+
+    function showFeedback(text, isOk, hasTimer = false) {
+      feedbackBannerEl.className = "feedback-banner show " + (isOk ? "correct" : "wrong");
+      feedbackTextEl.innerHTML = text;
+      if (!hasTimer) {
+        advanceCountdownEl.innerText = "";
+      }
+    }
+
+    function triggerAutoAdvance() {
+      isAdvancing = true;
+      let secondsLeft = 3;
+      advanceCountdownEl.innerText = `Επόμενο επίπεδο σε ${secondsLeft}... ⏳`;
+
+      const timer = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft > 0) {
+          advanceCountdownEl.innerText = `Επόμενο επίπεδο σε ${secondsLeft}... ⏳`;
+        } else {
+          clearInterval(timer);
+          advanceLevel();
+        }
+      }, 1000);
+    }
+
+    function advanceLevel() {
+      if (currentLevelIndex < 2) {
+        currentLevelIndex++;
+        loadCurrentMission();
+      } else {
+        actCompleteNoticeEl.classList.add('show');
+        setTimeout(() => {
+          if (currentActivityIndex < activities.length - 1) {
+            currentActivityIndex++;
+            currentLevelIndex = 0;
+            loadCurrentMission();
+          } else {
+            showFinalCongrats();
+          }
+        }, 1800);
+      }
+    }
+
+    function showFinalCongrats() {
+      document.getElementById('finalScoreModal').innerText = totalScore;
+      congratsModalEl.classList.add('show');
+    }
+
+    function restartEverything() {
+      congratsModalEl.classList.remove('show');
+      currentActivityIndex = 0;
+      currentLevelIndex = 0;
+      totalScore = 0;
+      solvedTasks.clear();
+      starCounterEl.innerText = "0";
+      loadCurrentMission();
+    }
+
+    function selectCat(cat) {
+      document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+      if (cat === 'all') document.getElementById('tabAll').classList.add('active');
+      if (cat === 'images') document.getElementById('tabImages').classList.add('active');
+      if (cat === 'maps') document.getElementById('tabMaps').classList.add('active');
+
+      const act = activities[currentActivityIndex];
+      const lvl = act.levels[currentLevelIndex];
+      if (lvl.results) {
+        displayResults(lvl.results, false);
+      }
+    }
+
+    function cleanGreek(str) {
+      return str.toLowerCase()
+        .replace(/ά/g, 'α').replace(/έ/g, 'ε').replace(/ή/g, 'η').replace(/ί/g, 'ι')
+        .replace(/ό/g, 'ο').replace(/ύ/g, 'υ').replace(/ώ/g, 'ω')
+        .replace(/ΐ/g, 'ι').replace(/ΰ/g, 'υ');
+    }
+  </script>
+</body>
+</html>
