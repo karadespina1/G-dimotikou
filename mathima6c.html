@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Μάθημα 6: Εντολή επιλογής στο Scratch (Μέρος Β΄) - Γ' Δημοτικού</title>
+    <style>
+        :root {
+            --scratch-orange: #ffab19;
+            --scratch-blue: #4c97ff;
+            --scratch-purple: #9966ff;
+            --scratch-yellow: #ffd500;
+            --scratch-green: #0fbd8c;
+            --scratch-red: #ff4c4c;
+            --scratch-sensing: #4cbfe6;
+            --primary: #2563eb;
+            --primary-soft: #eff6ff;
+            --secondary: #059669;
+            --secondary-soft: #d1fae5;
+            --danger: #dc2626;
+            --danger-soft: #fee2e2;
+            --bg-page: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .app-window {
+            width: 100%;
+            max-width: 880px;
+            background: var(--card-bg);
+            border-radius: 22px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+            border: 3px solid #bfdbfe;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .app-header {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header-title-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lesson-badge {
+            background: #ffab19;
+            color: #7c2d12;
+            font-weight: 900;
+            font-size: 1.15rem;
+            padding: 6px 12px;
+            border-radius: 12px;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .header-text h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .header-text p {
+            font-size: 0.86rem;
+            opacity: 0.9;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-ctrl {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-ctrl:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* Progress Section */
+        .progress-section {
+            background: rgba(0, 0, 0, 0.16);
+            padding: 10px 14px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        .progress-bar-wrap {
+            flex: 1;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #facc15;
+            width: 12.5%;
+            transition: width 0.35s ease;
+            border-radius: 999px;
+        }
+
+        /* 8 Navigation Tabs */
+        .activities-nav {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            background: #eff6ff;
+            border-bottom: 2px solid #bfdbfe;
+            padding: 6px;
+            gap: 4px;
+            overflow-x: auto;
+        }
+
+        .act-tab {
+            background: white;
+            border: 2px solid #cbd5e1;
+            padding: 8px 4px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: #475569;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            transition: all 0.15s;
+        }
+
+        .act-tab:hover {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+        }
+
+        .act-tab.active {
+            border-color: var(--primary);
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+        }
+
+        .act-tab.completed {
+            border-color: var(--secondary);
+            background: var(--secondary-soft);
+            color: #065f46;
+        }
+
+        .act-tab.active.completed {
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* Sub-steps bar (1, 2, 3) */
+        .substep-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f1f5f9;
+            padding: 10px 18px;
+            border-radius: 14px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .substep-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #1e3a8a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .substep-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .substep-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .substep-dot.active {
+            background: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+            transform: scale(1.1);
+        }
+
+        .substep-dot.done {
+            background: var(--secondary);
+        }
+
+        /* Prompt Card */
+        .prompt-card {
+            background: #ffffff;
+            border: 2px solid #93c5fd;
+            border-left: 8px solid var(--primary);
+            border-radius: 14px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .prompt-card h2 {
+            font-size: 1.25rem;
+            color: #1e3a8a;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prompt-card p {
+            font-size: 1.15rem;
+            line-height: 1.5;
+            color: #1e293b;
+        }
+
+        /* Visual Stage Box */
+        .stage-box {
+            background: #f8fafc;
+            border: 3px dashed #cbd5e1;
+            border-radius: 18px;
+            padding: 22px;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            text-align: center;
+        }
+
+        .big-illustration {
+            font-size: 3.2rem;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        /* Scratch Block Components */
+        .scratch-block {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 800;
+            font-size: 1.05rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: 2px solid rgba(0,0,0,0.15);
+        }
+
+        .block-event {
+            background-color: #ffbf00;
+            border-radius: 16px 16px 8px 8px;
+        }
+
+        .block-motion {
+            background-color: #4c97ff;
+        }
+
+        .block-looks {
+            background-color: #9966ff;
+        }
+
+        .block-sensing {
+            background-color: #4cbfe6;
+            clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+            padding: 6px 16px;
+        }
+
+        /* Scratch If Block */
+        .scratch-if-cblock {
+            background-color: #ffab19;
+            border-radius: 10px;
+            color: white;
+            font-weight: 800;
+            font-size: 1.05rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            border: 2px solid rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: fit-content;
+            text-align: left;
+        }
+
+        .if-top-row {
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .if-inner-hole {
+            background: #ffffff;
+            color: #64748b;
+            border: 2px dashed #d97706;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            min-width: 90px;
+            text-align: center;
+        }
+
+        .if-arm {
+            background: #fffbeb;
+            border-left: 18px solid #ffab19;
+            width: 100%;
+            min-height: 40px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .if-bottom-row {
+            height: 12px;
+            width: 100%;
+            background-color: #ffab19;
+            border-radius: 0 0 10px 10px;
+        }
+
+        /* Options */
+        .options-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            width: 100%;
+        }
+
+        .btn-choice {
+            background: white;
+            border: 3px solid #94a3b8;
+            padding: 14px 22px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            border-radius: 16px;
+            cursor: pointer;
+            color: #1e293b;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.15s;
+            min-width: 130px;
+            text-align: center;
+        }
+
+        .btn-choice:hover {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-choice.correct {
+            background: var(--secondary-soft) !important;
+            border-color: var(--secondary) !important;
+            color: #065f46 !important;
+        }
+
+        .btn-choice.wrong {
+            background: var(--danger-soft) !important;
+            border-color: var(--danger) !important;
+            color: #991b1b !important;
+        }
+
+        /* Feedback Banner */
+        .feedback-banner {
+            display: none;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-align: center;
+            animation: bounceIn 0.3s ease;
+        }
+
+        .feedback-banner.success {
+            display: block;
+            background: var(--secondary-soft);
+            border: 3px solid var(--secondary);
+            color: #065f46;
+        }
+
+        .feedback-banner.error {
+            display: block;
+            background: var(--danger-soft);
+            border: 3px solid var(--danger);
+            color: #991b1b;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Footer */
+        .app-footer {
+            padding: 16px 24px;
+            border-top: 2px solid #e2e8f0;
+            background: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn-nav {
+            background: white;
+            border: 2px solid #cbd5e1;
+            padding: 10px 20px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-next {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-next:hover:not(:disabled) {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        /* Help Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-card {
+            background: white;
+            width: 100%;
+            max-width: 580px;
+            border-radius: 20px;
+            padding: 24px;
+            border: 4px solid #93c5fd;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            animation: bounceIn 0.25s ease;
+        }
+
+        .modal-card h3 {
+            font-size: 1.35rem;
+            color: #1e3a8a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-card p, .modal-card li {
+            font-size: 1.05rem;
+            line-height: 1.5;
+            color: #334155;
+        }
+
+        .modal-card ul {
+            padding-left: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .btn-close-modal {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        /* Diploma */
+        .diploma-box {
+            display: none;
+            background: #fffdf5;
+            border: 6px double #d97706;
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .diploma-box h2 {
+            font-size: 1.75rem;
+            color: #b45309;
+            margin-bottom: 6px;
+        }
+
+        .diploma-box p {
+            font-size: 1.15rem;
+            color: #451a03;
+            margin: 6px 0;
+        }
+
+        .diploma-stars {
+            font-size: 2.8rem;
+            margin: 10px 0;
+        }
+
+        .btn-print {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            .diploma-box, .diploma-box * { visibility: visible; }
+            .diploma-box { position: absolute; left: 0; top: 0; width: 100%; border: 4px solid black; }
+            .btn-print { display: none; }
+        }
+
+        @media (max-width: 650px) {
+            .activities-nav {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .header-text h1 {
+                font-size: 1.05rem;
+            }
+            .btn-choice {
+                width: 100%;
+                font-size: 1.15rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-window">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-top">
+                <div class="header-title-box">
+                    <div class="lesson-badge">Μ6</div>
+                    <div class="header-text">
+                        <div style="font-size:0.75rem; text-transform:uppercase; opacity:0.85; font-weight:700;">
+                            Ενοτητα 1 · Αλγοριθμικη – Προγραμματισμος – Ρομποτικη
+                        </div>
+                        <h1>Εντολή επιλογής στο Scratch (Μέρος Β΄)</h1>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <button class="btn-ctrl" id="sound-btn" title="Ενεργοποίηση/Απενεργοποίηση Ήχου">🔊 Ήχος</button>
+                    <button class="btn-ctrl" id="help-btn" title="Οδηγίες και Βοήθεια">❓ Βοήθεια</button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-section">
+                <span>Δραστηριότητα <span id="act-num-label">1</span> από 8</span>
+                <div class="progress-bar-wrap">
+                    <div class="progress-fill" id="progress-bar"></div>
+                </div>
+                <span>⭐ <span id="stars-total">0</span>/24</span>
+            </div>
+        </header>
+
+        <!-- 8 Tabs -->
+        <nav class="activities-nav" id="acts-nav" aria-label="Επιλογή δραστηριότητας"></nav>
+
+        <!-- Main Content -->
+        <main class="content-area">
+            <!-- Step indicator -->
+            <div class="substep-bar">
+                <div class="substep-title">
+                    <span id="act-badge-emoji">🏡</span>
+                    <span id="step-indicator-text">Βήμα 1 από 3</span>
+                </div>
+                <div class="substep-dots">
+                    <div class="substep-dot" id="dot-0">1</div>
+                    <div class="substep-dot" id="dot-1">2</div>
+                    <div class="substep-dot" id="dot-2">3</div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="prompt-card">
+                <h2 id="mission-title">Τίτλος Αποστολής</h2>
+                <p id="mission-question">Ερώτηση...</p>
+            </div>
+
+            <!-- Visual Stage -->
+            <div class="stage-box" id="stage-box"></div>
+
+            <!-- Shuffled Choices -->
+            <div class="options-grid" id="options-grid"></div>
+
+            <!-- Feedback -->
+            <div class="feedback-banner" id="feedback-banner"></div>
+
+            <!-- Certificate (at finish) -->
+            <div class="diploma-box" id="diploma-box">
+                <h2>🏆 ΕΠΑΙΝΟΣ ΠΡΟΓΡΑΜΜΑΤΙΣΤΗ «ΣΠΙΤΑΚΙ & ΟΡΙΟ» 🏆</h2>
+                <p>Απονέμεται στον / στη μαθητή/-τρια της <strong>Γ' Δημοτικού</strong></p>
+                <div class="diploma-stars">⭐⭐⭐⭐⭐</div>
+                <p>Ολοκλήρωσες με απόλυτη επιτυχία το <strong>Μάθημα 6ο</strong>!</p>
+                <p>Έμαθες να λύνεις προβλήματα με προγραμματισμό: αυτόματη επιστροφή στο Σπιτάκι, έλεγχος για το όριο της σκηνής και διπλασιασμός εντολών!</p>
+                <button class="btn-print" onclick="window.print()">🖨️ Εκτύπωση Επαίνου</button>
+            </div>
+        </main>
+
+        <!-- Footer Navigation -->
+        <footer class="app-footer">
+            <button class="btn-nav" id="btn-prev">⬅️ Προηγούμενο</button>
+            <button class="btn-nav" id="btn-restart">🔄 Επανεκκίνηση</button>
+            <button class="btn-nav btn-next" id="btn-next">Επόμενο Βήμα ➡️</button>
+        </footer>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="modal-overlay" id="help-modal">
+        <div class="modal-card">
+            <h3>🏡 Τι μάθαμε στο Μάθημα 6ο;</h3>
+            <p>Λύνουμε τα 2 προβλήματα του πρώτου έργου μας με προγραμματιστικό τρόπο!</p>
+            <ul>
+                <li><strong>1ο Πρόβλημα:</strong> Έπρεπε να σέρνουμε τη γάτα με το ποντίκι στην αρχή. Το λύνουμε βάζοντας ένα <strong>Σπιτάκι 🏡</strong> και την εντολή <code>πήγαινε σε [Σπιτάκι]</code>!</li>
+                <li><strong>2ο Πρόβλημα:</strong> Η γάτα έφτανε στη δεξιά άκρη και εξαφανιζόταν. Το λύνουμε με συνθήκη: <code>εάν αγγίζει [όριο] τότε πήγαινε σε [Σπιτάκι]</code>.</li>
+                <li><strong>Διπλασιασμός:</strong> Κάνουμε δεξί κλικ σε μια εντολή για να την αντιγράψουμε γρήγορα!</li>
+            </ul>
+            <button class="btn-close-modal" id="modal-close-btn">Το κατάλαβα! 👍</button>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================================
+           1. AUDIO ENGINE (Web Audio API - Offline)
+           ========================================================================== */
+        class AudioManager {
+            constructor() {
+                this.enabled = true;
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+            }
+            playTone(freq, duration, type = 'sine', delay = 0) {
+                if (!this.enabled) return;
+                this.init();
+                setTimeout(() => {
+                    try {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = type;
+                        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                        gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start();
+                        osc.stop(this.ctx.currentTime + duration);
+                    } catch (e) {}
+                }, delay * 1000);
+            }
+            correct() {
+                this.playTone(523.25, 0.12, 'triangle', 0);    // C5
+                this.playTone(659.25, 0.12, 'triangle', 0.1);  // E5
+                this.playTone(783.99, 0.22, 'triangle', 0.2);  // G5
+            }
+            wrong() {
+                this.playTone(280, 0.15, 'sawtooth', 0);
+                this.playTone(210, 0.22, 'sawtooth', 0.12);
+            }
+            cheer() {
+                const notes = [523, 659, 784, 1046];
+                notes.forEach((freq, idx) => {
+                    this.playTone(freq, 0.25, 'triangle', idx * 0.12);
+                });
+            }
+        }
+        const audio = new AudioManager();
+
+        /* ==========================================================================
+           2. DATA 8 ACTIVITIES FOR LESSON 6 (3 SUBSTEPS = 24 MISSIONS)
+           ========================================================================== */
+        const activitiesData = [
+            /* 1. Τα Δύο Προβλήματα του Έργου */
+            {
+                id: 1,
+                name: "Προβλήματα",
+                emoji: "🤔",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Το 1ο Πρόβλημα με το Ποντίκι",
+                        question: "Στο 1ο έργο, τι έπρεπε να κάνουμε με το χέρι μας κάθε φορά που η γάτα περπατούσε;",
+                        visual: `
+                            <div class="big-illustration">🐱 ➡️ ➡️ 🖱️ ⬅️ ❓</div>
+                            <div style="font-size:1.1rem; font-weight:bold; color:#1e3a8a;">Σελίδα 28: Θέλουμε να γίνεται αυτόματα!</div>
+                        `,
+                        options: ["Να τη σύρουμε με το ποντίκι αριστερά", "Να σβήσουμε τον υπολογιστή"],
+                        correct: "Να τη σύρουμε με το ποντίκι αριστερά"
+                    },
+                    {
+                        title: "Βήμα 2: Το 2ο Πρόβλημα στο Όριο",
+                        question: "Όταν η γάτα φτάνει στη δεξιά άκρη της σκηνής, τι παθαίνει στο αρχικό έργο;",
+                        visual: `
+                            <div style="border:3px solid #3b82f6; border-radius:12px; background:white; padding:16px 20px; font-size:2.2rem; display:flex; justify-content:flex-end;">
+                                <span style="opacity:0.6;">🐱</span><span style="border-right:6px solid #ef4444; padding-right:4px;">|</span>
+                            </div>
+                            <div style="font-size:1.1rem; font-weight:bold; color:#b91c1c;">Εξαφανίζεται και φαίνεται μόνο η ουρά της!</div>
+                        `,
+                        options: ["Εξαφανίζεται στην άκρη της σκηνής", "Γίνεται αόρατη σε όλο το δωμάτιο"],
+                        correct: "Εξαφανίζεται στην άκρη της σκηνής"
+                    },
+                    {
+                        title: "Βήμα 3: Πώς τα λύνουμε;",
+                        question: "Πώς μπορούμε να λύσουμε αυτά τα δύο προβλήματα σύμφωνα με το βιβλίο;",
+                        visual: `
+                            <div class="big-illustration">💡 💻 🧩</div>
+                        `,
+                        options: ["Με προγραμματιστικό τρόπο (με εντολές!)", "Αγοράζοντας καινούργιο πληκτρολόγιο"],
+                        correct: "Με προγραμματιστικό τρόπο (με εντολές!)"
+                    }
+                ]
+            },
+
+            /* 2. Το Νέο Αντικείμενο: Το Σπιτάκι */
+            {
+                id: 2,
+                name: "Σπιτάκι",
+                emoji: "🏡",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Ποιο αντικείμενο προσθέτουμε;",
+                        question: "Για να επιστρέφει αυτόματα η γατούλα στην αφετηρία της, ποιο αντικείμενο φέρνουμε από τη συλλογή;",
+                        visual: `
+                            <div class="big-illustration">🐱 ➡️ ❓ (🏡 ή 🚀)</div>
+                        `,
+                        options: ["Το Σπιτάκι (Home/House) 🏡", "Έναν πύραυλο 🚀"],
+                        correct: "Το Σπιτάκι (Home/House) 🏡"
+                    },
+                    {
+                        title: "Βήμα 2: Πού τοποθετούμε το σπιτάκι;",
+                        question: "Σε ποιο σημείο της σκηνής τοποθετούμε το σπιτάκι προσέχοντας να μην ακουμπάει στο κάτω ή αριστερό όριο;",
+                        visual: `
+                            <div style="border:3px solid #3b82f6; border-radius:12px; background:white; padding:16px 20px; font-size:2.2rem; display:flex; justify-content:flex-start; gap:20px;">
+                                <span>🏡</span><span>🐱</span>
+                            </div>
+                        `,
+                        options: ["Στην αριστερή πλευρά της σκηνής", "Στην οροφή του δωματίου"],
+                        correct: "Στην αριστερή πλευρά της σκηνής"
+                    },
+                    {
+                        title: "Βήμα 3: Μετονομασία αντικειμένου",
+                        question: "Πώς αλλάζουμε το όνομα του νέου αντικειμένου στην περιοχή μορφών;",
+                        visual: `
+                            <div style="background:#e0f2fe; border:2px solid #38bdf8; padding:10px 20px; border-radius:12px; font-size:1.15rem; font-weight:bold; color:#0369a1;">
+                                Αντικείμενο: [ Σπιτάκι 🏡 ]
+                            </div>
+                        `,
+                        options: ["Σπιτάκι", "Κουτί99"],
+                        correct: "Σπιτάκι"
+                    }
+                ]
+            },
+
+            /* 3. Η Μπλε Εντολή Κίνησης: Πήγαινε σε... */
+            {
+                id: 3,
+                name: "Πήγαινε σε...",
+                emoji: "🎯",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Σε ποια κατηγορία ανήκει;",
+                        question: "Η εντολή «πήγαινε σε [ ... ]» έχει χρώμα μπλε. Σε ποια κατηγορία θα τη βρούμε;",
+                        visual: `
+                            <div class="scratch-block block-motion">πήγαινε σε [ τυχαία θέση ▾ ]</div>
+                        `,
+                        options: ["Κίνηση (Motion - Μπλε)", "Ήχοι (Sounds)"],
+                        correct: "Κίνηση (Motion - Μπλε)"
+                    },
+                    {
+                        title: "Βήμα 2: Τι επιλέγουμε στο τρίγωνο;",
+                        question: "Πατάμε στο λευκό τριγωνάκι της εντολής. Ποια επιλογή διαλέγουμε;",
+                        visual: `
+                            <div class="scratch-block block-motion">πήγαινε σε [ Σπιτάκι ▾ ]</div>
+                        `,
+                        options: ["Σπιτάκι", "τυχαία θέση"],
+                        correct: "Σπιτάκι"
+                    },
+                    {
+                        title: "Βήμα 3: Τι συμβαίνει όταν κάνουμε κλικ πάνω της;",
+                        question: "Αν η γάτα βρίσκεται σε ένα τυχαίο σημείο και πατήσουμε το πλακίδιο «πήγαινε σε Σπιτάκι», τι θα κάνει;",
+                        visual: `
+                            <div class="big-illustration">🐱 💨 ➡️ 🏡</div>
+                        `,
+                        options: ["Πηγαίνει αμέσως πάνω στο σπιτάκι!", "Σβήνεται από το έργο"],
+                        correct: "Πηγαίνει αμέσως πάνω στο σπιτάκι!"
+                    }
+                ]
+            },
+
+            /* 4. Η Νέα Συνθήκη: Αγγίζει Όριο; */
+            {
+                id: 4,
+                name: "Όριο Σκηνής",
+                emoji: "🚧",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Τι είναι το «όριο»;",
+                        question: "Τι ονομάζουμε «όριο» στο περιβάλλον του Scratch;",
+                        visual: `
+                            <div class="big-illustration">🖼️ 🧱 [Η άκρη της σκηνής]</div>
+                        `,
+                        options: ["Την άκρη / σύνορο της σκηνής", "Το καλώδιο του ρεύματος"],
+                        correct: "Την άκρη / σύνορο της σκηνής"
+                    },
+                    {
+                        title: "Βήμα 2: Ποια συνθήκη διαλέγουμε;",
+                        question: "Από την κατηγορία Αισθητήρες, παίρνουμε το πλακίδιο «αγγίζει...;» και επιλέγουμε:",
+                        visual: `
+                            <div class="scratch-block block-sensing">αγγίζει [ όριο ▾ ] ;</div>
+                        `,
+                        options: ["όριο", "δείκτη ποντικιού"],
+                        correct: "όριο"
+                    },
+                    {
+                        title: "Βήμα 3: Η διατύπωση της απόφασης",
+                        question: "Πώς διατυπώνεται με λόγια η απόφαση που θέλουμε να πάρει η γατούλα;",
+                        visual: `
+                            <div style="font-size:1.15rem; font-weight:800; color:#1e3a8a; background:#dbeafe; padding:10px 18px; border-radius:12px;">
+                                Αν φτάσεις στο όριο της σκηνής ➡️ τότε...
+                            </div>
+                        `,
+                        options: ["τότε γύρνα πίσω στο σπιτάκι", "τότε κλείσε τον υπολογιστή"],
+                        correct: "τότε γύρνα πίσω στο σπιτάκι"
+                    }
+                ]
+            },
+
+            /* 5. Σύνθεση του «εάν... τότε» για το Όριο */
+            {
+                id: 5,
+                name: "Σύνθεση Εντολής",
+                emoji: "🧩",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Η συνθήκη μέσα στο εξάγωνο",
+                        question: "Πού τοποθετούμε το κυανό πλακίδιο «αγγίζει όριο ;»;",
+                        visual: `
+                            <div class="scratch-if-cblock">
+                                <div class="if-top-row">εάν <div class="if-inner-hole">αγγίζει όριο ;</div> τότε</div>
+                                <div class="if-arm"><span style="color:#d97706;">(κενό)</span></div>
+                                <div class="if-bottom-row"></div>
+                            </div>
+                        `,
+                        options: ["Μέσα στο εξάγωνο άνοιγμα του 'εάν... τότε'", "Στο μενού Αρχείο"],
+                        correct: "Μέσα στο εξάγωνο άνοιγμα του 'εάν... τότε'"
+                    },
+                    {
+                        title: "Βήμα 2: Η ενέργεια στην αγκαλιά",
+                        question: "Ποια μπλε εντολή τοποθετούμε μέσα στην αγκαλιά του «εάν... τότε»;",
+                        visual: `
+                            <div class="scratch-if-cblock">
+                                <div class="if-top-row">εάν αγγίζει όριο τότε</div>
+                                <div class="if-arm"><div class="scratch-block block-motion" style="font-size:0.85rem; padding:4px 8px;">πήγαινε σε Σπιτάκι</div></div>
+                                <div class="if-bottom-row"></div>
+                            </div>
+                        `,
+                        options: ["πήγαινε σε Σπιτάκι", "πες Καληνύχτα!"],
+                        correct: "πήγαινε σε Σπιτάκι"
+                    },
+                    {
+                        title: "Βήμα 3: Πού μπαίνει στο κύριο σενάριο;",
+                        question: "Τοποθετούμε ολόκληρο το «εάν... τότε» κάτω από το συμβάν του δεξιού βέλους. Πού ακριβώς;",
+                        visual: `
+                            <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+                                <div class="scratch-block block-event" style="font-size:0.9rem;">όταν πατηθεί πλήκτρο [δεξί βέλος ▾]</div>
+                                <div class="scratch-block block-motion" style="font-size:0.9rem;">κινήσου 10 βήματα</div>
+                                <div class="scratch-if-cblock" style="font-size:0.85rem;">
+                                    <div class="if-top-row">εάν αγγίζει όριο τότε</div>
+                                    <div class="if-arm"><div class="scratch-block block-motion" style="font-size:0.75rem; padding:3px 6px;">πήγαινε σε Σπιτάκι</div></div>
+                                    <div class="if-bottom-row"></div>
+                                </div>
+                            </div>
+                        `,
+                        options: ["Ακριβώς κάτω από την εντολή 'κινήσου 10 βήματα'", "Πάνω από το συμβάν"],
+                        correct: "Ακριβώς κάτω από την εντολή 'κινήσου 10 βήματα'"
+                    }
+                ]
+            },
+
+            /* 6. Δεξί Κλικ & Διπλασιασμός (Duplicate) */
+            {
+                id: 6,
+                name: "Διπλασιασμός",
+                emoji: "📑",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Πώς αντιγράφουμε μια εντολή;",
+                        question: "Κάνουμε δεξί κλικ πάνω στην μπλε εντολή «πήγαινε σε Σπιτάκι». Ποια επιλογή πατάμε;",
+                        visual: `
+                            <div style="background:white; border:2px solid #94a3b8; border-radius:8px; padding:8px 16px; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+                                <div>👉 <strong>Διπλασιασμός</strong></div>
+                                <div style="opacity:0.6;">Προσθήκη σχολίου</div>
+                                <div style="opacity:0.6;">Διαγραφή Εντολής</div>
+                            </div>
+                        `,
+                        options: ["Διπλασιασμός (Duplicate)", "Διαγραφή Εντολής"],
+                        correct: "Διπλασιασμός (Duplicate)"
+                    },
+                    {
+                        title: "Βήμα 2: Πού βάζουμε το αντίγραφο;",
+                        question: "Στη σελίδα 30, πού τοποθετούμε το νέο αντίγραφο της εντολής «πήγαινε σε Σπιτάκι»;",
+                        visual: `
+                            <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+                                <div class="scratch-block block-event">όταν γίνει κλικ σε 🚩</div>
+                                <div class="scratch-block block-motion">πήγαινε σε Σπιτάκι 🏡</div>
+                                <div class="scratch-block block-looks">πες Γεια! για 2 δευτ.</div>
+                            </div>
+                        `,
+                        options: ["Κάτω από το συμβάν της πράσινης σημαίας 🚩", "Έξω από το παράθυρο"],
+                        correct: "Κάτω από το συμβάν της πράσινης σημαίας 🚩"
+                    },
+                    {
+                        title: "Βήμα 3: Τι πετυχαίνουμε με αυτό;",
+                        question: "Κάθε φορά που πατάμε την πράσινη σημαία 🚩, πού ξεκινάει πλέον η γατούλα;",
+                        visual: `
+                            <div class="big-illustration">🚩 👆 ➡️ 🐱 🏡 [Στο σπιτάκι της!]</div>
+                        `,
+                        options: ["Πηγαίνει αυτόματα στην αρχή, στο Σπιτάκι!", "Χάνεται στη δεξιά άκρη"],
+                        correct: "Πηγαίνει αυτόματα στην αρχή, στο Σπιτάκι!"
+                    }
+                ]
+            },
+
+            /* 7. Τα Δύο Σενάρια & Μαθηματική Λογική */
+            {
+                id: 7,
+                name: "Τα 2 Σενάρια",
+                emoji: "✌️",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Πόσα σενάρια έχει το τελικό έργο;",
+                        question: "Στη σελίδα 31 του βιβλίου, πόσα διαφορετικά σενάρια εκτελούνται στο έργο της γατούλας;",
+                        visual: `
+                            <div class="big-illustration">1️⃣ ➕ 1️⃣ = 2️⃣ Σενάρια!</div>
+                        `,
+                        options: ["2 διαφορετικά σενάρια", "100 σενάρια"],
+                        correct: "2 διαφορετικά σενάρια"
+                    },
+                    {
+                        title: "Βήμα 2: Ποια είναι τα 2 συμβάντα;",
+                        question: "Για ποια δύο συμβάντα γράψαμε εντολές;",
+                        visual: `
+                            <div class="big-illustration">🚩 🤝 ➡️</div>
+                        `,
+                        options: ["Πράσινη σημαία 🚩 ΚΑΙ Δεξί βέλος ➡️", "Μόνο όταν κουνάμε το ποντίκι"],
+                        correct: "Πράσινη σημαία 🚩 ΚΑΙ Δεξί βέλος ➡️"
+                    },
+                    {
+                        title: "Βήμα 3: Πράξεις Βημάτων (Μαθηματικά)",
+                        question: "Η γατούλα κάνει 10 βήματα σε κάθε πάτημα. Αν πατήσεις το δεξί βέλος 4 φορές (10+10+10+10), πόσα βήματα προχώρησε;",
+                        visual: `
+                            <div class="big-illustration">🐾 10 ➕ 10 ➕ 10 ➕ 10 = ;</div>
+                        `,
+                        options: ["40 βήματα", "25 βήματα"],
+                        correct: "40 βήματα"
+                    }
+                ]
+            },
+
+            /* 8. Τελική Δοκιμασία & Έπαινος */
+            {
+                id: 8,
+                name: "Έπαινος",
+                emoji: "🎓",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Τι συμβαίνει όταν φτάσει στο όριο;",
+                        question: "Καθώς περπατάει με το δεξί βέλος, μόλις ακουμπήσει το δεξί όριο της σκηνής, τι θα κάνει αμέσως;",
+                        visual: `
+                            <div class="big-illustration">🐱 ➡️ 🚧 💥 💨 🏡 [Πίσω στο σπίτι!]</div>
+                        `,
+                        options: ["Επιστρέφει αυτόματα πίσω στο Σπιτάκι!", "Σταματάει και σβήνει η οθόνη"],
+                        correct: "Επιστρέφει αυτόματα πίσω στο Σπιτάκι!"
+                    },
+                    {
+                        title: "Βήμα 2: Γιατί είναι χρήσιμος ο προγραμματισμός;",
+                        question: "Τι μάθαμε σε αυτό το μάθημα για τον προγραμματισμό;",
+                        visual: `
+                            <div class="big-illustration">💡 🛠️ 🎯</div>
+                        `,
+                        options: ["Μας βοηθάει να λύνουμε προβλήματα με έξυπνο τρόπο!", "Είναι μόνο για να βλέπουμε βίντεο"],
+                        correct: "Μας βοηθάει να λύνουμε προβλήματα με έξυπνο τρόπο!"
+                    },
+                    {
+                        title: "Βήμα 3: Ολοκλήρωση & Έπαινος!",
+                        question: "Συγχαρητήρια! Ολοκλήρωσες και το 6ο Μάθημα με απόλυτη επιτυχία! Πάτησε για να πάρεις τον Έπαινό σου:",
+                        visual: `
+                            <div class="big-illustration">🎉 🥳 🐱 🏡 🏆 🎈</div>
+                        `,
+                        options: ["🏆 ΠΑΡΕ ΤΟΝ ΕΠΑΙΝΟ ΣΟΥ!"],
+                        correct: "🏆 ΠΑΡΕ ΤΟΝ ΕΠΑΙΝΟ ΣΟΥ!"
+                    }
+                ]
+            }
+        ];
+
+        /* ==========================================================================
+           3. STATE MANAGEMENT
+           ========================================================================== */
+        let state = {
+            currentActIndex: 0,
+            currentStepIndex: 0,
+            starsMatrix: Array(8).fill(null).map(() => [false, false, false]),
+            answeredCorrectly: false
+        };
+
+        const actsNav = document.getElementById('acts-nav');
+        const actNumLabel = document.getElementById('act-num-label');
+        const progressBar = document.getElementById('progress-bar');
+        const starsTotal = document.getElementById('stars-total');
+        const actBadgeEmoji = document.getElementById('act-badge-emoji');
+        const stepIndicatorText = document.getElementById('step-indicator-text');
+        const missionTitle = document.getElementById('mission-title');
+        const missionQuestion = document.getElementById('mission-question');
+        const stageBox = document.getElementById('stage-box');
+        const optionsGrid = document.getElementById('options-grid');
+        const feedbackBanner = document.getElementById('feedback-banner');
+        const diplomaBox = document.getElementById('diploma-box');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const btnRestart = document.getElementById('btn-restart');
+        const soundBtn = document.getElementById('sound-btn');
+        const helpBtn = document.getElementById('help-btn');
+        const helpModal = document.getElementById('help-modal');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+
+        /* ==========================================================================
+           4. RENDER & CONTROLLER
+           ========================================================================== */
+        function initApp() {
+            renderTabs();
+            loadMission(0, 0);
+            setupEventListeners();
+        }
+
+        function renderTabs() {
+            actsNav.innerHTML = '';
+            activitiesData.forEach((act, idx) => {
+                const isCompleted = state.starsMatrix[idx].every(Boolean);
+                const isActive = idx === state.currentActIndex;
+
+                const tab = document.createElement('div');
+                tab.className = `act-tab ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`;
+                tab.setAttribute('role', 'button');
+                tab.setAttribute('tabindex', '0');
+
+                const doneCount = state.starsMatrix[idx].filter(Boolean).length;
+                let starsStr = '';
+                for (let i = 0; i < 3; i++) {
+                    starsStr += (i < doneCount) ? '⭐' : '☆';
+                }
+
+                tab.innerHTML = `
+                    <span style="font-size:1.2rem;">${act.emoji}</span>
+                    <span>${idx + 1}η</span>
+                    <span style="font-size:0.65rem; color:#b45309;">${starsStr}</span>
+                `;
+
+                tab.onclick = () => {
+                    state.currentActIndex = idx;
+                    state.currentStepIndex = 0;
+                    renderTabs();
+                    loadMission(state.currentActIndex, state.currentStepIndex);
+                };
+
+                actsNav.appendChild(tab);
+            });
+        }
+
+        function loadMission(actIdx, stepIdx) {
+            state.answeredCorrectly = false;
+            const act = activitiesData[actIdx];
+            const substep = act.substeps[stepIdx];
+
+            actNumLabel.innerText = actIdx + 1;
+            const totalDone = state.starsMatrix.flat().filter(Boolean).length;
+            starsTotal.innerText = totalDone;
+            progressBar.style.width = `${((actIdx * 3 + stepIdx + 1) / 24) * 100}%`;
+
+            actBadgeEmoji.innerText = act.emoji;
+            stepIndicatorText.innerText = `Βήμα ${stepIdx + 1} από 3`;
+            for (let i = 0; i < 3; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                dot.className = 'substep-dot';
+                if (i === stepIdx) dot.classList.add('active');
+                if (state.starsMatrix[actIdx][i]) dot.classList.add('done');
+            }
+
+            missionTitle.innerText = `${act.emoji} ${substep.title}`;
+            missionQuestion.innerText = substep.question;
+            stageBox.innerHTML = substep.visual;
+
+            // SHUFFLE ΤΩΝ ΕΠΙΛΟΓΩΝ (Ποτέ σταθερά η πρώτη σωστή)
+            optionsGrid.innerHTML = '';
+            const shuffledOptions = [...substep.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach(optText => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-choice';
+                btn.innerText = optText;
+                btn.onclick = () => handleChoice(optText, substep.correct, btn);
+                optionsGrid.appendChild(btn);
+            });
+
+            feedbackBanner.style.display = 'none';
+            feedbackBanner.className = 'feedback-banner';
+            btnPrev.disabled = (actIdx === 0 && stepIdx === 0);
+
+            if (actIdx !== 7 || stepIdx !== 2 || !state.starsMatrix[7][2]) {
+                diplomaBox.style.display = 'none';
+            }
+        }
+
+        function handleChoice(selectedOption, correctOption, buttonElement) {
+            if (state.answeredCorrectly) return;
+
+            if (selectedOption === correctOption) {
+                state.answeredCorrectly = true;
+                audio.correct();
+                buttonElement.classList.add('correct');
+
+                if (!state.starsMatrix[state.currentActIndex][state.currentStepIndex]) {
+                    state.starsMatrix[state.currentActIndex][state.currentStepIndex] = true;
+                    starsTotal.innerText = state.starsMatrix.flat().filter(Boolean).length;
+                    renderTabs();
+                    document.getElementById(`dot-${state.currentStepIndex}`).classList.add('done');
+                }
+
+                feedbackBanner.className = 'feedback-banner success';
+                feedbackBanner.innerHTML = `🎉 <strong>Μπράβο!</strong> Σωστή απόφαση! Κέρδισες 1 αστέρι! ⭐`;
+
+                setTimeout(() => {
+                    goToNextStep();
+                }, 1000);
+
+            } else {
+                audio.wrong();
+                buttonElement.classList.add('wrong');
+                feedbackBanner.className = 'feedback-banner error';
+                feedbackBanner.innerHTML = `💪 <strong>Προσπάθησε ξανά!</strong> Θυμήσου πώς λύνουμε το πρόβλημα στο Scratch.`;
+
+                setTimeout(() => {
+                    buttonElement.classList.remove('wrong');
+                }, 700);
+            }
+        }
+
+        function goToNextStep() {
+            if (state.currentStepIndex < 2) {
+                state.currentStepIndex++;
+                loadMission(state.currentActIndex, state.currentStepIndex);
+            } else if (state.currentActIndex < 7) {
+                state.currentActIndex++;
+                state.currentStepIndex = 0;
+                renderTabs();
+                loadMission(state.currentActIndex, state.currentStepIndex);
+            } else {
+                audio.cheer();
+                diplomaBox.style.display = 'block';
+                diplomaBox.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function goToPrevStep() {
+            if (state.currentStepIndex > 0) {
+                state.currentStepIndex--;
+                loadMission(state.currentActIndex, state.currentStepIndex);
+            } else if (state.currentActIndex > 0) {
+                state.currentActIndex--;
+                state.currentStepIndex = 2;
+                renderTabs();
+                loadMission(state.currentActIndex, state.currentStepIndex);
+            }
+        }
+
+        function setupEventListeners() {
+            btnNext.onclick = () => goToNextStep();
+            btnPrev.onclick = () => goToPrevStep();
+
+            btnRestart.onclick = () => {
+                if (window.confirm("Θέλεις να ξεκινήσεις από την αρχή τις δραστηριότητες;")) {
+                    state.currentActIndex = 0;
+                    state.currentStepIndex = 0;
+                    state.starsMatrix = Array(8).fill(null).map(() => [false, false, false]);
+                    renderTabs();
+                    loadMission(0, 0);
+                }
+            };
+
+            soundBtn.onclick = () => {
+                audio.enabled = !audio.enabled;
+                soundBtn.innerText = audio.enabled ? '🔊 Ήχος' : '🔇 Ήχος';
+            };
+
+            helpBtn.onclick = () => {
+                helpModal.style.display = 'flex';
+            };
+            modalCloseBtn.onclick = () => {
+                helpModal.style.display = 'none';
+            };
+            helpModal.onclick = (e) => {
+                if (e.target === helpModal) helpModal.style.display = 'none';
+            };
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
