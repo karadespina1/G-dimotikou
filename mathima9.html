@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Μάθημα 9: Πώς αποθηκεύεται η ψηφιακή εικόνα; - Γ' Δημοτικού</title>
+    <style>
+        :root {
+            --pixel-purple: #7c3aed;
+            --pixel-blue: #2563eb;
+            --pixel-cyan: #06b6d4;
+            --pixel-amber: #f59e0b;
+            --primary: #2563eb;
+            --primary-soft: #eff6ff;
+            --secondary: #059669;
+            --secondary-soft: #d1fae5;
+            --danger: #dc2626;
+            --danger-soft: #fee2e2;
+            --bg-page: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .app-window {
+            width: 100%;
+            max-width: 880px;
+            background: var(--card-bg);
+            border-radius: 22px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+            border: 3px solid #ddd6fe;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .app-header {
+            background: linear-gradient(135deg, #5b21b6, #7c3aed);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header-title-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lesson-badge {
+            background: #f59e0b;
+            color: #78350f;
+            font-weight: 900;
+            font-size: 1.15rem;
+            padding: 6px 12px;
+            border-radius: 12px;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .header-text h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .header-text p {
+            font-size: 0.86rem;
+            opacity: 0.9;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-ctrl {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-ctrl:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* Progress Section */
+        .progress-section {
+            background: rgba(0, 0, 0, 0.16);
+            padding: 10px 14px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        .progress-bar-wrap {
+            flex: 1;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #facc15;
+            width: 12.5%;
+            transition: width 0.35s ease;
+            border-radius: 999px;
+        }
+
+        /* 8 Navigation Tabs */
+        .activities-nav {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            background: #f5f3ff;
+            border-bottom: 2px solid #ddd6fe;
+            padding: 6px;
+            gap: 4px;
+            overflow-x: auto;
+        }
+
+        .act-tab {
+            background: white;
+            border: 2px solid #cbd5e1;
+            padding: 8px 4px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: #475569;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            transition: all 0.15s;
+        }
+
+        .act-tab:hover {
+            border-color: var(--pixel-purple);
+            background: #f5f3ff;
+        }
+
+        .act-tab.active {
+            border-color: var(--pixel-purple);
+            background: #7c3aed;
+            color: white;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+        }
+
+        .act-tab.completed {
+            border-color: var(--secondary);
+            background: var(--secondary-soft);
+            color: #065f46;
+        }
+
+        .act-tab.active.completed {
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* Sub-steps bar (1, 2, 3) */
+        .substep-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f1f5f9;
+            padding: 10px 18px;
+            border-radius: 14px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .substep-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #5b21b6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .substep-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .substep-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .substep-dot.active {
+            background: var(--pixel-purple);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3);
+            transform: scale(1.1);
+        }
+
+        .substep-dot.done {
+            background: var(--secondary);
+        }
+
+        /* Prompt Card */
+        .prompt-card {
+            background: #ffffff;
+            border: 2px solid #c4b5fd;
+            border-left: 8px solid var(--pixel-purple);
+            border-radius: 14px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .prompt-card h2 {
+            font-size: 1.25rem;
+            color: #5b21b6;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prompt-card p {
+            font-size: 1.15rem;
+            line-height: 1.5;
+            color: #1e293b;
+        }
+
+        /* Visual Stage Box */
+        .stage-box {
+            background: #f8fafc;
+            border: 3px dashed #cbd5e1;
+            border-radius: 18px;
+            padding: 22px;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            text-align: center;
+        }
+
+        .big-illustration {
+            font-size: 3.2rem;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        /* Pixel Grid Simulator */
+        .pixel-demo-grid {
+            display: inline-grid;
+            gap: 4px;
+            background: #334155;
+            padding: 8px;
+            border-radius: 10px;
+        }
+
+        .pixel-cell {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.85rem;
+        }
+
+        .px-white { background: #ffffff; color: #64748b; }
+        .px-black { background: #0f172a; color: #ffffff; }
+        .px-cyan { background: #38bdf8; color: #0f172a; }
+        .px-green-dark { background: #15803d; color: #ffffff; }
+        .px-green-light { background: #86efac; color: #0f172a; }
+        .px-brown { background: #92400e; color: #ffffff; }
+
+        /* Options */
+        .options-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            width: 100%;
+        }
+
+        .btn-choice {
+            background: white;
+            border: 3px solid #94a3b8;
+            padding: 14px 22px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            border-radius: 16px;
+            cursor: pointer;
+            color: #1e293b;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.15s;
+            min-width: 130px;
+            text-align: center;
+        }
+
+        .btn-choice:hover {
+            border-color: var(--pixel-purple);
+            background: #f5f3ff;
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-choice.correct {
+            background: var(--secondary-soft) !important;
+            border-color: var(--secondary) !important;
+            color: #065f46 !important;
+        }
+
+        .btn-choice.wrong {
+            background: var(--danger-soft) !important;
+            border-color: var(--danger) !important;
+            color: #991b1b !important;
+        }
+
+        /* Feedback Banner */
+        .feedback-banner {
+            display: none;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-align: center;
+            animation: bounceIn 0.3s ease;
+        }
+
+        .feedback-banner.success {
+            display: block;
+            background: var(--secondary-soft);
+            border: 3px solid var(--secondary);
+            color: #065f46;
+        }
+
+        .feedback-banner.error {
+            display: block;
+            background: var(--danger-soft);
+            border: 3px solid var(--danger);
+            color: #991b1b;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Footer */
+        .app-footer {
+            padding: 16px 24px;
+            border-top: 2px solid #e2e8f0;
+            background: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn-nav {
+            background: white;
+            border: 2px solid #cbd5e1;
+            padding: 10px 20px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            border-color: var(--pixel-purple);
+            background: #f5f3ff;
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-next {
+            background: var(--pixel-purple);
+            color: white;
+            border-color: var(--pixel-purple);
+        }
+
+        .btn-next:hover:not(:disabled) {
+            background: #5b21b6;
+            color: white;
+        }
+
+        /* Help Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-card {
+            background: white;
+            width: 100%;
+            max-width: 580px;
+            border-radius: 20px;
+            padding: 24px;
+            border: 4px solid #c4b5fd;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            animation: bounceIn 0.25s ease;
+        }
+
+        .modal-card h3 {
+            font-size: 1.35rem;
+            color: #5b21b6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-card p, .modal-card li {
+            font-size: 1.05rem;
+            line-height: 1.5;
+            color: #334155;
+        }
+
+        .modal-card ul {
+            padding-left: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .btn-close-modal {
+            background: var(--pixel-purple);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        /* Diploma */
+        .diploma-box {
+            display: none;
+            background: #faf5ff;
+            border: 6px double #7c3aed;
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .diploma-box h2 {
+            font-size: 1.75rem;
+            color: #6b21a8;
+            margin-bottom: 6px;
+        }
+
+        .diploma-box p {
+            font-size: 1.15rem;
+            color: #3b0764;
+            margin: 6px 0;
+        }
+
+        .diploma-stars {
+            font-size: 2.8rem;
+            margin: 10px 0;
+        }
+
+        .btn-print {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            .diploma-box, .diploma-box * { visibility: visible; }
+            .diploma-box { position: absolute; left: 0; top: 0; width: 100%; border: 4px solid black; }
+            .btn-print { display: none; }
+        }
+
+        @media (max-width: 650px) {
+            .activities-nav {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .header-text h1 {
+                font-size: 1.05rem;
+            }
+            .btn-choice {
+                width: 100%;
+                font-size: 1.15rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-window">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-top">
+                <div class="header-title-box">
+                    <div class="lesson-badge">Μ9</div>
+                    <div class="header-text">
+                        <div style="font-size:0.75rem; text-transform:uppercase; opacity:0.85; font-weight:700;">
+                            Ενοτητα 2 · Υπολογιστικα συστηματα – Ψηφιακες συσκευες – Δικτυα
+                        </div>
+                        <h1>Πώς αποθηκεύεται η ψηφιακή εικόνα;</h1>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <button class="btn-ctrl" id="sound-btn" title="Ενεργοποίηση/Απενεργοποίηση Ήχου">🔊 Ήχος</button>
+                    <button class="btn-ctrl" id="help-btn" title="Οδηγίες και Βοήθεια">❓ Βοήθεια</button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-section">
+                <span>Δραστηριότητα <span id="act-num-label">1</span> από 8</span>
+                <div class="progress-bar-wrap">
+                    <div class="progress-fill" id="progress-bar"></div>
+                </div>
+                <span>⭐ <span id="stars-total">0</span>/24</span>
+            </div>
+        </header>
+
+        <!-- 8 Tabs -->
+        <nav class="activities-nav" id="acts-nav" aria-label="Επιλογή δραστηριότητας"></nav>
+
+        <!-- Main Content -->
+        <main class="content-area">
+            <!-- Step indicator -->
+            <div class="substep-bar">
+                <div class="substep-title">
+                    <span id="act-badge-emoji">🖼️</span>
+                    <span id="step-indicator-text">Βήμα 1 από 3</span>
+                </div>
+                <div class="substep-dots">
+                    <div class="substep-dot" id="dot-0">1</div>
+                    <div class="substep-dot" id="dot-1">2</div>
+                    <div class="substep-dot" id="dot-2">3</div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="prompt-card">
+                <h2 id="mission-title">Τίτλος Αποστολής</h2>
+                <p id="mission-question">Ερώτηση...</p>
+            </div>
+
+            <!-- Visual Stage -->
+            <div class="stage-box" id="stage-box"></div>
+
+            <!-- Shuffled Choices -->
+            <div class="options-grid" id="options-grid"></div>
+
+            <!-- Feedback -->
+            <div class="feedback-banner" id="feedback-banner"></div>
+
+            <!-- Certificate (at finish) -->
+            <div class="diploma-box" id="diploma-box">
+                <h2>🏆 ΕΠΑΙΝΟΣ ΕΙΔΙΚΟΥ ΨΗΦΙΑΚΗΣ ΕΙΚΟΝΑΣ 🏆</h2>
+                <p>Απονέμεται στον / στη μαθητή/-τρια της <strong>Γ' Δημοτικού</strong></p>
+                <div class="diploma-stars">⭐⭐⭐⭐⭐</div>
+                <p>Ολοκλήρωσες με επιτυχία το <strong>Μάθημα 9ο</strong>!</p>
+                <p>Έμαθες πώς ο υπολογιστής αποθηκεύει δεδομένα με 0 και 1,</p>
+                <p>τι είναι το bit, το Byte, τα εικονοστοιχεία (pixels) και πώς κωδικοποιούνται οι εικόνες!</p>
+                <button class="btn-print" onclick="window.print()">🖨️ Εκτύπωση Επαίνου</button>
+            </div>
+        </main>
+
+        <!-- Footer Navigation -->
+        <footer class="app-footer">
+            <button class="btn-nav" id="btn-prev">⬅️ Προηγούμενο</button>
+            <button class="btn-nav" id="btn-restart">🔄 Επανεκκίνηση</button>
+            <button class="btn-nav btn-next" id="btn-next">Επόμενο Βήμα ➡️</button>
+        </footer>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="modal-overlay" id="help-modal">
+        <div class="modal-card">
+            <h3>🖼️ Τι μάθαμε στο Μάθημα 9ο;</h3>
+            <p>Όλα μέσα στον υπολογιστή γίνονται αριθμοί 0 και 1 με ηλεκτρικό ρεύμα!</p>
+            <ul>
+                <li><strong>Δυαδικό ψηφίο (Bit):</strong> Το 0 ή το 1. Είναι το πιο μικρό στοιχείο.</li>
+                <li><strong>Ψηφιολέξη (Byte):</strong> Μια ομάδα από <strong>8 bits</strong> (1 Byte = 8 bits). Με αυτό μετράμε το μέγεθος των δεδομένων!</li>
+                <li><strong>Εικονοστοιχείο (Pixel):</strong> Τα μικρά τετραγωνάκια που σχηματίζουν μια ψηφιακή εικόνα σαν σκακιέρα.</li>
+                <li><strong>Κωδικοποίηση:</strong>
+                    <ul>
+                        <li>Ασπρόμαυρη: 0 = Άσπρο ⬜, 1 = Μαύρο ⬛ (1 bit ανά pixel).</li>
+                        <li>4 Χρώματα: Χρειαζόμαστε 2 bits για κάθε χρώμα (00, 11, 01, 10).</li>
+                    </ul>
+                </li>
+            </ul>
+            <button class="btn-close-modal" id="modal-close-btn">Το κατάλαβα! 👍</button>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================================
+           1. AUDIO ENGINE (Web Audio API - Offline)
+           ========================================================================== */
+        class AudioManager {
+            constructor() {
+                this.enabled = true;
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+            }
+            playTone(freq, duration, type = 'sine', delay = 0) {
+                if (!this.enabled) return;
+                this.init();
+                setTimeout(() => {
+                    try {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = type;
+                        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                        gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start();
+                        osc.stop(this.ctx.currentTime + duration);
+                    } catch (e) {}
+                }, delay * 1000);
+            }
+            correct() {
+                this.playTone(523.25, 0.12, 'triangle', 0);    // C5
+                this.playTone(659.25, 0.12, 'triangle', 0.1);  // E5
+                this.playTone(783.99, 0.22, 'triangle', 0.2);  // G5
+            }
+            wrong() {
+                this.playTone(280, 0.15, 'sawtooth', 0);
+                this.playTone(210, 0.22, 'sawtooth', 0.12);
+            }
+            cheer() {
+                const notes = [523, 659, 784, 1046];
+                notes.forEach((freq, idx) => {
+                    this.playTone(freq, 0.25, 'triangle', idx * 0.12);
+                });
+            }
+        }
+        const audio = new AudioManager();
+
+        /* ==========================================================================
+           2. DATA 8 ACTIVITIES FOR LESSON 9 (IMAGE CODING, PIXELS, BITS & BYTES)
+           ========================================================================== */
+        const activitiesData = [
+            /* 1. Ηλεκτρικό Ρεύμα: 0 και 1 (Bit) */
+            {
+                id: 1,
+                name: "0 και 1 (Bit)",
+                emoji: "⚡",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Πώς αποθηκεύει ο υπολογιστής;",
+                        question: "Τα δεδομένα μέσα στον υπολογιστή μετατρέπονται σε ηλεκτρικά σήματα με δύο μόνο αριθμούς. Ποιους;",
+                        visual: `
+                            <div class="big-illustration">⚡ [ 0 ] και [ 1 ] ⚡</div>
+                            <div style="font-size:1.15rem; font-weight:800; color:#5b21b6; background:#f5f3ff; padding:8px 16px; border-radius:12px;">
+                                Ηλεκτρικό ρεύμα: 0 και 1!
+                            </div>
+                        `,
+                        options: ["Το 0 και το 1", "Το 7 και το 9"],
+                        correct: "Το 0 και το 1"
+                    },
+                    {
+                        title: "Βήμα 2: Πώς λέγεται το 0 ή το 1;",
+                        question: "Κάθε ψηφίο 0 ή 1 ονομάζεται δυαδικό ψηφίο ή στα αγγλικά:",
+                        visual: `
+                            <div class="big-illustration">0️⃣ 1️⃣ ➡️ ❓</div>
+                        `,
+                        options: ["Bit (δυαδικό ψηφίο)", "Χιλιόμετρο"],
+                        correct: "Bit (δυαδικό ψηφίο)"
+                    },
+                    {
+                        title: "Βήμα 3: Τι είδους δεδομένα επεξεργάζεται;",
+                        question: "Ο υπολογιστής μετατρέπει σε 0 και 1:",
+                        visual: `
+                            <div class="big-illustration">📝 [Κείμενα] 🖼️ [Εικόνες] 🎵 [Ήχους]</div>
+                        `,
+                        options: ["Όλα: κείμενα, εικόνες, ήχους!", "Μόνο τη ζωγραφική"],
+                        correct: "Όλα: κείμενα, εικόνες, ήχους!"
+                    }
+                ]
+            },
+
+            /* 2. Η Ψηφιολέξη (Byte) & Μέτρηση Δεδομένων */
+            {
+                id: 2,
+                name: "Το Byte",
+                emoji: "📦",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Πόσα bits έχει 1 Byte;",
+                        question: "Μία ψηφιολέξη (1 Byte) αποτελείται από μία ομάδα δυαδικών ψηφίων. Πόσα bits είναι; (σελίδα 37)",
+                        visual: `
+                            <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap; background:#e0e7ff; padding:12px; border-radius:12px;">
+                                <span style="background:#4338ca; color:white; padding:6px 10px; border-radius:6px; font-weight:bold;">0</span>
+                                <span style="background:#4338ca; color:white; padding:6px 10px; border-radius:6px; font-weight:bold;">1</span>
+                                <span style="background:#4338ca; color:white; padding:6px 10px; border-radius:6px; font-weight:bold;">0</span>
+                                <span style="background:#4338ca; color:white; padding:6px 10px; border-radius:6px; font-weight:bold;">0</span>
+                                <span style="background:#4338ca; color:white; padding:6px 10px; border-radius:6px; font-weight:bold;">1</span>
+                                <span style="background:#4338ca; color:white; padding:6px 10px; border-radius:6px; font-weight:bold;">1</span>
+                                <span style="background:#4338ca; color:white; padding:6px 10px; border-radius:6px; font-weight:bold;">0</span>
+                                <span style="background:#4338ca; color:white; padding:6px 10px; border-radius:6px; font-weight:bold;">1</span>
+                            </div>
+                            <div style="font-weight:bold; color:#3730a3; font-size:1.1rem;">1 Byte = 8 bits!</div>
+                        `,
+                        options: ["8 δυαδικά ψηφία (bits)", "2 δυαδικά ψηφία"],
+                        correct: "8 δυαδικά ψηφία (bits)"
+                    },
+                    {
+                        title: "Βήμα 2: Με τι μετράμε το μέγεθος των δεδομένων;",
+                        question: "Στην άσκηση της σελίδας 37, με ποια μονάδα μετράμε το μέγεθος των δεδομένων;",
+                        visual: `
+                            <div class="big-illustration">⚖️ [Μέτρο, Byte, Έτος, Λίτρο]</div>
+                        `,
+                        options: ["Byte", "Λίτρο"],
+                        correct: "Byte"
+                    },
+                    {
+                        title: "Βήμα 3: Πράξη με Bytes (Μαθηματικά)",
+                        question: "Αν 1 Byte έχει 8 bits, πόσα bits έχουν 2 Bytes μαζί; (8 + 8 = ;)",
+                        visual: `
+                            <div class="big-illustration">📦 8 bits ➕ 📦 8 bits = ;</div>
+                        `,
+                        options: ["16 bits", "10 bits"],
+                        correct: "16 bits"
+                    }
+                ]
+            },
+
+            /* 3. Το Εικονοστοιχείο (Pixel) */
+            {
+                id: 3,
+                name: "Pixel",
+                emoji: "🔲",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Η εικόνα σαν σκακιέρα",
+                        question: "Χωρίζουμε μια ψηφιακή εικόνα σε οριζόντιες γραμμές και κάθετες στήλες σαν σκακιέρα. Πώς λέγονται τα μικρά τετραγωνάκια;",
+                        visual: `
+                            <div class="pixel-demo-grid" style="grid-template-columns: repeat(3, 1fr);">
+                                <div class="pixel-cell px-white">⬜</div>
+                                <div class="pixel-cell px-black">⬛</div>
+                                <div class="pixel-cell px-white">⬜</div>
+                                <div class="pixel-cell px-black">⬛</div>
+                                <div class="pixel-cell px-black">⬛</div>
+                                <div class="pixel-cell px-white">⬜</div>
+                            </div>
+                        `,
+                        options: ["Εικονοστοιχεία (Pixels)", "Κουμπιά"],
+                        correct: "Εικονοστοιχεία (Pixels)"
+                    },
+                    {
+                        title: "Βήμα 2: Υπολογισμός τετραγώνων (Προπαίδεια)",
+                        question: "Στη σελίδα 38, η εικόνα έχει 7 γραμμές και 8 στήλες. Πόσα εικονοστοιχεία (pixels) έχει συνολικά; (7 x 8 = ;)",
+                        visual: `
+                            <div class="big-illustration">7 γραμμές ✖️ 8 στήλες = ;</div>
+                        `,
+                        options: ["56 εικονοστοιχεία", "40 εικονοστοιχεία"],
+                        correct: "56 εικονοστοιχεία"
+                    },
+                    {
+                        title: "Βήμα 3: Τι είναι η «κωδικοποίηση»;",
+                        question: "Πώς ονομάζεται η μετατροπή μιας εικόνας σε ψηφιακή (σε αριθμούς 0 και 1) ώστε να την καταλάβει ο υπολογιστής;",
+                        visual: `
+                            <div class="big-illustration">🎨 ➡️ 010110 ➡️ 💻</div>
+                        `,
+                        options: ["Κωδικοποίηση", "Φωτοτυπία"],
+                        correct: "Κωδικοποίηση"
+                    }
+                ]
+            },
+
+            /* 4. Ασπρόμαυρη Εικόνα: 0 και 1 */
+            {
+                id: 4,
+                name: "Ασπρόμαυρο",
+                emoji: "🏁",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Ποιο χρώμα είναι το 0;",
+                        question: "Στο παράδειγμα με το δέντρο (σελίδα 38), όταν βλέπουμε άσπρο εικονοστοιχείο, τι αριθμό γράφουμε;",
+                        visual: `
+                            <div class="big-illustration">⬜ [Άσπρο pixel] ➡️ ❓ (0 ή 1)</div>
+                        `,
+                        options: ["0 (για το άσπρο)", "1 (για το άσπρο)"],
+                        correct: "0 (για το άσπρο)"
+                    },
+                    {
+                        title: "Βήμα 2: Ποιο χρώμα είναι το 1;",
+                        question: "Όταν βλέπουμε μαύρο εικονοστοιχείο (τα κλαδιά ή τον κορμό του δέντρου), τι αριθμό γράφουμε;",
+                        visual: `
+                            <div class="big-illustration">⬛ [Μαύρο pixel] ➡️ ❓ (0 ή 1)</div>
+                        `,
+                        options: ["1 (για το μαύρο)", "0 (για το μαύρο)"],
+                        correct: "1 (για το μαύρο)"
+                    },
+                    {
+                        title: "Βήμα 3: Πόσα bits χρειάζεται κάθε pixel;",
+                        question: "Για μια απλή ασπρόμαυρη εικόνα (με 2 μόνο χρώματα: άσπρο ή μαύρο), πόσα bits χρειαζόμαστε για κάθε τετραγωνάκι;",
+                        visual: `
+                            <div class="big-illustration">🔲 ➡️ 1 bit (0 ή 1)</div>
+                        `,
+                        options: ["1 bit για κάθε pixel", "10 bits"],
+                        correct: "1 bit για κάθε pixel"
+                    }
+                ]
+            },
+
+            /* 5. Μαθηματικά: Bytes στην Ασπρόμαυρη Εικόνα */
+            {
+                id: 5,
+                name: "Μέτρηση Bytes",
+                emoji: "🧮",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Bits της εικόνας",
+                        question: "Η εικόνα του δέντρου έχει 56 pixels και κάθε pixel θέλει 1 bit. Πόσα bits χρειάζονται συνολικά;",
+                        visual: `
+                            <div class="big-illustration">56 pixels ✖️ 1 bit = 56 bits</div>
+                        `,
+                        options: ["56 bits", "10 bits"],
+                        correct: "56 bits"
+                    },
+                    {
+                        title: "Βήμα 2: Μετατροπή σε Bytes (Διαίρεση)",
+                        question: "Αν 1 Byte = 8 bits, πόσα Bytes είναι τα 56 bits; (Σκέψου: ποιος αριθμός επί 8 κάνει 56; 7 x 8 = 56)",
+                        visual: `
+                            <div class="big-illustration">56 bits ➗ 8 = ; Bytes</div>
+                        `,
+                        options: ["7 Bytes", "2 Bytes"],
+                        correct: "7 Bytes"
+                    },
+                    {
+                        title: "Βήμα 3: Κάθε γραμμή πόσα Bytes είναι;",
+                        question: "Κάθε γραμμή έχει 8 εικονοστοιχεία (8 bits). Άρα κάθε γραμμή χρειάζεται ακριβώς:",
+                        visual: `
+                            <div class="big-illustration">8 bits = 1 Byte!</div>
+                        `,
+                        options: ["1 Byte", "5 Bytes"],
+                        correct: "1 Byte"
+                    }
+                ]
+            },
+
+            /* 6. Έγχρωμη Εικόνα (4 Χρώματα) */
+            {
+                id: 6,
+                name: "4 Χρώματα",
+                emoji: "🎨",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Πόσα bits για 4 χρώματα;",
+                        question: "Στη σελίδα 39, για να φτιάξουμε εικόνα με 4 χρώματα, πόσα δυαδικά ψηφία (bits) χρειαζόμαστε για ΚΑΘΕ pixel;",
+                        visual: `
+                            <div class="big-illustration">4 Χρώματα ➡️ [ 00, 11, 01, 10 ]</div>
+                            <div style="font-weight:bold; color:#5b21b6; font-size:1.1rem;">2 ψηφία για κάθε τετραγωνάκι!</div>
+                        `,
+                        options: ["2 bits για κάθε pixel", "1 bit μόνο"],
+                        correct: "2 bits για κάθε pixel"
+                    },
+                    {
+                        title: "Βήμα 2: Ο κώδικας των χρωμάτων",
+                        question: "Στο βιβλίο: 00 = Σκούρο πράσινο, 11 = Γαλάζιο, 01 = Καφέ, 10 = Ανοιχτό πράσινο. Τι χρώμα είναι το 11;",
+                        visual: `
+                            <div class="pixel-demo-grid" style="grid-template-columns: repeat(4, 1fr);">
+                                <div class="pixel-cell px-green-dark">00</div>
+                                <div class="pixel-cell px-cyan">11</div>
+                                <div class="pixel-cell px-brown">01</div>
+                                <div class="pixel-cell px-green-light">10</div>
+                            </div>
+                        `,
+                        options: ["Γαλάζιο 🟦", "Καφέ 🟫"],
+                        correct: "Γαλάζιο 🟦"
+                    },
+                    {
+                        title: "Βήμα 3: Γιατί θέλει περισσότερο χώρο;",
+                        question: "Γιατί η έγχρωμη εικόνα χρειάζεται περισσότερα Bytes από την ασπρόμαυρη;",
+                        visual: `
+                            <div class="big-illustration">🎨 > 🏁 [Πιο πολλά bits!]</div>
+                        `,
+                        options: ["Γιατί κάθε pixel χρειάζεται περισσότερα bits για τα χρώματα!", "Επειδή έχει πιο μεγάλο πλαίσιο"],
+                        correct: "Γιατί κάθε pixel χρειάζεται περισσότερα bits για τα χρώματα!"
+                    }
+                ]
+            },
+
+            /* 7. Μεγάλα Δεδομένα: KB, MB, GB */
+            {
+                id: 7,
+                name: "KB, MB, GB",
+                emoji: "💾",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Πολλαπλάσια του Byte (σελίδα 40)",
+                        question: "Όταν έχουμε πολλά δεδομένα, χρησιμοποιούμε μεγαλύτερες μονάδες. Ποιο είναι 1000 Bytes;",
+                        visual: `
+                            <div class="big-illustration">1 KB = 1000 Bytes! 📦</div>
+                        `,
+                        options: ["1 KB (Kilobyte)", "1 μέτρο"],
+                        correct: "1 KB (Kilobyte)"
+                    },
+                    {
+                        title: "Βήμα 2: Πώς αποθηκεύεται μια φωτογραφία;",
+                        question: "Σύμφωνα με τα παραδείγματα της σελίδας 40, μία ψηφιακή εικόνα αποθηκεύεται συνήθως με μερικά:",
+                        visual: `
+                            <div class="big-illustration">📷 ➡️ ❓ [KB, MB, ή GB;]</div>
+                        `,
+                        options: ["ΜΒ (Megabytes)", "Γραμμάρια"],
+                        correct: "ΜΒ (Megabytes)"
+                    },
+                    {
+                        title: "Βήμα 3: Ο μεγάλος δίσκος αποθήκευσης",
+                        question: "Ένας σκληρός δίσκος υπολογιστή μπορεί να αποθηκεύσει πάρα πολλές εικόνες και ταινίες. Μετριέται σε:",
+                        visual: `
+                            <div class="big-illustration">💽 ➡️ GB (Gigabytes)!</div>
+                        `,
+                        options: ["GB (Gigabytes)", "Χιλιοστά"],
+                        correct: "GB (Gigabytes)"
+                    }
+                ]
+            },
+
+            /* 8. Τελική Δοκιμασία & Έπαινος */
+            {
+                id: 8,
+                name: "Έπαινος Εικόνας",
+                emoji: "🎓",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Ανακεφαλαίωση Εικόνας",
+                        question: "Τελικά, πώς «βλέπει» ο υπολογιστής μια ζωγραφιά ή φωτογραφία;",
+                        visual: `
+                            <div class="big-illustration">🖼️ ➡️ 🔲 [Pixels] ➡️ 0101 [Bits]</div>
+                        `,
+                        options: ["Σαν ένα πλέγμα από μικρά pixels με αριθμούς 0 και 1!", "Σαν ένα ζωγραφισμένο χαρτί"],
+                        correct: "Σαν ένα πλέγμα από μικρά pixels με αριθμούς 0 και 1!"
+                    },
+                    {
+                        title: "Βήμα 2: Πού γίνονται όλα αυτά;",
+                        question: "Σε ποια ενότητα του βιβλίου μπήκαμε τώρα;",
+                        visual: `
+                            <div style="font-weight:800; font-size:1.1rem; color:#5b21b6; background:#f5f3ff; padding:10px 18px; border-radius:12px;">
+                                Ενότητα 2: Υπολογιστικά συστήματα – Ψηφιακές συσκευές – Δίκτυα!
+                            </div>
+                        `,
+                        options: ["Ενότητα 2: Υπολογιστικά Συστήματα", "Ενότητα Μαγειρικής"],
+                        correct: "Ενότητα 2: Υπολογιστικά Συστήματα"
+                    },
+                    {
+                        title: "Βήμα 3: Ολοκλήρωση & Έπαινος!",
+                        question: "Συγχαρητήρια! Έμαθες τα μυστικά της ψηφιακής εικόνας! Πάτησε για να πάρεις το μεγάλο σου Δίπλωμα:",
+                        visual: `
+                            <div class="big-illustration">🎉 🥳 🖼️ 0️⃣ 1️⃣ 🏆 🎈</div>
+                        `,
+                        options: ["🏆 ΠΑΡΕ ΤΟΝ ΕΠΑΙΝΟ ΣΟΥ!"],
+                        correct: "🏆 ΠΑΡΕ ΤΟΝ ΕΠΑΙΝΟ ΣΟΥ!"
+                    }
+                ]
+            }
+        ];
+
+        /* ==========================================================================
+           3. STATE MANAGEMENT
+           ========================================================================== */
+        let state = {
+            currentActIndex: 0,
+            currentStepIndex: 0,
+            starsMatrix: Array(8).fill(null).map(() => [false, false, false]),
+            answeredCorrectly: false
+        };
+
+        const actsNav = document.getElementById('acts-nav');
+        const actNumLabel = document.getElementById('act-num-label');
+        const progressBar = document.getElementById('progress-bar');
+        const starsTotal = document.getElementById('stars-total');
+        const actBadgeEmoji = document.getElementById('act-badge-emoji');
+        const stepIndicatorText = document.getElementById('step-indicator-text');
+        const missionTitle = document.getElementById('mission-title');
+        const missionQuestion = document.getElementById('mission-question');
+        const stageBox = document.getElementById('stage-box');
+        const optionsGrid = document.getElementById('options-grid');
+        const feedbackBanner = document.getElementById('feedback-banner');
+        const diplomaBox = document.getElementById('diploma-box');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const btnRestart = document.getElementById('btn-restart');
+        const soundBtn = document.getElementById('sound-btn');
+        const helpBtn = document.getElementById('help-btn');
+        const helpModal = document.getElementById('help-modal');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+
+        /* ==========================================================================
+           4. RENDER & CONTROLLER
+           ========================================================================== */
+        function initApp() {
+            renderTabs();
+            loadMission(0, 0);
+            setupEventListeners();
+        }
+
+        function renderTabs() {
+            actsNav.innerHTML = '';
+            activitiesData.forEach((act, idx) => {
+                const isCompleted = state.starsMatrix[idx].every(Boolean);
+                const isActive = idx === state.currentActIndex;
+
+                const tab = document.createElement('div');
+                tab.className = `act-tab ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`;
+                tab.setAttribute('role', 'button');
+                tab.setAttribute('tabindex', '0');
+
+                const doneCount = state.starsMatrix[idx].filter(Boolean).length;
+                let starsStr = '';
+                for (let i = 0; i < 3; i++) {
+                    starsStr += (i < doneCount) ? '⭐' : '☆';
+                }
+
+                tab.innerHTML = `
+                    <span style="font-size:1.2rem;">${act.emoji}</span>
+                    <span>${idx + 1}η</span>
+                    <span style="font-size:0.65rem; color:#5b21b6;">${starsStr}</span>
+                `;
+
+                tab.onclick = () => {
+                    state.currentActIndex = idx;
+                    state.currentStepIndex = 0;
+                    renderTabs();
+                    loadMission(state.currentActIndex, state.currentStepIndex);
+                };
+
+                actsNav.appendChild(tab);
+            });
+        }
+
+        function loadMission(actIdx, stepIdx) {
+            state.answeredCorrectly = false;
+            const act = activitiesData[actIdx];
+            const substep = act.substeps[stepIdx];
+
+            actNumLabel.innerText = actIdx + 1;
+            const totalDone = state.starsMatrix.flat().filter(Boolean).length;
+            starsTotal.innerText = totalDone;
+            progressBar.style.width = `${((actIdx * 3 + stepIdx + 1) / 24) * 100}%`;
+
+            actBadgeEmoji.innerText = act.emoji;
+            stepIndicatorText.innerText = `Βήμα ${stepIdx + 1} από 3`;
+            for (let i = 0; i < 3; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                dot.className = 'substep-dot';
+                if (i === stepIdx) dot.classList.add('active');
+                if (state.starsMatrix[actIdx][i]) dot.classList.add('done');
+            }
+
+            missionTitle.innerText = `${act.emoji} ${substep.title}`;
+            missionQuestion.innerText = substep.question;
+            stageBox.innerHTML = substep.visual;
+
+            // SHUFFLE ΤΩΝ ΕΠΙΛΟΓΩΝ (Ποτέ σταθερά η πρώτη σωστή)
+            optionsGrid.innerHTML = '';
+            const shuffledOptions = [...substep.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach(optText => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-choice';
+                btn.innerText = optText;
+                btn.onclick = () => handleChoice(optText, substep.correct, btn);
+                optionsGrid.appendChild(btn);
+            });
+
+            feedbackBanner.style.display = 'none';
+            feedbackBanner.className = 'feedback-banner';
+            btnPrev.disabled = (actIdx === 0 && stepIdx === 0);
+
+            if (actIdx !== 7 || stepIdx !== 2 || !state.starsMatrix[7][2]) {
+                diplomaBox.style.display = 'none';
+            }
+        }
+
+        function handleChoice(selectedOption, correctOption, buttonElement) {
+            if (state.answeredCorrectly) return;
+
+            if (selectedOption === correctOption) {
+                state.answeredCorrectly = true;
+                audio.correct();
+                buttonElement.classList.add('correct');
+
+                if (!state.starsMatrix[state.currentActIndex][state.currentStepIndex]) {
+                    state.starsMatrix[state.currentActIndex][state.currentStepIndex] = true;
+                    starsTotal.innerText = state.starsMatrix.flat().filter(Boolean).length;
+                    renderTabs();
+                    document.getElementById(`dot-${state.currentStepIndex}`).classList.add('done');
+                }
+
+                feedbackBanner.className = 'feedback-banner success';
+                feedbackBanner.innerHTML = `🎉 <strong>Μπράβο!</strong> Σωστή απάντηση! Κέρδισες 1 αστέρι! ⭐`;
+
+                setTimeout(() => {
+                    goToNextStep();
+                }, 1000);
+
+            } else {
+                audio.wrong();
+                buttonElement.classList.add('wrong');
+                feedbackBanner.className = 'feedback-banner error';
+                feedbackBanner.innerHTML = `💪 <strong>Προσπάθησε ξανά!</strong> Θυμήσου πώς αποθηκεύεται η εικόνα.`;
+
+                setTimeout(() => {
+                    buttonElement.classList.remove('wrong');
+                }, 700);
+            }
+        }
+
+        function goToNextStep() {
+            if (state.currentStepIndex < 2) {
+                state.currentStepIndex++;
+                loadMission(state.currentActIndex, state.currentStepIndex);
+            } else if (state.currentActIndex < 7) {
+                state.currentActIndex++;
+                state.currentStepIndex = 0;
+                renderTabs();
+                loadMission(state.currentActIndex, state.currentStepIndex);
+            } else {
+                audio.cheer();
+                diplomaBox.style.display = 'block';
+                diplomaBox.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function goToPrevStep() {
+            if (state.currentStepIndex > 0) {
+                state.currentStepIndex--;
+                loadMission(state.currentActIndex, state.currentStepIndex);
+            } else if (state.currentActIndex > 0) {
+                state.currentActIndex--;
+                state.currentStepIndex = 2;
+                renderTabs();
+                loadMission(state.currentActIndex, state.currentStepIndex);
+            }
+        }
+
+        function setupEventListeners() {
+            btnNext.onclick = () => goToNextStep();
+            btnPrev.onclick = () => goToPrevStep();
+
+            btnRestart.onclick = () => {
+                if (window.confirm("Θέλεις να ξεκινήσεις από την αρχή τις δραστηριότητες;")) {
+                    state.currentActIndex = 0;
+                    state.currentStepIndex = 0;
+                    state.starsMatrix = Array(8).fill(null).map(() => [false, false, false]);
+                    renderTabs();
+                    loadMission(0, 0);
+                }
+            };
+
+            soundBtn.onclick = () => {
+                audio.enabled = !audio.enabled;
+                soundBtn.innerText = audio.enabled ? '🔊 Ήχος' : '🔇 Ήχος';
+            };
+
+            helpBtn.onclick = () => {
+                helpModal.style.display = 'flex';
+            };
+            modalCloseBtn.onclick = () => {
+                helpModal.style.display = 'none';
+            };
+            helpModal.onclick = (e) => {
+                if (e.target === helpModal) helpModal.style.display = 'none';
+            };
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
