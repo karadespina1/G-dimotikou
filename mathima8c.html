@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Μάθημα 8: Αποφυγή εμποδίων με το ρομπότ R2 & LAZ blocks - Γ' Δημοτικού</title>
+    <style>
+        :root {
+            --r2-blue: #0284c7;
+            --r2-amber: #f59e0b;
+            --r2-cyan: #06b6d4;
+            --primary: #2563eb;
+            --primary-soft: #eff6ff;
+            --secondary: #059669;
+            --secondary-soft: #d1fae5;
+            --danger: #dc2626;
+            --danger-soft: #fee2e2;
+            --bg-page: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .app-window {
+            width: 100%;
+            max-width: 880px;
+            background: var(--card-bg);
+            border-radius: 22px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+            border: 3px solid #bae6fd;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .app-header {
+            background: linear-gradient(135deg, #0369a1, #0284c7);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header-title-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lesson-badge {
+            background: #f59e0b;
+            color: #78350f;
+            font-weight: 900;
+            font-size: 1.15rem;
+            padding: 6px 12px;
+            border-radius: 12px;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .header-text h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .header-text p {
+            font-size: 0.86rem;
+            opacity: 0.9;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-ctrl {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-ctrl:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* Progress Section */
+        .progress-section {
+            background: rgba(0, 0, 0, 0.16);
+            padding: 10px 14px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        .progress-bar-wrap {
+            flex: 1;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #facc15;
+            width: 12.5%;
+            transition: width 0.35s ease;
+            border-radius: 999px;
+        }
+
+        /* 8 Navigation Tabs */
+        .activities-nav {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            background: #f0f9ff;
+            border-bottom: 2px solid #bae6fd;
+            padding: 6px;
+            gap: 4px;
+            overflow-x: auto;
+        }
+
+        .act-tab {
+            background: white;
+            border: 2px solid #cbd5e1;
+            padding: 8px 4px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: #475569;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            transition: all 0.15s;
+        }
+
+        .act-tab:hover {
+            border-color: var(--r2-blue);
+            background: var(--primary-soft);
+        }
+
+        .act-tab.active {
+            border-color: var(--r2-blue);
+            background: #0284c7;
+            color: white;
+            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);
+        }
+
+        .act-tab.completed {
+            border-color: var(--secondary);
+            background: var(--secondary-soft);
+            color: #065f46;
+        }
+
+        .act-tab.active.completed {
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* Sub-steps bar (1, 2, 3) */
+        .substep-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f1f5f9;
+            padding: 10px 18px;
+            border-radius: 14px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .substep-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #0369a1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .substep-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .substep-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .substep-dot.active {
+            background: var(--r2-blue);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.3);
+            transform: scale(1.1);
+        }
+
+        .substep-dot.done {
+            background: var(--secondary);
+        }
+
+        /* Prompt Card */
+        .prompt-card {
+            background: #ffffff;
+            border: 2px solid #7dd3fc;
+            border-left: 8px solid var(--r2-blue);
+            border-radius: 14px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .prompt-card h2 {
+            font-size: 1.25rem;
+            color: #0369a1;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prompt-card p {
+            font-size: 1.15rem;
+            line-height: 1.5;
+            color: #1e293b;
+        }
+
+        /* Visual Stage Box */
+        .stage-box {
+            background: #f8fafc;
+            border: 3px dashed #cbd5e1;
+            border-radius: 18px;
+            padding: 22px;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            text-align: center;
+        }
+
+        .big-illustration {
+            font-size: 3.2rem;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        /* LAZ Blocks Style */
+        .laz-block {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 800;
+            font-size: 1.05rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: 2px solid rgba(0,0,0,0.15);
+        }
+
+        .laz-loop {
+            background-color: #f59e0b;
+        }
+
+        .laz-sensor {
+            background-color: #06b6d4;
+        }
+
+        .laz-if {
+            background-color: #ffab19;
+        }
+
+        .laz-motion {
+            background-color: #0284c7;
+        }
+
+        /* Options */
+        .options-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            width: 100%;
+        }
+
+        .btn-choice {
+            background: white;
+            border: 3px solid #94a3b8;
+            padding: 14px 22px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            border-radius: 16px;
+            cursor: pointer;
+            color: #1e293b;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.15s;
+            min-width: 130px;
+            text-align: center;
+        }
+
+        .btn-choice:hover {
+            border-color: var(--r2-blue);
+            background: var(--primary-soft);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-choice.correct {
+            background: var(--secondary-soft) !important;
+            border-color: var(--secondary) !important;
+            color: #065f46 !important;
+        }
+
+        .btn-choice.wrong {
+            background: var(--danger-soft) !important;
+            border-color: var(--danger) !important;
+            color: #991b1b !important;
+        }
+
+        /* Feedback Banner */
+        .feedback-banner {
+            display: none;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-align: center;
+            animation: bounceIn 0.3s ease;
+        }
+
+        .feedback-banner.success {
+            display: block;
+            background: var(--secondary-soft);
+            border: 3px solid var(--secondary);
+            color: #065f46;
+        }
+
+        .feedback-banner.error {
+            display: block;
+            background: var(--danger-soft);
+            border: 3px solid var(--danger);
+            color: #991b1b;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Footer */
+        .app-footer {
+            padding: 16px 24px;
+            border-top: 2px solid #e2e8f0;
+            background: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn-nav {
+            background: white;
+            border: 2px solid #cbd5e1;
+            padding: 10px 20px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            border-color: var(--r2-blue);
+            background: var(--primary-soft);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-next {
+            background: var(--r2-blue);
+            color: white;
+            border-color: var(--r2-blue);
+        }
+
+        .btn-next:hover:not(:disabled) {
+            background: #0369a1;
+            color: white;
+        }
+
+        /* Help Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-card {
+            background: white;
+            width: 100%;
+            max-width: 580px;
+            border-radius: 20px;
+            padding: 24px;
+            border: 4px solid #7dd3fc;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            animation: bounceIn 0.25s ease;
+        }
+
+        .modal-card h3 {
+            font-size: 1.35rem;
+            color: #0369a1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-card p, .modal-card li {
+            font-size: 1.05rem;
+            line-height: 1.5;
+            color: #334155;
+        }
+
+        .modal-card ul {
+            padding-left: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .btn-close-modal {
+            background: var(--r2-blue);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        /* Diploma */
+        .diploma-box {
+            display: none;
+            background: #f0fdfa;
+            border: 6px double #0d9488;
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .diploma-box h2 {
+            font-size: 1.75rem;
+            color: #0f766e;
+            margin-bottom: 6px;
+        }
+
+        .diploma-box p {
+            font-size: 1.15rem;
+            color: #134e4a;
+            margin: 6px 0;
+        }
+
+        .diploma-stars {
+            font-size: 2.8rem;
+            margin: 10px 0;
+        }
+
+        .btn-print {
+            background: #0d9488;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            .diploma-box, .diploma-box * { visibility: visible; }
+            .diploma-box { position: absolute; left: 0; top: 0; width: 100%; border: 4px solid black; }
+            .btn-print { display: none; }
+        }
+
+        @media (max-width: 650px) {
+            .activities-nav {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .header-text h1 {
+                font-size: 1.05rem;
+            }
+            .btn-choice {
+                width: 100%;
+                font-size: 1.15rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-window">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-top">
+                <div class="header-title-box">
+                    <div class="lesson-badge">Μ8</div>
+                    <div class="header-text">
+                        <div style="font-size:0.75rem; text-transform:uppercase; opacity:0.85; font-weight:700;">
+                            Ενοτητα 1 · Αλγοριθμικη – Προγραμματισμος – Ρομποτικη
+                        </div>
+                        <h1>Παιχνίδι με το ρομπότ R2: Παγίδευσε το ρομπότ σου!</h1>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <button class="btn-ctrl" id="sound-btn" title="Ενεργοποίηση/Απενεργοποίηση Ήχου">🔊 Ήχος</button>
+                    <button class="btn-ctrl" id="help-btn" title="Οδηγίες και Βοήθεια">❓ Βοήθεια</button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-section">
+                <span>Δραστηριότητα <span id="act-num-label">1</span> από 8</span>
+                <div class="progress-bar-wrap">
+                    <div class="progress-fill" id="progress-bar"></div>
+                </div>
+                <span>⭐ <span id="stars-total">0</span>/24</span>
+            </div>
+        </header>
+
+        <!-- 8 Tabs -->
+        <nav class="activities-nav" id="acts-nav" aria-label="Επιλογή δραστηριότητας"></nav>
+
+        <!-- Main Content -->
+        <main class="content-area">
+            <!-- Step indicator -->
+            <div class="substep-bar">
+                <div class="substep-title">
+                    <span id="act-badge-emoji">🚧</span>
+                    <span id="step-indicator-text">Βήμα 1 από 3</span>
+                </div>
+                <div class="substep-dots">
+                    <div class="substep-dot" id="dot-0">1</div>
+                    <div class="substep-dot" id="dot-1">2</div>
+                    <div class="substep-dot" id="dot-2">3</div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="prompt-card">
+                <h2 id="mission-title">Τίτλος Αποστολής</h2>
+                <p id="mission-question">Ερώτηση...</p>
+            </div>
+
+            <!-- Visual Stage -->
+            <div class="stage-box" id="stage-box"></div>
+
+            <!-- Shuffled Choices -->
+            <div class="options-grid" id="options-grid"></div>
+
+            <!-- Feedback -->
+            <div class="feedback-banner" id="feedback-banner"></div>
+
+            <!-- Certificate (at finish) -->
+            <div class="diploma-box" id="diploma-box">
+                <h2>🏆 ΕΠΑΙΝΟΣ MASTER ΡΟΜΠΟΤΙΚΗΣ R2 🏆</h2>
+                <p>Απονέμεται στον / στη μαθητή/-τρια της <strong>Γ' Δημοτικού</strong></p>
+                <div class="diploma-stars">⭐⭐⭐⭐⭐</div>
+                <p>Ολοκλήρωσες με επιτυχία το <strong>Μάθημα 8ο</strong>!</p>
+                <p>Προγραμμάτισες το ρομπότ εδάφους <strong>R2</strong> στα <strong>LAZ blocks</strong></p>
+                <p>να «βλέπει» εμπόδια με αισθητήρες, να παίρνει αποφάσεις και να επαναλαμβάνει τις κινήσεις του για πάντα!</p>
+                <button class="btn-print" onclick="window.print()">🖨️ Εκτύπωση Επαίνου</button>
+            </div>
+        </main>
+
+        <!-- Footer Navigation -->
+        <footer class="app-footer">
+            <button class="btn-nav" id="btn-prev">⬅️ Προηγούμενο</button>
+            <button class="btn-nav" id="btn-restart">🔄 Επανεκκίνηση</button>
+            <button class="btn-nav btn-next" id="btn-next">Επόμενο Βήμα ➡️</button>
+        </footer>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="modal-overlay" id="help-modal">
+        <div class="modal-card">
+            <h3>🚧 Πώς αποφεύγει εμπόδια το R2;</h3>
+            <p>Στο Μάθημα 8 μαθαίνουμε να κάνουμε το ρομποτάκι μας έξυπνο ώστε να μην τρακάρει ποτέ!</p>
+            <ul>
+                <li><strong>Αισθητήρας Εμποδίων:</strong> Το R2 έχει αισθητήρα μπροστά («μάτια») που ανιχνεύει αν βάλουμε το χέρι μας ή ένα βιβλίο.</li>
+                <li><strong>Συνθήκη Επιλογής:</strong> <code>εάν συναντήσεις εμπόδιο ➡️ τότε σταμάτα ή κάνε πίσω και στρίψε!</code></li>
+                <li><strong>Επανάλαβε για πάντα (Loop):</strong> Βάζουμε τις εντολές μέσα σε επανάληψη ώστε να ελέγχει συνεχώς όσο κινείται.</li>
+                <li><strong>Παιχνίδι Παγίδευσης:</strong> Βάζουμε τα χέρια μας μπροστά και διασκεδάζουμε βλέποντας το R2 να αλλάζει δρόμο!</li>
+            </ul>
+            <button class="btn-close-modal" id="modal-close-btn">Το κατάλαβα! 👍</button>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================================
+           1. AUDIO ENGINE (Web Audio API - Offline)
+           ========================================================================== */
+        class AudioManager {
+            constructor() {
+                this.enabled = true;
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+            }
+            playTone(freq, duration, type = 'sine', delay = 0) {
+                if (!this.enabled) return;
+                this.init();
+                setTimeout(() => {
+                    try {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = type;
+                        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                        gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start();
+                        osc.stop(this.ctx.currentTime + duration);
+                    } catch (e) {}
+                }, delay * 1000);
+            }
+            correct() {
+                this.playTone(523.25, 0.12, 'triangle', 0);    // C5
+                this.playTone(659.25, 0.12, 'triangle', 0.1);  // E5
+                this.playTone(783.99, 0.22, 'triangle', 0.2);  // G5
+            }
+            wrong() {
+                this.playTone(280, 0.15, 'sawtooth', 0);
+                this.playTone(210, 0.22, 'sawtooth', 0.12);
+            }
+            cheer() {
+                const notes = [523, 659, 784, 1046];
+                notes.forEach((freq, idx) => {
+                    this.playTone(freq, 0.25, 'triangle', idx * 0.12);
+                });
+            }
+        }
+        const audio = new AudioManager();
+
+        /* ==========================================================================
+           2. DATA 8 ACTIVITIES FOR LESSON 8 (R2 OBSTACLE AVOIDANCE & LOOPS)
+           ========================================================================== */
+        const activitiesData = [
+            /* 1. Τα «Μάτια» του Ρομπότ R2 (Αισθητήρας) */
+            {
+                id: 1,
+                name: "Ο Αισθητήρας",
+                emoji: "👀",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Πώς καταλαβαίνει τα εμπόδια;",
+                        question: "Το ρομπότ R2 έχει μπροστά ένα εξάρτημα που 'βλέπει' αν υπάρχει κάτι κοντά του. Πώς λέγεται;",
+                        visual: `
+                            <div class="big-illustration">🤖 📡 ✋ [Χέρι / Εμπόδιο]</div>
+                            <div style="font-size:1.15rem; font-weight:800; color:#0369a1; background:#e0f2fe; padding:8px 16px; border-radius:12px;">
+                                Ανιχνευτής / Αισθητήρας απόστασης!
+                            </div>
+                        `,
+                        options: ["Αισθητήρας εμποδίων", "Πληκτρολόγιο"],
+                        correct: "Αισθητήρας εμποδίων"
+                    },
+                    {
+                        title: "Βήμα 2: Τι σήμα δίνει ο αισθητήρας;",
+                        question: "Όταν βάλουμε το χέρι μας μπροστά από το R2, ποια συνθήκη γίνεται ΑΛΗΘΕΙΑ;",
+                        visual: `
+                            <div class="big-illustration">✋ ➡️ 🤖 = ✅ [Υπάρχει εμπόδιο!]</div>
+                        `,
+                        options: ["Υπάρχει εμπόδιο μπροστά", "Είναι ώρα για ύπνο"],
+                        correct: "Υπάρχει εμπόδιο μπροστά"
+                    },
+                    {
+                        title: "Βήμα 3: Γιατί είναι χρήσιμος;",
+                        question: "Γιατί χρειάζεται το ρομπότ R2 αυτόν τον αισθητήρα;",
+                        visual: `
+                            <div class="big-illustration">🤖 💥 🧱 ❌ ➡️ 🤖 🛑 ✅</div>
+                        `,
+                        options: ["Για να μην τρακάρει σε τοίχους και εμπόδια!", "Για να παίζει μουσική μόνο"],
+                        correct: "Για να μην τρακάρει σε τοίχους και εμπόδια!"
+                    }
+                ]
+            },
+
+            /* 2. Κίνηση Μπροστά Συνεχώς */
+            {
+                id: 2,
+                name: "Συνεχής Κίνηση",
+                emoji: "🚀",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Πήγαινε μπροστά συνεχώς",
+                        question: "Στο Μάθημα 8 (σελίδα 34), η πρώτη εντολή κάνει το ρομπότ να κινείται προς τα εμπρός. Ποια είναι;",
+                        visual: `
+                            <div class="laz-block laz-motion">⬆️ πήγαινε μπροστά συνεχώς</div>
+                        `,
+                        options: ["πήγαινε μπροστά συνεχώς ⬆️", "πήγαινε πίσω ⬇️"],
+                        correct: "πήγαινε μπροστά συνεχώς ⬆️"
+                    },
+                    {
+                        title: "Βήμα 2: Πότε θα σταματήσει;",
+                        question: "Αν του πούμε «πήγαινε μπροστά συνεχώς», πότε θα σταματήσει από μόνο του αν δεν του δώσουμε άλλη εντολή;",
+                        visual: `
+                            <div class="big-illustration">🤖 💨 💨 💨 ❓</div>
+                        `,
+                        options: ["Ποτέ, θα προχωράει συνέχεια μέχρι να βρει εμπόδιο!", "Σε 1 δευτερόλεπτο"],
+                        correct: "Ποτέ, θα προχωράει συνέχεια μέχρι να βρει εμπόδιο!"
+                    },
+                    {
+                        title: "Βήμα 3: Ποια είναι η δεύτερη εντολή;",
+                        question: "Τι πρέπει να περιμένει το ρομπότ μετά για να αποφασίσει;",
+                        visual: `
+                            <div class="big-illustration">⏳ 🤖 ✋ [Περίμενε μέχρι να βρεις εμπόδιο]</div>
+                        `,
+                        options: ["Να περιμένει μέχρι να συναντήσει εμπόδιο", "Να σβήσει το φως"],
+                        correct: "Να περιμένει μέχρι να συναντήσει εμπόδιο"
+                    }
+                ]
+            },
+
+            /* 3. Η Συνθήκη: «Αν συναντήσεις εμπόδιο...» */
+            {
+                id: 3,
+                name: "Απόφαση & Εμπόδιο",
+                emoji: "🛑",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Ποιο πλακίδιο περιμένει το εμπόδιο;",
+                        question: "Στα LAZ blocks / ρομποτική, ποια εντολή ελέγχου χρησιμοποιούμε για να περιμένει τον αισθητήρα;",
+                        visual: `
+                            <div class="laz-block laz-sensor">⏳ περίμενε μέχρι: [ εμπόδιο μπροστά ▾ ]</div>
+                        `,
+                        options: ["περίμενε μέχρι εμπόδιο μπροστά ⏳", "παίξε τραγούδι 🎶"],
+                        correct: "περίμενε μέχρι εμπόδιο μπροστά ⏳"
+                    },
+                    {
+                        title: "Βήμα 2: Η πρώτη απλή αντίδραση",
+                        question: "Στη σελίδα 34, μόλις συναντήσει το εμπόδιο, ποια τρίτη εντολή βάζουμε;",
+                        visual: `
+                            <div class="laz-block laz-motion" style="background:#dc2626;">🛑 σταμάτα τα μοτέρ</div>
+                        `,
+                        options: ["σταμάτα 🛑", "στρίψε δεξιά ↪️"],
+                        correct: "σταμάτα 🛑"
+                    },
+                    {
+                        title: "Βήμα 3: Δοκιμή με το χέρι!",
+                        question: "Βάζουμε το χέρι μας μπροστά από το ρομποτάκι καθώς κινείται. Τι θα κάνει;",
+                        visual: `
+                            <div class="big-illustration">🤖 ➡️ ✋ 🛑 [Κοκκαλώνει στη θέση του!]</div>
+                        `,
+                        options: ["Σταματάει ακριβώς πριν ακουμπήσει το χέρι μας!", "Πέφτει πάνω του με δύναμη"],
+                        correct: "Σταματάει ακριβώς πριν ακουμπήσει το χέρι μας!"
+                    }
+                ]
+            },
+
+            /* 4. Έξυπνη Αποφυγή: Πίσω & Στρίψε! */
+            {
+                id: 4,
+                name: "Έξυπνη Αποφυγή",
+                emoji: "↩️",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Τροποποίηση προγράμματος (σελίδα 35)",
+                        question: "Δεν θέλουμε μόνο να σταματάει, αλλά να βρίσκει άλλο δρόμο! Τι εντολή του δίνουμε πρώτα;",
+                        visual: `
+                            <div class="laz-block laz-motion">⬇️ πήγαινε πίσω για 1 δευτερόλεπτο</div>
+                        `,
+                        options: ["πήγαινε πίσω για 1 δευτερόλεπτο ⬇️", "κάνε τούμπες"],
+                        correct: "πήγαινε πίσω για 1 δευτερόλεπτο ⬇️"
+                    },
+                    {
+                        title: "Βήμα 2: Αλλαγή πορείας",
+                        question: "Αφού κάνει πίσω για 1 δευτερόλεπτο, ποια εντολή ακολουθεί για να αλλάξει κατεύθυνση;",
+                        visual: `
+                            <div class="laz-block laz-motion">↩️ στρίψε αριστερά για 1 δευτερόλεπτο</div>
+                        `,
+                        options: ["στρίψε αριστερά (ή δεξιά) ↩️", "σβήσε τα φώτα"],
+                        correct: "στρίψε αριστερά (ή δεξιά) ↩️"
+                    },
+                    {
+                        title: "Βήμα 3: Πράξεις Χρόνου (Μαθηματικά)",
+                        question: "Το R2 έκανε 1 δευτερόλεπτο πίσω και 1 δευτερόλεπτο στροφή. Πόσα δευτερόλεπτα κράτησε ο ελιγμός; (1 + 1 = ;)",
+                        visual: `
+                            <div class="big-illustration">⏱️ 1 δευτ. ➕ 1 δευτ. = ;</div>
+                        `,
+                        options: ["2 δευτερόλεπτα", "8 δευτερόλεπτα"],
+                        correct: "2 δευτερόλεπτα"
+                    }
+                ]
+            },
+
+            /* 5. Η Εντολή Επανάληψης: «Επανάλαβε για πάντα» */
+            {
+                id: 5,
+                name: "Για Πάντα (Loop)",
+                emoji: "🔄",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Το μεγάλο κίτρινο πλακίδιο",
+                        question: "Στη σελίδα 35, βάζουμε όλες τις εντολές μέσα σε ένα πλακίδιο επανάληψης. Πώς λέγεται;",
+                        visual: `
+                            <div class="laz-block laz-loop">🔄 επανάλαβε για πάντα</div>
+                        `,
+                        options: ["επανάλαβε για πάντα (Loop)", "σταμάτα για πάντα"],
+                        correct: "επανάλαβε για πάντα (Loop)"
+                    },
+                    {
+                        title: "Βήμα 2: Τι πετυχαίνουμε με το «για πάντα»;",
+                        question: "Γιατί βάζουμε το πρόγραμμα μέσα στο «επανάλαβε για πάντα»;",
+                        visual: `
+                            <div class="big-illustration">🤖 🔄 [Συνέχεια αποφεύγει εμπόδια!]</div>
+                        `,
+                        options: ["Για να μην σταματάει μετά από 1 εμπόδιο, αλλά να συνεχίζει!", "Για να τελειώσει αμέσως"],
+                        correct: "Για να μην σταματάει μετά από 1 εμπόδιο, αλλά να συνεχίζει!"
+                    },
+                    {
+                        title: "Βήμα 3: Πώς διαβάζεται ο αλγόριθμος;",
+                        question: "Ποια είναι η σωστή σειρά μέσα στην επανάληψη;",
+                        visual: `
+                            <div style="font-size:1.05rem; font-weight:800; color:#1e3a8a; background:#dbeafe; padding:10px 18px; border-radius:12px;">
+                                Μπροστά ➡️ Αν βρεις εμπόδιο ➡️ Πίσω & Στρίψε ➡️ Ξανά από την αρχή!
+                            </div>
+                        `,
+                        options: ["Μπροστά ➡️ Εμπόδιο ➡️ Πίσω/Στρίψε ➡️ Επανάληψη", "Στρίψε ➡️ Σβήσε ➡️ Τέλος"],
+                        correct: "Μπροστά ➡️ Εμπόδιο ➡️ Πίσω/Στρίψε ➡️ Επανάληψη"
+                    }
+                ]
+            },
+
+            /* 6. Το Παιχνίδι: «Παγίδευσε το Ρομπότ σου!» */
+            {
+                id: 6,
+                name: "Παγίδευση R2",
+                emoji: "🎮",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Πού βάζουμε το ρομποτάκι;",
+                        question: "Στο τέλος της σελίδας 35, πού τοποθετούμε το R2 για να παίξουμε το παιχνίδι;",
+                        visual: `
+                            <div class="big-illustration">🤖 🛹 [Στο πάτωμα της τάξης / μεγάλο τραπέζι]</div>
+                        `,
+                        options: ["Στο πάτωμα ή σε ασφαλές τραπέζι", "Στην τσάντα μας κλειστό"],
+                        correct: "Στο πάτωμα ή σε ασφαλές τραπέζι"
+                    },
+                    {
+                        title: "Βήμα 2: Πώς προσπαθούμε να το παγιδεύσουμε;",
+                        question: "Τι βάζουμε γύρω από το R2 για να δούμε πώς ξεφεύγει από τις παγίδες;",
+                        visual: `
+                            <div class="big-illustration">📦 🤖 📚 👟 [Εμπόδια γύρω-γύρω!]</div>
+                        `,
+                        options: ["Τα πόδια μας, βιβλία ή χαρτόκουτα ως εμπόδια!", "Νερό και σαπούνι"],
+                        correct: "Τα πόδια μας, βιβλία ή χαρτόκουτα ως εμπόδια!"
+                    },
+                    {
+                        title: "Βήμα 3: Τι κάνει το ρομποτάκι;",
+                        question: "Κάθε φορά που πλησιάζει σε ένα εμπόδιο, τι βλέπουμε να κάνει;",
+                        visual: `
+                            <div class="big-illustration">🤖 ↩️ ↪️ 💨 [Ξεγλιστράει έξυπνα!]</div>
+                        `,
+                        options: ["Κάνει πίσω, στρίβει και βρίσκει ελεύθερο πέρασμα!", "Κολλάει και κλαίει"],
+                        correct: "Κάνει πίσω, στρίβει και βρίσκει ελεύθερο πέρασμα!"
+                    }
+                ]
+            },
+
+            /* 7. Μαθηματική Σκέψη & Γωνίες */
+            {
+                id: 7,
+                name: "Γωνίες & Στροφές",
+                emoji: "📐",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Πόσες φορές απέφυγε;",
+                        question: "Το ρομποτάκι R2 απέφυγε 3 φορές το βιβλίο και 2 φορές το πόδι μας. Πόσες αποφυγές έκανε συνολικά; (3 + 2 = ;)",
+                        visual: `
+                            <div class="big-illustration">🎯 3 ➕ 2 = ; Αποφυγές!</div>
+                        `,
+                        options: ["5 αποφυγές", "10 αποφυγές"],
+                        correct: "5 αποφυγές"
+                    },
+                    {
+                        title: "Βήμα 2: Στροφή 90 μοιρών (Ορθή γωνία)",
+                        question: "Όταν το ρομποτάκι στρίβει δεξιά για να αποφύγει τον τοίχο, τι είδους γωνία σχηματίζει;",
+                        visual: `
+                            <div class="big-illustration">📐 🤖 ➡️ ⬆️ [Ορθή γωνία 90°]</div>
+                        `,
+                        options: ["Ορθή γωνία (σαν τη γωνία του βιβλίου)", "Κύκλος χωρίς γωνία"],
+                        correct: "Ορθή γωνία (σαν τη γωνία του βιβλίου)"
+                    },
+                    {
+                        title: "Βήμα 3: Σύγκριση αποστάσεων",
+                        question: "Ο αισθητήρας βλέπει εμπόδιο στα 10 εκατοστά και ένα άλλο στα 20 εκατοστά. Ποιο εμπόδιο είναι πιο κοντά στο ρομπότ;",
+                        visual: `
+                            <div class="big-illustration">🤖 📏 [10 εκ. < 20 εκ.]</div>
+                        `,
+                        options: ["Το εμπόδιο στα 10 εκατοστά (είναι πιο κοντά)", "Το εμπόδιο στα 20 εκατοστά"],
+                        correct: "Το εμπόδιο στα 10 εκατοστά (είναι πιο κοντά)"
+                    }
+                ]
+            },
+
+            /* 8. Τελική Δοκιμασία & Έπαινος */
+            {
+                id: 8,
+                name: "Έπαινος Ρομποτικής",
+                emoji: "🎓",
+                substeps: [
+                    {
+                        title: "Βήμα 1: Τι μάθαμε στο Μάθημα 8;",
+                        question: "Ποια είναι τα δύο σπουδαία εργαλεία προγραμματισμού που συνδυάσαμε;",
+                        visual: `
+                            <div class="big-illustration">🧡 [Επιλογή] ➕ 🔄 [Επανάληψη]</div>
+                        `,
+                        options: ["Την εντολή επιλογής (αν... τότε) ΚΑΙ την επανάληψη (για πάντα)!", "Μόνο ζωγραφική"],
+                        correct: "Την εντολή επιλογής (αν... τότε) ΚΑΙ την επανάληψη (για πάντα)!"
+                    },
+                    {
+                        title: "Βήμα 2: Είναι τα ρομπότ έξυπνα;",
+                        question: "Τελικά, ποιος κάνει το ρομπότ R2 να φαίνεται τόσο έξυπνο;",
+                        visual: `
+                            <div class="big-illustration">🧠 💻 👧 👦 🤖</div>
+                        `,
+                        options: ["Ο προγραμματιστής (εσύ!) που έγραψε τις σωστές εντολές!", "Το ίδιο το πλαστικό του ρομπότ"],
+                        correct: "Ο προγραμματιστής (εσύ!) που έγραψε τις σωστές εντολές!"
+                    },
+                    {
+                        title: "Βήμα 3: Ολοκλήρωση & Έπαινος!",
+                        question: "Συγχαρητήρια! Ολοκλήρωσες και το 8ο Μάθημα Ρομποτικής! Πάτησε για να πάρεις το μεγάλο σου Πτυχίο:",
+                        visual: `
+                            <div class="big-illustration">🎉 🥳 🤖 🏆 🎈 🌟</div>
+                        `,
+                        options: ["🏆 ΠΑΡΕ ΤΟΝ ΕΠΑΙΝΟ ΣΟΥ!"],
+                        correct: "🏆 ΠΑΡΕ ΤΟΝ ΕΠΑΙΝΟ ΣΟΥ!"
+                    }
+                ]
+            }
+        ];
+
+        /* ==========================================================================
+           3. STATE MANAGEMENT
+           ========================================================================== */
+        let state = {
+            currentActIndex: 0,
+            currentStepIndex: 0,
+            starsMatrix: Array(8).fill(null).map(() => [false, false, false]),
+            answeredCorrectly: false
+        };
+
+        const actsNav = document.getElementById('acts-nav');
+        const actNumLabel = document.getElementById('act-num-label');
+        const progressBar = document.getElementById('progress-bar');
+        const starsTotal = document.getElementById('stars-total');
+        const actBadgeEmoji = document.getElementById('act-badge-emoji');
+        const stepIndicatorText = document.getElementById('step-indicator-text');
+        const missionTitle = document.getElementById('mission-title');
+        const missionQuestion = document.getElementById('mission-question');
+        const stageBox = document.getElementById('stage-box');
+        const optionsGrid = document.getElementById('options-grid');
+        const feedbackBanner = document.getElementById('feedback-banner');
+        const diplomaBox = document.getElementById('diploma-box');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const btnRestart = document.getElementById('btn-restart');
+        const soundBtn = document.getElementById('sound-btn');
+        const helpBtn = document.getElementById('help-btn');
+        const helpModal = document.getElementById('help-modal');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+
+        /* ==========================================================================
+           4. RENDER & CONTROLLER
+           ========================================================================== */
+        function initApp() {
+            renderTabs();
+            loadMission(0, 0);
+            setupEventListeners();
+        }
+
+        function renderTabs() {
+            actsNav.innerHTML = '';
+            activitiesData.forEach((act, idx) => {
+                const isCompleted = state.starsMatrix[idx].every(Boolean);
+                const isActive = idx === state.currentActIndex;
+
+                const tab = document.createElement('div');
+                tab.className = `act-tab ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`;
+                tab.setAttribute('role', 'button');
+                tab.setAttribute('tabindex', '0');
+
+                const doneCount = state.starsMatrix[idx].filter(Boolean).length;
+                let starsStr = '';
+                for (let i = 0; i < 3; i++) {
+                    starsStr += (i < doneCount) ? '⭐' : '☆';
+                }
+
+                tab.innerHTML = `
+                    <span style="font-size:1.2rem;">${act.emoji}</span>
+                    <span>${idx + 1}η</span>
+                    <span style="font-size:0.65rem; color:#0369a1;">${starsStr}</span>
+                `;
+
+                tab.onclick = () => {
+                    state.currentActIndex = idx;
+                    state.currentStepIndex = 0;
+                    renderTabs();
+                    loadMission(state.currentActIndex, state.currentStepIndex);
+                };
+
+                actsNav.appendChild(tab);
+            });
+        }
+
+        function loadMission(actIdx, stepIdx) {
+            state.answeredCorrectly = false;
+            const act = activitiesData[actIdx];
+            const substep = act.substeps[stepIdx];
+
+            actNumLabel.innerText = actIdx + 1;
+            const totalDone = state.starsMatrix.flat().filter(Boolean).length;
+            starsTotal.innerText = totalDone;
+            progressBar.style.width = `${((actIdx * 3 + stepIdx + 1) / 24) * 100}%`;
+
+            actBadgeEmoji.innerText = act.emoji;
+            stepIndicatorText.innerText = `Βήμα ${stepIdx + 1} από 3`;
+            for (let i = 0; i < 3; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                dot.className = 'substep-dot';
+                if (i === stepIdx) dot.classList.add('active');
+                if (state.starsMatrix[actIdx][i]) dot.classList.add('done');
+            }
+
+            missionTitle.innerText = `${act.emoji} ${substep.title}`;
+            missionQuestion.innerText = substep.question;
+            stageBox.innerHTML = substep.visual;
+
+            // SHUFFLE ΤΩΝ ΕΠΙΛΟΓΩΝ (Ποτέ σταθερά η πρώτη σωστή)
+            optionsGrid.innerHTML = '';
+            const shuffledOptions = [...substep.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach(optText => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-choice';
+                btn.innerText = optText;
+                btn.onclick = () => handleChoice(optText, substep.correct, btn);
+                optionsGrid.appendChild(btn);
+            });
+
+            feedbackBanner.style.display = 'none';
+            feedbackBanner.className = 'feedback-banner';
+            btnPrev.disabled = (actIdx === 0 && stepIdx === 0);
+
+            if (actIdx !== 7 || stepIdx !== 2 || !state.starsMatrix[7][2]) {
+                diplomaBox.style.display = 'none';
+            }
+        }
+
+        function handleChoice(selectedOption, correctOption, buttonElement) {
+            if (state.answeredCorrectly) return;
+
+            if (selectedOption === correctOption) {
+                state.answeredCorrectly = true;
+                audio.correct();
+                buttonElement.classList.add('correct');
+
+                if (!state.starsMatrix[state.currentActIndex][state.currentStepIndex]) {
+                    state.starsMatrix[state.currentActIndex][state.currentStepIndex] = true;
+                    starsTotal.innerText = state.starsMatrix.flat().filter(Boolean).length;
+                    renderTabs();
+                    document.getElementById(`dot-${state.currentStepIndex}`).classList.add('done');
+                }
+
+                feedbackBanner.className = 'feedback-banner success';
+                feedbackBanner.innerHTML = `🎉 <strong>Μπράβο!</strong> Σωστή επιλογή! Κέρδισες 1 αστέρι! ⭐`;
+
+                setTimeout(() => {
+                    goToNextStep();
+                }, 1000);
+
+            } else {
+                audio.wrong();
+                buttonElement.classList.add('wrong');
+                feedbackBanner.className = 'feedback-banner error';
+                feedbackBanner.innerHTML = `💪 <strong>Προσπάθησε ξανά!</strong> Θυμήσου πώς αποφεύγει τα εμπόδια το R2.`;
+
+                setTimeout(() => {
+                    buttonElement.classList.remove('wrong');
+                }, 700);
+            }
+        }
+
+        function goToNextStep() {
+            if (state.currentStepIndex < 2) {
+                state.currentStepIndex++;
+                loadMission(state.currentActIndex, state.currentStepIndex);
+            } else if (state.currentActIndex < 7) {
+                state.currentActIndex++;
+                state.currentStepIndex = 0;
+                renderTabs();
+                loadMission(state.currentActIndex, state.currentStepIndex);
+            } else {
+                audio.cheer();
+                diplomaBox.style.display = 'block';
+                diplomaBox.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function goToPrevStep() {
+            if (state.currentStepIndex > 0) {
+                state.currentStepIndex--;
+                loadMission(state.currentActIndex, state.currentStepIndex);
+            } else if (state.currentActIndex > 0) {
+                state.currentActIndex--;
+                state.currentStepIndex = 2;
+                renderTabs();
+                loadMission(state.currentActIndex, state.currentStepIndex);
+            }
+        }
+
+        function setupEventListeners() {
+            btnNext.onclick = () => goToNextStep();
+            btnPrev.onclick = () => goToPrevStep();
+
+            btnRestart.onclick = () => {
+                if (window.confirm("Θέλεις να ξεκινήσεις από την αρχή τις δραστηριότητες;")) {
+                    state.currentActIndex = 0;
+                    state.currentStepIndex = 0;
+                    state.starsMatrix = Array(8).fill(null).map(() => [false, false, false]);
+                    renderTabs();
+                    loadMission(0, 0);
+                }
+            };
+
+            soundBtn.onclick = () => {
+                audio.enabled = !audio.enabled;
+                soundBtn.innerText = audio.enabled ? '🔊 Ήχος' : '🔇 Ήχος';
+            };
+
+            helpBtn.onclick = () => {
+                helpModal.style.display = 'flex';
+            };
+            modalCloseBtn.onclick = () => {
+                helpModal.style.display = 'none';
+            };
+            helpModal.onclick = (e) => {
+                if (e.target === helpModal) helpModal.style.display = 'none';
+            };
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
