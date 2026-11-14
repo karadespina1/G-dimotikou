@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#091025">
+<title>Τάλως σε τροχιά</title>
+<style>
+:root{color-scheme:dark;--ink:#18324c;--muted:#375875;--in:#96f3dc;--out:#ffd68a;--bg:#e9f8ff;--line:#9cc2e3}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0,#fff1bb,var(--bg) 65%);color:var(--ink);font:500 16px/1.45 system-ui,sans-serif;min-height:100vh}main{max-width:1160px;margin:auto;padding:clamp(12px,3vw,34px)}header{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#176365;font-weight:800;font-size:.86rem}h1{margin:12px 0 0;font-size:clamp(2rem,5.4vw,4rem);letter-spacing:-.055em;line-height:1}h2,p{margin:0}.intro{color:var(--muted);margin:10px 0 18px}.console{display:grid;grid-template-columns:minmax(0,2.3fr) minmax(235px,1fr);gap:14px;align-items:start}.board,.panel{border:1px solid var(--line);border-radius:21px;background:#fffdf4}.board{position:relative;height:clamp(450px,47vw,560px);overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at center,#4285ad,#173e64 72%)}canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.column{position:absolute;top:4%;bottom:5%;width:26%;display:grid;grid-template-rows:auto repeat(5,1fr);gap:8px;z-index:2}.column.in{left:3%;color:var(--in)}.column.out{right:3%;color:var(--out);grid-template-rows:auto repeat(4,1fr)}.column h2{text-align:center;text-transform:uppercase;letter-spacing:.06em;font-size:clamp(.76rem,2vw,1rem);margin:0 0 2px}.device,.action{font:inherit;color:var(--ink);cursor:pointer}.device{color:#fff;display:grid;align-content:center;justify-items:center;gap:2px;min-width:0;border-radius:13px;background:#142440;border:1px solid #486384;padding:4px;font-weight:790;font-size:clamp(.65rem,1.65vw,1rem);overflow-wrap:anywhere;line-height:1.13;position:relative}.device span{font-size:clamp(1.4rem,3.5vw,2.65rem);line-height:1.2}.device:hover,.device.active{border-color:var(--in);background:#214256}.out .device:hover,.out .device.active{border-color:var(--out);background:#46354d}.device.done::after{content:"✓";position:absolute;top:4px;right:5px;color:var(--in);font-size:.83rem}.device:disabled{cursor:default}.device:focus-visible,.action:focus-visible{outline:3px solid white;outline-offset:3px}.computer{color:#fff;position:absolute;left:38%;right:38%;top:37%;bottom:26%;border:2px solid #8395bf;border-radius:16px;background:linear-gradient(#2e4270,#162644);display:grid;align-content:center;justify-items:center;text-align:center;padding:3px;z-index:2;font-size:clamp(.62rem,1.5vw,.94rem);font-weight:850;line-height:1.15;box-shadow:0 0 26px #08142a}.computer strong{font-size:clamp(1.4rem,4vw,3.1rem);line-height:1.15}.computer small{color:var(--in);font-size:clamp(.56rem,1.2vw,.8rem);margin-top:4px;overflow-wrap:anywhere;max-width:100%}.computer.live{border-color:var(--in);box-shadow:0 0 24px #63efdb55}.packet{position:absolute;z-index:3;white-space:nowrap;border:2px solid currentColor;border-radius:20px;background:#09142b;padding:4px 8px;font-weight:950;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 18px currentColor;font-size:clamp(.72rem,2vw,1.1rem)}.packet[hidden],.launch[hidden]{display:none}.panel{padding:17px;min-height:300px}.tag{color:#176365;font-size:.82rem;font-weight:900}.panel h2{font-size:clamp(1.25rem,2.6vw,1.72rem);line-height:1.15;margin:8px 0}.prompt{color:var(--muted)}.report{min-height:62px;margin:14px 0 8px;color:var(--ink);font-weight:740}.report:empty{min-height:0}.preview{border-radius:10px;padding:7px 10px;background:#1c2d50;color:var(--in);margin-bottom:9px;font-weight:850;overflow-wrap:anywhere}.preview:empty{display:none}.action{border:1px solid var(--in);background:var(--in);color:#102439;border-radius:10px;padding:9px 12px;min-height:44px;font-weight:850}.action.secondary{background:#1c2d50;color:var(--ink);border-color:#6d86ac;margin-top:8px}.legend{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--muted);font-size:.86rem;margin:13px 0}.legend b:first-child{color:#176365}.legend b:last-child{color:#924400}footer{color:var(--muted);font-size:.85rem}.launch{position:absolute;z-index:5;inset:0;overflow:hidden;text-align:center;background:radial-gradient(ellipse at bottom,#3857a1,#121d42 54%,#090e24);display:grid;align-content:center;justify-items:center;gap:8px}.launch strong{color:#fff;font-size:clamp(1.4rem,5vw,4rem);text-shadow:0 0 24px #56d3f5;z-index:2}.rocket{font-size:clamp(4rem,14vw,9rem);z-index:2}.launch.go .rocket{animation:fly 1.9s ease-in forwards}.launch i{position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;box-shadow:0 0 9px #80ecff;animation:twinkle 1.3s alternate infinite}.launch.go i{animation:stream .65s linear infinite}.launch .action{z-index:2}.launch:not(.landed) .action{display:none}.launch.landed .rocket{animation:none}.launch.landed{background:radial-gradient(ellipse,#31598b,#10193e 70%)}@keyframes fly{to{transform:translate(110px,-380px) scale(.28);opacity:0}}@keyframes twinkle{to{opacity:.25}}@keyframes stream{to{transform:translate(-45px,150px);opacity:0}}
+@media(max-width:720px){.console{grid-template-columns:1fr}.panel{min-height:0}.board{height:450px}}@media(max-width:380px){.board{height:425px}.column{width:28%}.computer{left:38%;right:38%}}@media(prefers-reduced-motion:reduce){.launch i,.launch.go .rocket{animation:none}}
+
+.race[hidden]{display:none}.race{position:absolute;inset:0;z-index:4;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto;gap:6px;padding:10px;background:#fff7d9;color:#162b47}.race-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:5px;font-size:clamp(.78rem,2.4vw,1.2rem)}#lives{font-size:.9rem;color:#8d2447;white-space:nowrap}#race-device{border-radius:10px;background:#c9f7ec;padding:4px 8px;color:#103b47}.race-status{min-height:2.8em;margin:0;font-size:.85rem;font-weight:700}.track{position:relative;overflow:hidden;border:2px solid #77b8e4;border-radius:14px;background:radial-gradient(ellipse at 20% 12%,#fff 0 7%,transparent 9%),radial-gradient(ellipse at 77% 23%,#fff 0 8%,transparent 10%),linear-gradient(#8bdcff,#e8faff 85%,#b3eb95 86%);touch-action:none}.rider{position:absolute;left:50%;top:86%;transform:translate(-50%,-50%);font-size:clamp(2.4rem,7vw,4.2rem);line-height:1;z-index:2;pointer-events:none}.falling{position:absolute;left:50%;top:-20%;width:30%;min-height:43px;display:grid;place-content:center;text-align:center;border-radius:12px;background:#fff;color:#162b47;border:2px solid #3864a2;box-shadow:0 4px 0 #3864a244;transform:translate(-50%,-50%);font-size:clamp(.67rem,2.1vw,.94rem);font-weight:850;line-height:1.1;z-index:3;pointer-events:none}.falling[hidden]{display:none}.falling span{font-size:1.25rem}.race-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}.race-controls .action{background:#bde9ff;color:#12324f;border-color:#69acd9}.race-start{text-align:center;background:#ffd86d;color:#302208;border-color:#cc9400}.race-start[hidden]{display:none}
+/* Keep all devices in view while leaving a clear track for the moving signal. */
+.device,.action{min-height:44px;touch-action:manipulation}
+.race-controls button{text-align:center;min-height:52px}
+@media(max-width:720px){
+  main{padding:12px max(12px,env(safe-area-inset-right)) 16px max(12px,env(safe-area-inset-left))}
+  .board{height:clamp(390px,64svh,485px)}
+  .panel{padding:12px}
+  .report{min-height:0;margin:8px 0}
+  .column{gap:5px}
+  .column.in{left:2%}.column.out{right:2%}
+  .device{font-size:clamp(.66rem,2.65vw,.95rem)}
+  .packet{padding:3px 5px}
+}
+@media(max-height:500px) and (orientation:landscape) and (min-width:540px){
+  .console{grid-template-columns:minmax(0,1.85fr) minmax(175px,1fr);gap:8px}
+  .board{height:max(290px,calc(100svh - 22px))}
+  .column{gap:3px}
+  .device span{font-size:1.32rem}
+  .race{gap:4px;padding:7px}
+  .race-status{min-height:2em}
+  .race-controls button{min-height:44px}
+}
+.quick-play{margin:0 0 12px;min-height:48px}.quick-play[hidden]{display:none}@media(max-width:720px){.quick-play{width:100%}}
+.track-message{position:absolute;inset:8px;z-index:4;display:grid;place-content:center;text-align:center;padding:10px;background:#fff9e5f5;color:#173856;border-radius:10px;font-weight:800}.track-message[hidden]{display:none}.track-message strong{font-size:clamp(1.2rem,4vw,2rem);line-height:1.13;margin-bottom:6px}.launch.landed i{width:9px;height:13px;border-radius:2px;background:var(--spark);animation:celebrate 1.7s ease-out both}.launch.landed strong,.launch.landed .rocket{z-index:3}@keyframes celebrate{from{transform:translateY(-100px) rotate(0);opacity:1}to{transform:translateY(105px) rotate(320deg);opacity:.25}}@media(prefers-reduced-motion:reduce){.launch.landed i{animation:none}}
+</style>
+</head>
+<body>
+<main>
+<header><span>Πληροφορική · Γ΄ Δημοτικού</span><span>Μάθημα 10</span></header>
+<h1>Τάλως σε τροχιά</h1>
+<p class="intro">Συσκευές πέφτουν από τον ουρανό! Κούνησε το καλάθι και πιάσε όσες ζητά η αποστολή.</p>
+<button class="action quick-play" id="quick-play">🎮 Παίξε τώρα · Πιάσε τις συσκευές</button>
+<div class="console">
+<section class="board" id="board" aria-label="Πίνακας συσκευών">
+<canvas id="wires" aria-hidden="true"></canvas>
+<div class="column in" id="inputs"><h2>Είσοδος</h2></div>
+<div class="computer" id="computer"><strong aria-hidden="true">🖥</strong><span>Κεντρική μονάδα</span><small id="signal">Έτοιμη</small></div>
+<div class="column out" id="outputs"><h2>Έξοδος</h2></div>
+<div class="packet" id="packet" hidden aria-hidden="true"></div>
+<div class="race" id="race" hidden>
+  <div class="race-top"><strong id="race-score"></strong><span id="race-device"></span><strong id="lives"></strong></div>
+  <p class="race-status" id="race-status" role="status"></p>
+  <div class="track" id="track" aria-label="Πεδίο με συσκευές που πέφτουν">
+    <div class="rider" id="rider" aria-hidden="true">🧺</div>
+    <div class="falling" hidden></div><div class="falling" hidden></div>
+    <div class="track-message" id="track-message"></div>
+  </div>
+  <div class="race-controls"><button class="action" id="left">⬅ Αριστερά</button><button class="action" id="right">Δεξιά ➡</button></div>
+  <button class="action race-start" id="race-start">Ξεκίνα</button>
+</div>
+<div class="launch" id="launch" hidden><div class="rocket" aria-hidden="true">🚀</div><strong id="countdown" role="status"></strong><button class="action" id="restart">Νέα αποστολή</button></div>
+</section>
+<section class="panel" aria-label="Κέντρο αποστολής">
+<div class="tag" id="progress"></div>
+<h2 id="title"></h2>
+<p class="prompt" id="prompt"></p>
+<p class="report" id="report" role="status"></p>
+<div class="preview" id="preview"></div>
+<button class="action" id="mode">Ελεύθερη δοκιμή</button>
+<button class="action secondary" id="liftoff" hidden>Παίξε με το καλάθι 🎮</button>
+</section>
+</div>
+<p class="legend"><b>Είσοδος → προς τον υπολογιστή</b><b>Έξοδος → από τον υπολογιστή</b></p>
+<footer>Δημιουργία παιχνιδιού · Δέσποινα Καραγιαννίδου</footer>
+</main>
+<script>
+const devices = [
+  {name:'Πληκτρολόγιο', icon:'⌨️', input:true, data:'ΠΑΜΕ', prompt:'Στείλε τη λέξη «ΠΑΜΕ» στον υπολογιστή.', result:'Η κεντρική μονάδα έλαβε τη λέξη «ΠΑΜΕ».'},
+  {name:'Ποντίκι', icon:'🖱️', input:true, data:'ΚΛΙΚ', prompt:'Στείλε ένα κλικ για να επιλέξεις τον προορισμό.', result:'Η κεντρική μονάδα έλαβε το κλικ.'},
+  {name:'Μικρόφωνο', icon:'🎙️', input:true, data:'♪ ΓΕΙΑ', prompt:'Στείλε τη φωνή του Τάλου στον υπολογιστή.', result:'Η κεντρική μονάδα έλαβε τον ήχο της φωνής.'},
+  {name:'Κάμερα', icon:'📹', input:true, data:'📷 ΕΙΚΟΝΑ', prompt:'Στείλε ζωντανή εικόνα από την καμπίνα στον υπολογιστή.', result:'Η κεντρική μονάδα έλαβε την εικόνα της κάμερας.'},
+  {name:'Σαρωτής', icon:'📄', input:true, data:'▤ ΣΑΡΩΣΗ', prompt:'Πέρασε τη ζωγραφιά από το χαρτί στον υπολογιστή.', result:'Η κεντρική μονάδα έλαβε την ψηφιακή εικόνα της ζωγραφιάς.'},
+  {name:'Οθόνη', icon:'🖥️', input:false, data:'🌙 ΧΑΡΤΗΣ', prompt:'Ζωντάνεψε τον χάρτη για να δει ο Τάλως τη διαδρομή.', result:'Η οθόνη έλαβε την εικόνα και έδειξε τον χάρτη.'},
+  {name:'Ηχεία', icon:'🔊', input:false, data:'♫ ΜΠΙΠ', prompt:'Παίξε το σήμα ετοιμότητας για να το ακούσει το πλήρωμα.', result:'Τα ηχεία έλαβαν το σήμα και έπαιξαν τον ήχο.'},
+  {name:'Εκτυπωτής', icon:'🖨️', input:false, data:'📄 ΣΧΕΔΙΟ', prompt:'Βγάλε σε χαρτί το σχέδιο πτήσης.', result:'Ο εκτυπωτής έλαβε το σχέδιο και το τύπωσε.'},
+  {name:'Ακουστικά', icon:'🎧', input:false, data:'♪ ΜΗΝΥΜΑ', prompt:'Άκου το μήνυμα του πύργου ελέγχου μόνο εσύ.', result:'Τα ακουστικά έλαβαν το σήμα και έπαιξαν το μήνυμα.'}
+];
+const order = [0,5,1,7,2,6,3,8,4];
+const get = id => document.getElementById(id);
+const board = get('board');
+const canvas = get('wires');
+const computer = get('computer');
+const packet = get('packet');
+const report = get('report');
+const preview = get('preview');
+const launch = get('launch');
+const ctx = canvas.getContext('2d');
+const touch = matchMedia('(pointer: coarse)');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+const buttons = devices.map((device,index) => {
+  const button = document.createElement('button');
+  button.className='device';
+  button.innerHTML='<span aria-hidden="true">'+device.icon+'</span>'+device.name;
+  button.onclick=()=>tryDevice(index);
+  get(device.input?'inputs':'outputs').append(button);
+  return button;
+});
+let step=0, free=false, busy=false, active=-1, audio;
+
+function tone(notes) {
+  try {
+    audio ||= new (window.AudioContext || window.webkitAudioContext)();
+    if(audio.state==='suspended') audio.resume().catch(()=>{});
+    notes.forEach((note,index)=>{
+      const oscillator=audio.createOscillator();
+      const envelope=audio.createGain();
+      const start=audio.currentTime+index*.15;
+      oscillator.frequency.value=note;
+      envelope.gain.setValueAtTime(.11,start);
+      envelope.gain.exponentialRampToValueAtTime(.001,start+.15);
+      oscillator.connect(envelope).connect(audio.destination);
+      oscillator.start(start);
+      oscillator.stop(start+.15);
+    });
+  } catch {}
+}
+
+function route(index) {
+  const base=board.getBoundingClientRect();
+  const a=buttons[index].getBoundingClientRect();
+  const b=computer.getBoundingClientRect();
+  const input=devices[index].input;
+  const pointA={x:(input?a.right:a.left)-base.left,y:(a.top+a.bottom)/2-base.top};
+  const pointB={x:(input?b.left:b.right)-base.left,y:(b.top+b.bottom)/2-base.top+(index-(input?2:6.5))*18};
+  return input?[pointA,pointB]:[pointB,pointA];
+}
+
+function draw(){
+  const scale=window.devicePixelRatio||1;
+  canvas.width=Math.round(board.clientWidth*scale);
+  canvas.height=Math.round(board.clientHeight*scale);
+  ctx.scale(scale,scale);
+  devices.forEach((device,index)=>{
+    const [start,end]=route(index);
+    const angle=Math.atan2(end.y-start.y,end.x-start.x);
+    const center={x:(start.x+end.x)/2,y:(start.y+end.y)/2};
+    ctx.strokeStyle=device.input?'#57efd6':'#ffb44c';
+    ctx.globalAlpha=active===index?1:.47;
+    ctx.lineWidth=active===index?4:2;
+    ctx.beginPath();ctx.moveTo(start.x,start.y);ctx.lineTo(end.x,end.y);ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(center.x-8*Math.cos(angle-.65),center.y-8*Math.sin(angle-.65));
+    ctx.lineTo(center.x,center.y);
+    ctx.lineTo(center.x-8*Math.cos(angle+.65),center.y-8*Math.sin(angle+.65));
+    ctx.stroke();
+  });
+  ctx.globalAlpha=1;
+}
+
+function update(){
+  get('mode').textContent=free?'Πίσω στην αποστολή':'Ελεύθερη δοκιμή';
+  get('progress').textContent='Έλεγχοι πτήσης · '+step+' / '+order.length;
+  get('title').textContent=free?'Δοκίμασε μια συσκευή':step===order.length?'Έτοιμοι για εκτόξευση!':'Αποστολή '+(step+1);
+  get('prompt').textContent=free?'Πάτησε όποια συσκευή θέλεις και ακολούθησε το σήμα.':step===order.length?'Όλες οι συσκευές λειτουργούν. Μπες στο παιχνίδι με το καλάθι!':devices[order[step]].prompt;
+  get('liftoff').hidden=free||step!==order.length;
+  buttons.forEach((button,index)=>button.classList.toggle('done',order.slice(0,step).includes(index)));
+}
+
+function tryDevice(index){
+  if(busy)return;
+  const device=devices[index];
+  const correct=order[step]===index;
+  const exploring=free||step===order.length;
+  busy=true;
+  active=index;
+  buttons[index].classList.add('active');
+  computer.classList.add('live');
+  get('mode').disabled=true;
+  get('liftoff').disabled=true;
+  preview.textContent='';
+  const direction=device.input?'Είσοδος · '+device.name+' → Κεντρική μονάδα':'Έξοδος · Κεντρική μονάδα → '+device.name;
+  report.textContent=direction;
+  get('signal').textContent=device.input?'Περιμένει…':'Στέλνει…';
+  packet.style.color=device.input?'var(--in)':'var(--out)';
+  packet.textContent=device.data;
+  packet.hidden=false;
+  draw();
+  tone([device.input?440:550]);
+  const start=performance.now();
+  const duration=reduced.matches?1:1350;
+  function frame(now){
+    const progress=Math.min(1,(now-start)/duration);
+    const [from,to]=route(index);
+    packet.style.left=(from.x+(to.x-from.x)*progress)+'px';
+    packet.style.top=(from.y+(to.y-from.y)*progress)+'px';
+    if(progress<1){requestAnimationFrame(frame);return}
+    window.setTimeout(()=>{
+      packet.hidden=true;
+      active=-1;
+      busy=false;
+      buttons[index].classList.remove('active');
+      computer.classList.remove('live');
+      get('mode').disabled=false;
+      get('liftoff').disabled=false;
+      get('signal').textContent=device.input?'Έλαβε σήμα':'Έστειλε σήμα';
+      report.textContent=direction+'. '+device.result;
+      preview.textContent=device.data;
+      if(index===6 || index===8)tone([620,830,1060]);
+      if(!exploring && correct){step+=1;update()}
+      else if(!exploring)report.textContent+=' Για την αποστολή δοκίμασε άλλη συσκευή.';
+      draw();
+    },reduced.matches?0:300);
+  }
+  requestAnimationFrame(frame);
+}
+
+get('mode').onclick=()=>{
+  free=!free;
+  report.textContent='';
+  preview.textContent='';
+  update();
+};
+get('liftoff').onclick=()=>startRace();
+get('quick-play').onclick=()=>startRace();
+async function launchRocket(){
+  busy=true;
+  launch.hidden=false;
+  get('mode').disabled=true;
+  get('liftoff').hidden=true;
+  buttons.forEach(button=>{button.disabled=true});
+  const countdown=get('countdown');
+  for(let i=0;i<52;i++){
+    const star=document.createElement('i');
+    star.style.setProperty('--spark',['#50f2de','#ffdb73','#ff91cb','#91c7ff'][i%4]);
+    star.style.left=(i*37%100)+'%';
+    star.style.top=(i*53%100)+'%';
+    star.style.animationDelay=(i%11)*-.13+'s';
+    launch.prepend(star);
+  }
+  for(const number of [3,2,1]){
+    countdown.textContent=number;
+    tone([420]);
+    await new Promise(resolve=>setTimeout(resolve,750));
+  }
+  countdown.textContent='Εκτόξευση!';
+  launch.classList.add('go');
+  tone([420,550,710,930,1220]);
+  await new Promise(resolve=>setTimeout(resolve,1800));
+  countdown.textContent='🏆 Νίκη! Ο Τάλως μπήκε σε τροχιά!';
+  tone([523,659,784,1047]);
+  launch.classList.add('landed');
+  get('restart').focus({preventScroll:true});
+};
+get('restart').onclick=()=>{
+  launch.hidden=true;
+  get('race').hidden=true;
+  get('quick-play').hidden=false;
+  launch.classList.remove('go','landed');
+  launch.querySelectorAll('i').forEach(star=>star.remove());
+  buttons.forEach(button=>{button.disabled=false});
+  get('mode').disabled=false;
+  get('signal').textContent='Έτοιμη';
+  preview.textContent='';
+  report.textContent='';
+  step=0;
+  busy=false;
+  update();
+  buttons[0].focus({preventScroll:true});
+};
+
+const race = get('race');
+const rider = get('rider');
+const falling = [...document.querySelectorAll('.falling')];
+const trackMessage = get('track-message');
+const track = get('track');
+const raceStart = get('race-start');
+const levels = [
+  {goal:'Πιάσε συσκευές ΕΙΣΟΔΟΥ', help:'Στέλνουν δεδομένα στον υπολογιστή.', targets:[0,1,2,3,4], deck:[0,5,2,6,4,8,1,7,3]},
+  {goal:'Πιάσε συσκευές ΕΞΟΔΟΥ', help:'Παίρνουν δεδομένα από τον υπολογιστή.', targets:[5,6,7,8], deck:[5,3,7,0,8,4,6,2,1]}
+];
+const positions = [18,50,82];
+let levelIndex = 0;
+let lane = 1;
+let drawCount = 0;
+let caught = new Set();
+let playing = false;
+let lives = 3;
+
+function steer(nextLane) {
+  lane = Math.max(0,Math.min(2,nextLane));
+  rider.style.left = positions[lane] + '%';
+}
+get('left').onclick = () => steer(lane-1);
+get('right').onclick = () => steer(lane+1);
+document.addEventListener('keydown', event => {
+  if (race.hidden || !['ArrowLeft','ArrowRight'].includes(event.key)) return;
+  event.preventDefault();
+  steer(lane + (event.key === 'ArrowLeft' ? -1 : 1));
+});
+function steerToPointer(event) {
+  const rect = track.getBoundingClientRect();
+  const position = (event.clientX-rect.left)/rect.width;
+  steer(position < 1/3 ? 0 : position > 2/3 ? 2 : 1);
+}
+track.onpointerdown = event => {
+  track.setPointerCapture(event.pointerId);
+  steerToPointer(event);
+};
+track.onpointermove = event => {
+  if (track.hasPointerCapture(event.pointerId)) steerToPointer(event);
+};
+
+function showLevel() {
+  const level = levels[levelIndex];
+  get('race-score').textContent = (levelIndex+1) + ' / ' + levels.length + ' · 🧺 ' + caught.size + ' / ' + level.targets.length;
+  get('race-device').textContent = level.goal;
+  get('lives').textContent = '❤️ ' + lives + ' / 3';
+  get('lives').setAttribute('aria-label', 'Ζωές: ' + lives + ' από 3');
+}
+
+function prepareLevel() {
+  playing = false;
+  drawCount = 0;
+  caught = new Set();
+  steer(1);
+  falling.forEach(card => {card.hidden = true});
+  trackMessage.hidden = false;
+  trackMessage.innerHTML = '<strong>Επίπεδο ' + (levelIndex+1) + '</strong>Μάζεψε ' + levels[levelIndex].targets.length + ' διαφορετικές συσκευές ' + (levelIndex === 0 ? 'εισόδου.' : 'εξόδου.') + '<br>' + levels[levelIndex].help;
+  showLevel();
+  get('race-status').textContent = levelIndex === 0
+    ? 'Σύρε το καλάθι ή πάτησε τα βελάκια. Πιάσε μόνο τις συσκευές που ζητά το επίπεδο.'
+    : 'Μπράβο! Κράτησες τις ζωές σου. Πάτησε «Ξεκίνα το επίπεδο 2».';
+  raceStart.textContent = levelIndex === 0 ? 'Ξεκίνα' : 'Ξεκίνα το επίπεδο 2';
+  raceStart.hidden = false;
+  raceStart.focus({preventScroll:true});
+}
+
+function startRace() {
+  if (busy) return;
+  busy = true;
+  levelIndex = 0;
+  lives = 3;
+  race.hidden = false;
+  get('quick-play').hidden = true;
+  get('liftoff').hidden = true;
+  get('mode').disabled = true;
+  buttons.forEach(button => { button.disabled = true; });
+  prepareLevel();
+  board.scrollIntoView({block:'start'});
+}
+
+function dropDevices() {
+  const level = levels[levelIndex];
+  const wave = drawCount++;
+  const remaining = level.targets.filter(index => !caught.has(index));
+  const other = level.deck.filter(index => !level.targets.includes(index));
+  // Each wave offers one useful choice and one distractor.
+  const target = remaining[wave%remaining.length];
+  const distractor = other[wave%other.length];
+  const targetLane = (wave + Math.floor(wave/3))%3;
+  const cards = [
+    {index:target,lane:targetLane},
+    {index:distractor,lane:(targetLane+1+wave%2)%3}
+  ];
+  cards.forEach((card,i) => {
+    const device = devices[card.index];
+    falling[i].innerHTML = '<span aria-hidden="true">' + device.icon + '</span>' + device.name;
+    falling[i].style.left = positions[card.lane] + '%';
+    falling[i].style.top = '8%';
+    falling[i].hidden = false;
+  });
+  const started = performance.now();
+  const duration = reduced.matches ? 4600 : 3600;
+  function frame(now) {
+    const progress = Math.min(1,(now-started)/duration);
+    falling.forEach(card => {card.style.top = (reduced.matches ? 40 : 8+78*progress) + '%'});
+    if (progress < 1) {
+      requestAnimationFrame(frame);
+      return;
+    }
+    falling.forEach(card => {card.hidden = true});
+    const picked = cards.find(card => card.lane === lane);
+    if (picked?.index === target) {
+      caught.add(target);
+      tone([580,780]);
+      showLevel();
+      get('race-status').textContent = 'Το έπιασες! ' + devices[target].name + ' μπήκε στο καλάθι.';
+    } else if (picked) {
+      lives -= 1;
+      tone([270,180]);
+      showLevel();
+      if (lives === 0) {
+        playing = false;
+        trackMessage.innerHTML = '<strong>Τέλος ζωών</strong>Πάτησε «Παίξε ξανά» για να ξεκινήσεις με 3 ζωές.';
+        trackMessage.hidden = false;
+        get('race-status').textContent = 'Το παιχνίδι τελείωσε.';
+        raceStart.textContent = 'Παίξε ξανά';
+        raceStart.hidden = false;
+        raceStart.focus({preventScroll:true});
+        return;
+      }
+      get('race-status').textContent = devices[picked.index].name + ' · Έχασες μία ζωή. ' + level.help;
+    } else {
+      get('race-status').textContent = 'Στην επόμενη πτώση δοκίμασε να πιάσεις τη σωστή συσκευή.';
+    }
+    if (caught.size < level.targets.length) {
+      setTimeout(dropDevices, 400);
+    } else if (levelIndex+1 === levels.length) {
+      setTimeout(() => {
+        race.hidden = true;
+        launchRocket();
+      }, 850);
+    } else {
+      levelIndex += 1;
+      prepareLevel();
+    }
+  }
+  requestAnimationFrame(frame);
+}
+raceStart.onclick = () => {
+  if (playing) return;
+  if (lives === 0) {
+    lives = 3;
+    levelIndex = 0;
+    prepareLevel();
+  }
+  playing = true;
+  raceStart.hidden = true;
+  get('left').focus({preventScroll:true});
+  get('race-status').textContent = levels[levelIndex].help;
+  trackMessage.hidden = true;
+  dropDevices();
+};
+new ResizeObserver(draw).observe(board);
+update();
+draw();
+</script>
+</body>
+</html>
