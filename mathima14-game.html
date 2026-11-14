@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#161332">
+<title>Η απόδραση του Τάλου</title>
+<style>
+:root{color-scheme:dark;--ink:#fff9ec;--muted:#d3d1ea;--accent:#99f6dc;--gold:#ffdb7d;--panel:#242145}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#35265b,#161332 65%);color:var(--ink);font:500 1.05rem/1.45 system-ui,sans-serif}button{font:inherit;cursor:pointer}button:focus-visible{outline:3px solid white;outline-offset:4px}h1,h2,p{margin:0}h1{font-size:clamp(2rem,5.4vw,3.7rem);line-height:1.1;letter-spacing:-.045em}h2{font-size:clamp(1.45rem,3vw,2rem);line-height:1.15}h2:focus{outline:none}
+main{max-width:1070px;margin:auto;padding:clamp(15px,4vw,38px)}header{display:flex;justify-content:space-between;gap:10px;align-items:center;color:var(--accent);font-weight:800;margin-bottom:18px;font-size:.88rem}.intro{color:var(--muted);margin:8px 0 18px}.progress{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;list-style:none;margin:0 0 14px;padding:0}.progress li{background:#252144;border:1px solid #666083;border-radius:9px;text-align:center;padding:5px;color:var(--muted);font-weight:800}.progress .active{background:var(--gold);border-color:var(--gold);color:#241837}.progress .done{background:#245448;color:#caffed;border-color:#68bea5}
+.layout{display:grid;grid-template-columns:1fr 1.08fr;gap:14px;align-items:stretch}.scene,.panel{border:1px solid #746c99;border-radius:22px;overflow:hidden}.scene{min-height:365px;position:relative;isolation:isolate;background:linear-gradient(var(--wall),var(--wall2) 71%,#252144 71%);text-align:center;display:grid;align-items:center}.scene:before{content:'';position:absolute;inset:70% -30% -30%;background:repeating-linear-gradient(90deg,transparent 0 52px,#fff2 53px 55px),repeating-linear-gradient(0deg,transparent 0 23px,#fff2 24px 26px);transform:perspective(130px) rotateX(24deg);z-index:-1}.scene:after{content:'';position:absolute;top:0;left:38%;width:24%;height:10px;border-radius:0 0 12px 12px;background:var(--accent);box-shadow:0 0 27px 5px var(--accent)}.place{position:absolute;left:13px;top:15px;background:#171632ce;border-radius:8px;padding:5px 9px;font-size:.85rem;font-weight:800}.prop{font-size:clamp(3rem,10vw,6.7rem);filter:drop-shadow(0 8px 2px #1a1638);margin-right:26%}.robot{position:absolute;bottom:10%;left:13%;font-size:3.65rem;filter:drop-shadow(0 6px 2px #1a1638);z-index:2}.portal{position:absolute;right:9%;bottom:17%;width:27%;height:55%;background:linear-gradient(90deg,#383456,#242144);border:7px solid #a49ac5;border-radius:45% 45% 7px 7px;display:grid;place-items:center;box-shadow:inset 0 0 0 4px #282342,0 7px 0 #221e43;font-size:1.6rem}.portal.open{background:radial-gradient(ellipse,#fff9d9,#96fce0 55%,#467cf4);box-shadow:0 0 36px #9bffe4;border-color:#edfff7}
+.panel{background:var(--panel);padding:clamp(15px,2.6vw,25px)}.prompt{color:var(--muted);margin:9px 0 15px}.options{display:grid;gap:8px}.option,.help,.primary{min-height:47px;border:1px solid #7a709e;border-radius:11px;background:#38325e;color:var(--ink);padding:8px 13px;text-align:left}.option:hover,.help:hover{background:#4a4272}.option.chosen{border-color:var(--accent);background:#254f47;color:#d5fff3}.option:disabled{cursor:default}.option .symbol{display:inline-block;min-width:1.65em}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.primary{background:var(--gold);color:#201733;border-color:var(--gold);font-weight:900}.primary:hover{background:#ffeca9}.feedback{margin-top:9px;color:var(--gold);font-weight:760}.feedback:empty,.hint:empty{display:none}.hint{margin-top:8px;color:var(--muted)}.feedback.success{color:var(--accent)}
+.contents{border:1px solid #6d6597;border-radius:11px;margin:0 0 14px;padding:9px 12px;background:#1e1b3b}.contents ul{margin:2px 0 0;padding-left:23px;list-style:none;border-left:2px solid #6d6597}.contents li+li{margin-top:2px}.contents li{font-size:.95rem}.credit{margin:18px 0 0;color:var(--muted);font-size:.9rem}.contents.tree ul{padding-left:15px;margin-left:4px}.contents.tree li{position:relative}.contents.tree li::before{content:"";position:absolute;left:-15px;top:.7em;width:10px;border-top:2px solid #6d6597}.recap{margin:12px 0 16px;padding-left:1.2em}.recap li+li{margin-top:6px}.arrival{animation:arrive .35s ease both}.victory .robot{animation:escape 1.7s ease-in-out forwards}.victory .portal{animation:glow .85s alternate 4}.confetti{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:4}.confetti i{position:absolute;left:var(--x);top:-18px;width:var(--size);height:calc(var(--size) * .58);background:var(--color);border-radius:2px;animation:fall var(--time) var(--delay) ease-in forwards}
+@keyframes arrive{from{opacity:.3;transform:translateY(7px)}to{opacity:1;transform:none}}@keyframes escape{0%{left:13%}55%{transform:translateY(-22px) rotate(12deg)}82%{left:72%;transform:translateY(-22px) scale(.85)}100%{left:73%;transform:translateY(-33px) scale(.2);opacity:0}}@keyframes glow{to{box-shadow:0 0 75px 16px #c9fff5}}@keyframes fall{to{transform:translate(var(--drift),110vh) rotate(760deg)}}
+@media(max-width:740px){.layout{grid-template-columns:1fr}.scene{min-height:210px}.robot{font-size:2.65rem}.prop{font-size:4rem}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important}.confetti{display:none}.victory .robot{left:69%;bottom:22%}}
+</style>
+</head>
+<body>
+<main>
+<header><span>Πληροφορική · Γ΄ Δημοτικού</span><span>Αρχεία και φάκελοι</span></header>
+<h1>Η απόδραση του Τάλου</h1>
+<p class="intro">Ο Τάλως κλειδώθηκε στο ψηφιακό αρχείο! Άνοιξε τις οκτώ πόρτες για να τον βοηθήσεις να βγει.</p>
+<ol class="progress" id="progress" aria-label="Πρόοδος στα οκτώ δωμάτια"></ol>
+<div class="layout">
+<section class="scene" id="scene" aria-label="Δωμάτιο του Τάλου">
+<div class="place" id="place"></div>
+<div class="prop" id="prop" aria-hidden="true"></div>
+<div class="portal" id="portal" aria-hidden="true">🔒</div>
+<div class="robot" aria-hidden="true">🤖</div>
+</section>
+<section class="panel" id="panel" aria-label="Γρίφος"></section>
+</div>
+<footer class="credit">Δημιουργία παιχνιδιού · Δέσποινα Καραγιαννίδου</footer>
+</main>
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+<script>
+const rooms = [
+  {
+    name: 'Στούντιο φωτογραφίας', icon: '📸', colors: ['#473978','#725290'],
+    title: 'Πού είναι η φωτογραφία;',
+    prompt: 'Ο Τάλως τράβηξε μια φωτογραφία. Ποιο από τα παρακάτω είναι το αρχείο της φωτογραφίας;',
+    options: [['📁','Εικόνες'], ['🖼️','γάτα.jpg'], ['📁','Εκδρομή']],
+    correct: [1], hint: 'Ψάξε το εικονίδιο που μοιάζει με φωτογραφία.',
+    success: 'Η φωτογραφία «γάτα.jpg» είναι αρχείο.'
+  },
+  {
+    name: 'Αίθουσα ταξινόμησης', icon: '🗄️', colors: ['#264b68','#417b8b'],
+    title: 'Πού θα βάλεις τις φωτογραφίες;',
+    prompt: 'Διάλεξε τον φάκελο που μπορεί να κρατήσει μαζί τα αρχεία της εκδρομής.',
+    options: [['🖼️','βουνό.jpg'], ['📄','σημειώσεις.txt'], ['📁','Εκδρομή']],
+    correct: [2], hint: 'Ο φάκελος μοιάζει με ένα κουτί που χωράει πολλά πράγματα.',
+    success: 'Ο φάκελος «Εκδρομή» μπορεί να περιέχει πολλά αρχεία.'
+  },
+  {
+    name: 'Βιβλιοθήκη', icon: '📚', colors: ['#542b61','#8c547d'],
+    title: 'Τι κρύβει η βιβλιοθήκη;',
+    prompt: 'Κοίτα τι έχει μέσα ο φάκελος «Βιβλιοθήκη». Βρες και πάτησε και τα δύο αρχεία.',
+    box: ['Βιβλιοθήκη', [['📄','παραμύθι.txt'], ['📁','Ζωγραφιές'], ['🖼️','εξώφυλλο.jpg']]],
+    options: [['📄','παραμύθι.txt'], ['📁','Ζωγραφιές'], ['🖼️','εξώφυλλο.jpg']],
+    correct: [0,2], hint: 'Το κείμενο και η εικόνα είναι αρχεία. Ψάξε αυτά τα δύο εικονίδια.',
+    success: 'Βρήκες δύο αρχεία στον ίδιο φάκελο.'
+  },
+  {
+    name: 'Κρυφή αποθήκη', icon: '🧰', colors: ['#624235','#8a6b48'],
+    title: 'Βρες τον φάκελο μέσα στον φάκελο',
+    prompt: 'Οι φωτογραφίες του Τάλου βρίσκονται στον φάκελο «Εικόνες». Ποιο στοιχείο μέσα στην «Εκδρομή» θα ανοίξεις;',
+    box: ['Εκδρομή', [['📄','πρόγραμμα.txt'], ['📁','Εικόνες']]],
+    options: [['📄','πρόγραμμα.txt'], ['📁','Εικόνες']],
+    correct: [1], hint: 'Ψάξε τον μικρό φάκελο κάτω από τον μεγάλο.',
+    success: 'Ο φάκελος «Εικόνες» είναι μέσα στον φάκελο «Εκδρομή».'
+  },
+  {
+    name: 'Πύλη εξόδου', icon: '🗝️', colors: ['#233c65','#4154a1'],
+    title: 'Ετοίμασε τον φάκελο «Σχολείο»',
+    prompt: 'Για να ανοίξει η πύλη, βάλε στον ίδιο φάκελο ένα αρχείο και έναν άλλο φάκελο. Πάτησε τα δύο σωστά στοιχεία.',
+    options: [['📁','Ζωγραφιές'], ['📄','εργασία.txt'], ['🖼️','τάξη.jpg']],
+    collectTypes: true, hint: 'Διάλεξε τον φάκελο «Ζωγραφιές» και ένα από τα δύο αρχεία.',
+    success: 'Ο ίδιος φάκελος μπορεί να περιέχει ταυτόχρονα αρχεία και άλλους φακέλους.'
+  },
+  {
+    name: 'Στο χωριό', icon: '🏡', colors: ['#305448','#517458'],
+    title: 'Πού βρίσκεται η φωτογραφία;',
+    prompt: 'Κοίτα το δέντρο των φακέλων. Ποιος φάκελος έχει μέσα το αρχείο «πλατεία.jpg»;',
+    tree: ['Το χωριό', [
+      ['📁','Φωτογραφίες', [['🖼️','πλατεία.jpg'], ['🖼️','σχολείο.jpg']]],
+      ['📁','Κείμενα', [['📄','ιστορία.txt']]],
+      ['📄','οδηγίες.txt']
+    ]],
+    options: [['📁','Κείμενα'], ['📁','Φωτογραφίες'], ['📁','Το χωριό']],
+    correct: [1], hint: 'Η γραμμή της «πλατεία.jpg» ξεκινά κάτω από τον φάκελο που την περιέχει.',
+    success: 'Η «πλατεία.jpg» βρίσκεται μέσα στον φάκελο «Φωτογραφίες».'
+  },
+  {
+    name: 'Αίθουσα ιστοριών', icon: '📖', colors: ['#533c6c','#745a8b'],
+    title: 'Πού βρίσκεται ο μικρός φάκελος;',
+    prompt: 'Ποιος φάκελος έχει αμέσως μέσα του τον φάκελο «Παραμύθια»;',
+    tree: ['Σχολική γιορτή', [
+      ['📁','Ιστορίες', [['📁','Παραμύθια', [['📄','ο δράκος.txt']]], ['📄','μύθος.txt']]],
+      ['📁','Τραγούδια', [['🎵','χορός.mp3']]]
+    ]],
+    options: [['📁','Σχολική γιορτή'], ['📁','Τραγούδια'], ['📁','Ιστορίες']],
+    correct: [2], hint: 'Ακολούθησε τη γραμμή από τα «Παραμύθια» ένα επίπεδο προς τα πάνω.',
+    success: 'Τα «Παραμύθια» είναι φάκελος μέσα στις «Ιστορίες».'
+  },
+  {
+    name: 'Τελική έξοδος', icon: '🗺️', colors: ['#2c4178','#524ea3'],
+    title: 'Ακολούθησε τη σωστή διαδρομή',
+    prompt: 'Ξεκινάς στον φάκελο «Η τάξη μας». Ποιους φακέλους ανοίγεις με τη σειρά για να βρεις το «παραμύθι.mp3»;',
+    tree: ['Η τάξη μας', [
+      ['📁','Γιορτή', [['📁','Ήχοι', [['🎵','παραμύθι.mp3']]], ['📁','Εικόνες', [['🖼️','σκηνή.jpg']]]]],
+      ['📁','Εργασίες', [['📄','άσκηση.txt']]]
+    ]],
+    options: [['📁','Γιορτή → Ήχοι'], ['📁','Ήχοι → Γιορτή'], ['📁','Γιορτή → Εικόνες']],
+    correct: [0], hint: 'Ξεκίνα από πάνω. Άνοιξε πρώτα τον μεγάλο φάκελο και μετά τον φάκελο στον οποίο βλέπεις το αρχείο.',
+    success: 'Άνοιξες πρώτα τη «Γιορτή» και μετά τους «Ήχους». Η έξοδος είναι μπροστά σου!'
+  }
+];
+const panel = document.querySelector('#panel');
+const scene = document.querySelector('#scene');
+const confetti = document.querySelector('#confetti');
+const portal = document.querySelector('#portal');
+let roomIndex = 0;
+
+function folderView(name, items) {
+  const entries = items.map(([icon, text]) => '<li>' + icon + ' ' + text + '</li>').join('');
+  return '<div class="contents"><strong>📁 ' + name + '</strong><ul>' + entries + '</ul></div>';
+}
+
+function treeView(name, items) {
+  function branches(entries) {
+    return '<ul>' + entries.map(([icon, label, children]) =>
+      '<li>' + icon + ' ' + label + (children ? branches(children) : '') + '</li>'
+    ).join('') + '</ul>';
+  }
+  return '<div class="contents tree" aria-label="Δέντρο φακέλων"><strong>📁 ' + name + '</strong>' + branches(items) + '</div>';
+}
+
+function showProgress(completed) {
+  document.querySelector('#progress').innerHTML = rooms.map((_, index) => {
+    const done = index < completed;
+    const active = index === completed;
+    return '<li class="' + (done ? 'done' : active ? 'active' : '') + '"' +
+      (active ? ' aria-current="step"' : '') + ' aria-label="Δωμάτιο ' +
+      (index + 1) + (done ? ', λύθηκε' : '') + '">' + (done ? '✓ ' : '') + (index + 1) + '</li>';
+  }).join('');
+}
+
+function renderRoom(moveFocus = true) {
+  const room = rooms[roomIndex];
+  const selected = new Set();
+  const needed = room.collectTypes ? 2 : room.correct.length;
+  showProgress(roomIndex);
+  confetti.replaceChildren();
+  scene.classList.remove('victory');
+  portal.classList.remove('open');
+  portal.textContent = '🔒';
+  scene.style.setProperty('--wall', room.colors[0]);
+  scene.style.setProperty('--wall2', room.colors[1]);
+  document.querySelector('#place').textContent = 'Δωμάτιο ' + (roomIndex + 1) + ' · ' + room.name;
+  document.querySelector('#prop').textContent = room.icon;
+  panel.innerHTML = '<div class="arrival"><h2 tabindex="-1">' + room.title + '</h2><p class="prompt">' + room.prompt + '</p>' +
+    (room.box ? folderView(...room.box) : '') +
+    (room.tree ? treeView(...room.tree) : '') +
+    '<div id="built">' + (room.collectTypes ? folderView('Σχολείο', [['','Ο φάκελος είναι άδειος.']]) : '') + '</div>' +
+    '<div class="options"></div><p class="feedback" role="status"></p>' +
+    '<div class="actions"><button class="help" aria-expanded="false" aria-controls="hint">💡 Βοήθεια</button></div><p class="hint" id="hint"></p></div>';
+  const feedback = panel.querySelector('.feedback');
+  const actions = panel.querySelector('.actions');
+  const help = panel.querySelector('.help');
+  help.onclick = () => {
+    panel.querySelector('.hint').textContent = room.hint;
+    help.setAttribute('aria-expanded', 'true');
+  };
+  const options = room.options.map(([icon, label], index) => {
+    const button = document.createElement('button');
+    button.className = 'option';
+    button.innerHTML = '<span class="symbol">' + icon + '</span>' + label;
+    button.onclick = () => {
+      const repeatedType = room.collectTypes && [...selected].some(choice => (choice === 0) === (index === 0));
+      if (repeatedType) {
+        feedback.textContent = 'Έβαλες ήδη ένα αρχείο. Τώρα πρόσθεσε έναν φάκελο.';
+        return;
+      }
+      if (!room.collectTypes && !room.correct.includes(index)) {
+        feedback.textContent = 'Δοκίμασε ξανά. Μπορείς να πατήσεις «Βοήθεια».';
+        return;
+      }
+      selected.add(index);
+      button.classList.add('chosen');
+      button.disabled = true;
+      if (room.collectTypes) {
+        panel.querySelector('#built').innerHTML = folderView('Σχολείο', [...selected].sort().map(choice => room.options[choice]));
+      }
+      if (selected.size < needed) {
+        feedback.textContent = room.collectTypes
+          ? (index === 0 ? 'Πρόσθεσες φάκελο! Τώρα πρόσθεσε ένα αρχείο.' : 'Πρόσθεσες αρχείο! Τώρα πρόσθεσε έναν φάκελο.')
+          : 'Βρήκες το ένα! Ψάξε και το δεύτερο.';
+        options.find((option, choice) => !selected.has(choice)).focus();
+        return;
+      }
+      options.forEach(option => { option.disabled = true; });
+      feedback.textContent = room.success;
+      feedback.classList.add('success');
+      portal.classList.add('open');
+      portal.textContent = '✨';
+      showProgress(roomIndex + 1);
+      const next = document.createElement('button');
+      next.className = 'primary';
+      next.textContent = roomIndex === rooms.length - 1 ? 'Βγες με τον Τάλω →' : 'Πέρασε στο επόμενο δωμάτιο →';
+      next.onclick = () => {
+        if (roomIndex === rooms.length - 1) celebrate();
+        else {
+          roomIndex += 1;
+          renderRoom();
+        }
+      };
+      actions.replaceChildren(next);
+      panel.querySelector('.hint').textContent = '';
+      next.focus();
+    };
+    panel.querySelector('.options').append(button);
+    return button;
+  });
+  if (moveFocus) panel.querySelector('h2').focus();
+}
+
+function celebrate() {
+  scene.classList.add('victory');
+  document.querySelector('#place').textContent = 'Η πύλη άνοιξε!';
+  document.querySelector('#prop').textContent = '🏆';
+  panel.innerHTML = '<div class="arrival"><h2 tabindex="-1">🎉 Ο Τάλως απέδρασε!</h2><p class="prompt">Άνοιξες και τις οκτώ πόρτες της απόδρασης!</p><ul class="recap">' +
+    '<li>Ένα <strong>αρχείο</strong> μπορεί να είναι μια φωτογραφία ή ένα κείμενο.</li>' +
+    '<li>Ένας <strong>φάκελος</strong> οργανώνει αρχεία και μπορεί να έχει μέσα του και άλλους φακέλους.</li></ul>' +
+    '<button class="primary" id="restart">Παίξε ξανά</button></div>';
+  panel.querySelector('h2').focus();
+  document.querySelector('#restart').onclick = () => {
+    roomIndex = 0;
+    renderRoom();
+  };
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const colors = ['#ffdb7d','#99f6dc','#ff80bf','#92b6ff','#d9a0ff'];
+  const pieces = Array.from({length: 90}, (_, index) => {
+    const piece = document.createElement('i');
+    piece.style.cssText = '--x:' + Math.random() * 100 + '%;--size:' + (6 + Math.random() * 12) + 'px;--color:' +
+      colors[index % colors.length] + ';--time:' + (2 + Math.random() * 2) + 's;--delay:' + Math.random() * 1.5 +
+      's;--drift:' + (Math.random() * 200 - 100) + 'px';
+    return piece;
+  });
+  confetti.replaceChildren(...pieces);
+  pieces.forEach(piece => piece.addEventListener('animationend', () => piece.remove(), {once:true}));
+}
+
+renderRoom(false);
+</script>
+</body>
+</html>
