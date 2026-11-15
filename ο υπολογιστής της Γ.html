@@ -1,0 +1,265 @@
+<!doctype html><html lang="el"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Υπολογιστής Γ1</title>
+<style>
+:root{font-family:"Inter",system-ui,sans-serif;color:#182939;background:#112944}*{box-sizing:border-box}body{margin:0;min-height:100dvh}button,input{font:inherit}button{cursor:pointer;touch-action:manipulation}button:focus-visible,input:focus-visible{outline:3px solid #d76313;outline-offset:2px}[hidden]{display:none!important}
+.desktop{position:relative;min-height:calc(100dvh - 52px);padding:12px 12px 64px;background:radial-gradient(ellipse at 78% 22%,#d5f5ff 0,transparent 38%),radial-gradient(ellipse at 76% 63%,#269cc4 0,transparent 49%),linear-gradient(142deg,#123670,#325dc4 62%,#662e8f);isolation:isolate}.desktopIcons{display:grid;grid-template-rows:repeat(5,92px);grid-auto-flow:column;grid-auto-columns:97px;justify-content:start;gap:4px;min-height:472px}.item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:65px;padding:5px;overflow-wrap:anywhere;color:inherit;border:1px solid transparent;border-radius:5px;background:transparent;text-align:center;user-select:none}.item .icon{font-size:30px;line-height:1}.item .label{font-size:.85rem}.desktopIcons .item{color:#fff;text-shadow:0 1px 3px #15294f}.item:hover,.item.selected,.item.drop{background:#74b9fc39;border-color:#78bbf2}.item.drop{background:#a5f3ba80}.desktopIcons .item.selected{background:#a5d4fa50;border-color:#c5ecff}.deskControls{position:fixed;top:9px;right:10px;display:flex;flex-wrap:wrap;justify-content:end;gap:5px;z-index:1}.deskControls button,.taskbar button,.tools button,.path button,.dialog button,.menu button{min-height:38px;border:1px solid #aebed0;background:#f9fcff;border-radius:6px;color:#192f48;padding:6px 9px;font-weight:700}.deskControls button:disabled,.tools button:disabled{opacity:.45;cursor:default}.taskbar{position:fixed;bottom:0;left:0;right:0;display:flex;gap:5px;align-items:center;z-index:8;padding:5px 8px;min-height:50px;background:#eef6fdef;border-top:1px solid #9cbbdf}.taskbar span{margin-left:auto;font-size:.85rem;font-weight:800}.taskbar [aria-pressed=true]{background:#cee7fe;border-color:#5486b9}.window{position:absolute;z-index:3;left:clamp(0px,23vw,305px);top:70px;width:min(730px,calc(100% - clamp(0px,23vw,305px) - 15px));background:#fff;border:1px solid #5880a9;border-radius:10px;overflow:hidden;box-shadow:0 14px 42px #17275169}.caption{display:flex;gap:5px;align-items:center;min-height:44px;background:#dceaff;padding:4px 6px 4px 10px;cursor:move;touch-action:none}.caption strong{flex:1;overflow-wrap:anywhere}.caption button{min-width:42px;min-height:35px;border:0;border-radius:5px;background:transparent;font-size:1.15rem}.caption button:hover{background:#aecdff}.caption button:last-child:hover{background:#f3a2a3}.tools,.path{display:flex;gap:4px;flex-wrap:wrap;padding:6px;border-bottom:1px solid #d3dfed}.tools{background:#f2f7fd}.tools button,.path button{min-height:35px;font-size:.84rem}.path{align-items:center}.path button[aria-current]{background:#e6f1ff}.columns{display:grid;grid-template-columns:130px minmax(0,1fr);min-height:215px}.places{padding:7px;background:#eef3f9;border-right:1px solid #cfdeed}.places b{font-size:.8rem}.places button{display:block;margin-top:5px;padding:5px;border:1px solid transparent;border-radius:5px;background:transparent;min-height:40px;text-align:left}.places button:hover{background:#cfe5fb}.contents{padding:8px;min-width:0}.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(102px,100%),1fr));gap:3px}.items.big .icon{font-size:40px}.items.list{display:block}.items.list .item,.headers{display:grid;text-align:left;grid-template-columns:minmax(0,1fr) 69px 70px;gap:4px;min-height:39px;width:100%;font-size:.8rem;align-items:center}.headers{padding:5px}.fileName{display:flex;align-items:center;gap:5px;min-width:0;overflow-wrap:anywhere}.items.list .icon{font-size:20px}.footer{border-top:1px solid #d2e0ed;padding:6px 9px;background:#f2f7fd;font-size:.85rem;overflow-wrap:anywhere}.notice{position:fixed;z-index:7;right:10px;bottom:60px;max-width:min(480px,calc(100% - 20px));background:#f5fbff;border:1px solid #315679;border-radius:8px;padding:8px 10px;font-weight:700;box-shadow:0 4px 14px #18335255}.menu{position:fixed;z-index:12;min-width:165px;background:#f5f9fe;border:1px solid #6d8eae;border-radius:9px;padding:5px;box-shadow:0 8px 18px #17275169}.menu button{display:block;width:100%;text-align:left;margin:2px 0}.dialog{border:1px solid #6687ac;border-radius:10px;max-width:min(480px,calc(100% - 22px));color:inherit}.dialog::backdrop{background:#11284670}.dialog input{width:100%;min-height:44px;border:1px solid #7392b5;border-radius:5px;padding:7px;margin-bottom:6px}.dialog h2{margin:0 0 10px;font-size:1.2rem}.dialog p{line-height:1.4}.missions{margin:5px 0 10px;padding-left:24px}.missions li{padding:4px 0}.missions .complete{color:#17653b;font-weight:750}.quickGuide{position:absolute;right:14px;bottom:65px;color:#f9fcff;text-shadow:0 1px 3px #153352;font-size:.88rem;max-width:360px;margin:0;text-align:right}.desktop:has(.window:not([hidden])) .quickGuide{display:none}@media(max-width:650px){.desktop{padding:7px 6px 59px}.desktopIcons{grid-template-rows:none;grid-auto-flow:row;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:80px;min-height:0}.deskControls{position:sticky;top:0;left:auto;right:auto;justify-content:center;gap:3px;padding:3px;margin-bottom:5px;background:#224e94e8;border-radius:7px}.deskControls button{font-size:.75rem;padding:5px;min-height:42px}.window{position:relative;inset:auto!important;width:100%;margin-top:8px}.caption{cursor:default;touch-action:auto}.caption button{min-height:42px}.columns{grid-template-columns:1fr}.places{display:flex;align-items:center;gap:5px;flex-wrap:wrap;border-right:0;border-bottom:1px solid #cfdeed}.places button{margin:0;font-size:.82rem}.quickGuide{position:static;text-align:center;margin:16px auto 0}.tools button,.path button{min-height:42px}.taskbar span{display:none}}
+
+.guidePanel{position:relative;z-index:1;width:min(100%,600px);margin:0 0 10px auto;padding:8px 11px;background:#f4f9fff2;border:1px solid #9ebbd7;border-radius:9px;font-size:.86rem;box-shadow:0 3px 14px #14396530}.guidePanel summary{cursor:pointer;font-weight:800;min-height:26px;display:list-item}.guidePanel .missions{margin:4px 0 0}.guidePanel .missions li{padding:2px 0}.deskControls{position:relative;top:auto;right:auto;margin:0 0 7px auto}.editPanel{position:relative;z-index:6;width:min(100%,440px);margin:8px auto 10px;padding:12px;background:#fff;border:1px solid #6687ac;border-radius:10px;box-shadow:0 8px 24px #14294b55;scroll-margin-top:12px}.editPanel h2{font-size:1.1rem;margin:0 0 5px}.editPanel label{display:block;font-weight:700}.editPanel input{display:block;min-height:44px;width:100%;margin:4px 0 6px;padding:7px 9px;border:1px solid #7392b5;border-radius:6px;font-size:16px}.editPanel button{min-height:44px;border:1px solid #aebed0;border-radius:6px;padding:6px 10px;background:#f0f6fd;color:#192f48;font-weight:750}.editPanel button[type=submit]{background:#244f86;border-color:#244f86;color:white}.editPanel p:empty{display:none}.editPanel p{margin:5px 0;color:#85263e}.desktop:has(.editPanel:not([hidden])) .window{z-index:2}.window{top:clamp(168px,28vh,230px)}@media(max-width:650px){.guidePanel{margin:0 0 6px}.guidePanel summary{min-height:34px}.guidePanel .missions{padding-left:20px}.deskControls{top:0;position:sticky;margin-bottom:6px;z-index:5}.editPanel{scroll-margin-top:65px}}
+</style></head><body>
+<main id="desktop" class="desktop" aria-label="Εικονική επιφάνεια εργασίας του Γ1">
+<div id="deskControls" class="deskControls"><button id="deskOpen">Άνοιγμα</button><button id="deskNew">＋ Φάκελος</button><button id="deskActions">⋯ Ενέργειες</button><button id="deskPaste" hidden>Μετακίνηση εδώ</button></div>
+<details id="guidePanel" class="guidePanel" open><summary id="guideSummary">Οδηγίες Γ1</summary><ol id="deskMissions" class="missions"></ol></details>
+<section id="editPanel" class="editPanel" aria-labelledby="dialogTitle" hidden>
+<form id="form"><h2 id="dialogTitle" tabindex="-1"></h2><label for="name">Όνομα</label><input id="name" maxlength="56" autocomplete="off" enterkeyhint="done"><p id="error" role="status"></p><button type="submit">Αποθήκευση</button> <button type="button" id="cancel">Ακύρωση</button></form>
+</section>
+<div id="deskIcons" class="desktopIcons" aria-label="Εικονίδια επιφάνειας εργασίας"></div>
+<p class="quickGuide">Διπλό κλικ ή επιλογή και «Άνοιγμα» για να ανοίξεις ένα εικονίδιο.</p>
+<section id="window" class="window" aria-label="Εξερευνητής αρχείων" hidden>
+<div id="caption" class="caption"><strong id="title"></strong><button id="minimize" aria-label="Ελαχιστοποίηση">−</button><button id="close" aria-label="Κλείσιμο">×</button></div>
+<div class="tools"><button id="back">← Πίσω</button><button id="open">Άνοιγμα</button><button id="create">＋ Φάκελος</button><button id="actions">⋯ Ενέργειες</button><button id="view">☷ Λίστα</button><button id="zoom">🔎 Μεγέθυνση</button><button id="paste" hidden>Μετακίνηση εδώ</button></div>
+<nav class="path" id="path" aria-label="Διαδρομή φακέλου"></nav>
+<div class="columns"><nav class="places" aria-label="Τοποθεσίες"><b>Τοποθεσίες</b><button id="placeDesk">▣ Επιφάνεια εργασίας</button><button id="placeGrade">📁 Γ1</button></nav><section id="contents" class="contents" aria-label="Περιεχόμενο φακέλου"><div id="items" class="items"></div></section></div>
+<div id="footer" class="footer"></div>
+</section>
+</main>
+<nav class="taskbar" aria-label="Γραμμή εργασιών"><button id="start">▦ Έναρξη</button><button id="taskExplorer" hidden>📁 Εξερευνητής</button><span>Υπολογιστής Γ1 · Αρχεία και φάκελοι</span></nav>
+<div id="notice" class="notice" role="status" hidden></div>
+<div id="menu" class="menu" hidden></div>
+
+<dialog id="preview" class="dialog"><h2 id="previewTitle"></h2><div id="previewBody"></div><button id="closePreview">Κλείσιμο</button></dialog>
+<script>
+const $=id=>document.getElementById(id);
+const icons={folder:'📁',image:'🖼️',audio:'🎵',video:'🎬',text:'📄',guide:'📋',explorer:'🗂️'};
+const types={folder:'Φάκελος',image:'Εικόνα',audio:'Ήχος',video:'Βίντεο',text:'Κείμενο'};
+const folder=(name,children=[])=>({name,type:'folder',children});
+const file=(name,type,size)=>({name,type,size});
+const norm=s=>s.trim().toLocaleLowerCase('el').normalize('NFD').replace(/\p{M}/gu,'').replace(/ς/g,'σ');
+let desktop,grade,village,stories,info,story,map,untitled,guide,explorer,targets,loose,route,history,deskSelected,selected,carry,list,big,opened,visible,heard,readSize,editAction,editOrigin,sequence,data,noticeTimer;
+function reset(){
+ $('editPanel').hidden=true;editAction=null;editOrigin=null;
+ sequence=0;data=new Map();route=[];history=[];deskSelected=null;selected=null;carry=null;list=false;big=false;opened=false;visible=false;heard=false;readSize=false;
+ map=file('Χάρτης','image','640 KB');story=file('Παραμύθι','audio','3 MB');untitled=file('Άτιτλο 2','text','18 KB');
+ stories=folder('Διηγήσεις',[story,file('Θυμάμαι','audio','2 MB')]);
+ info=folder('Πληροφορίες',[map,file('Ιστορία και αξιοθέατα','text','26 KB')]);
+ village=folder('Το χωριό',[info,stories]);grade=folder('Γ1',[village]);
+ targets={image:folder('Εικόνες'),audio:folder('Ήχοι'),text:folder('Κείμενα'),video:folder('Βίντεο')};
+ loose=[file('Πλατεία','image','850 KB'),file('Τραγούδι','audio','4 MB'),untitled,file('Γιορτή','video','12 MB')];
+ guide={name:'Οδηγίες Γ1',type:'guide'};explorer={name:'Εξερευνητής',type:'explorer'};
+ desktop=folder('Επιφάνεια εργασίας',[guide,explorer,grade,...Object.values(targets),...loose]);
+ register(desktop,null);$('window').style.left='';$('window').style.top='';
+ render();
+}
+function register(item,parent){
+ item.id=String(++sequence);item.parent=parent;data.set(item.id,item);
+ item.children?.forEach(child=>register(child,item));
+}
+function n(tag,text='',cls=''){const a=document.createElement(tag);a.textContent=text;if(cls)a.className=cls;return a;}
+function button(parent,text,action,cls){const b=n('button',text,cls);b.type='button';b.onclick=action;parent.append(b);return b;}
+function note(text){
+ clearTimeout(noticeTimer);$('notice').textContent=text;$('notice').hidden=false;
+ noticeTimer=setTimeout(()=>$('notice').hidden=true,4200);
+}
+const current=()=>route.at(-1)||desktop;
+function lineage(item){const path=[];for(let p=item;p;p=p.parent)path.unshift(p);return path;}
+function gotoFolder(item){
+ if(!item?.children)return;
+ if(!opened||current()!==item)history.push(current());
+ route=lineage(item);selected=null;opened=true;visible=true;render();
+}
+function open(item){
+ if(!item)return;
+ if(item.type==='guide'){showGuide();return;}
+ if(item.type==='explorer'){gotoFolder(desktop);return;}
+ if(item.children){gotoFolder(item);return;}
+ $('previewTitle').textContent=icons[item.type]+' '+item.name;
+ const body=$('previewBody');body.replaceChildren(n('p',types[item.type]+' · '+item.size));
+ if(item===story){heard=true;body.append(n('p','Ηχογράφηση από τον φάκελο «Διηγήσεις».'));}
+ if(item===map&&list&&current()===info)readSize=true;
+ renderGuide();
+ $('preview').showModal();
+}
+function tasks(){
+ return [
+  ['Βρες το «Παραμύθι». Διαδρομή: Γ1 › Το χωριό › Διηγήσεις.',heard],
+  ['Δημιούργησε τον φάκελο «Παρουσίαση» πάνω στην επιφάνεια εργασίας.',desktop.children.some(item=>item.children&&norm(item.name)===norm('Παρουσίαση'))],
+  ['Μετονόμασε το «Άτιτλο 2» σε «Σημειώσεις πρόβας».',norm(untitled.name)===norm('Σημειώσεις πρόβας')],
+  ['Τακτοποίησε την «Πλατεία», το «Τραγούδι», τις σημειώσεις και τη «Γιορτή» στους φακέλους του τύπου τους.',loose.every(item=>item.parent===targets[item.type])],
+  ['Στο Γ1 › Το χωριό › Πληροφορίες, βάλε προβολή λίστας, βρες το μέγεθος του «Χάρτη» και άνοιξέ τον.',readSize]
+ ];
+}
+function renderGuide(){
+ const rows=tasks();
+ $('deskMissions').replaceChildren(...rows.map(([text,done])=>n('li',(done?'✓ ':'')+text,done?'complete':'')));
+ $('guideSummary').textContent='Οδηγίες Γ1 · '+rows.filter(([,done])=>done).length+'/'+rows.length+' ολοκληρώθηκαν';
+}
+function showGuide(){
+ $('previewTitle').textContent='📋 Οδηγίες Γ1';
+ const body=$('previewBody');const list=n('ol','','missions');
+ for(const [text,done] of tasks())list.append(n('li',(done?'✓ ':'')+text,done?'complete':''));
+ body.replaceChildren(n('p','Μάθημα 14 · Αρχεία και φάκελοι'),list,
+ n('p','Με ποντίκι: διπλό κλικ για άνοιγμα, δεξί κλικ για ενέργειες και σύρσιμο αρχείου πάνω σε φάκελο.'),n('p','Με αφή: επίλεξε εικονίδιο και πάτησε «Άνοιγμα». Από τις «Ενέργειες» διάλεξε «Αποκοπή», άνοιξε τον φάκελο προορισμού και πάτησε «Μετακίνηση εδώ».'));
+ $('preview').showModal();
+}
+function highlight(area,item){
+ area.querySelectorAll('[data-item]').forEach(b=>{
+  const on=b.dataset.item===item?.id;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on));
+ });
+}
+function itemButton(area,item,onDesk){
+ const b=button(area,'',()=>{
+  if(onDesk)deskSelected=item;else selected=item;
+  highlight(area,item);updateControls();
+ },'item');
+ b.dataset.item=item.id;b.setAttribute('aria-label',item.name+(types[item.type]?' · '+types[item.type]:''));
+ const label=n('span',item.name,'label'),icon=n('span',icons[item.type],'icon');icon.setAttribute('aria-hidden','true');
+ if(!onDesk&&list){
+  const name=n('span','','fileName');name.append(icon,label);b.append(name,n('span',types[item.type]||'—'),n('span',item.size||'—'));
+ }else b.append(icon,label);
+ b.ondblclick=()=>open(item);
+ b.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();open(item);}};
+ b.oncontextmenu=e=>{e.preventDefault();e.stopPropagation();if(onDesk)deskSelected=item;else selected=item;highlight(area,item);updateControls();context(e.clientX,e.clientY,onDesk?desktop:current(),item);};
+ if(item.size){
+  b.draggable=true;
+  b.ondragstart=e=>{e.dataTransfer.setData('text/plain',item.id);e.dataTransfer.effectAllowed='move';};
+ }
+ if(item.children)dropZone(b,item);
+}
+function dropZone(b,folder){
+ b.ondragover=e=>{e.preventDefault();e.stopPropagation();b.classList.add('drop');};
+ b.ondragleave=()=>b.classList.remove('drop');
+ b.ondrop=e=>{e.preventDefault();e.stopPropagation();b.classList.remove('drop');transfer(data.get(e.dataTransfer.getData('text/plain')),folder);};
+}
+function transfer(item,target){
+ if(!item?.size||!target?.children)return;
+ if(item.parent===target){note('Το αρχείο βρίσκεται ήδη εδώ.');return;}
+ if(target.children.some(x=>norm(x.name)===norm(item.name))){note('Υπάρχει ήδη αρχείο με αυτό το όνομα εδώ.');return;}
+ item.parent.children.splice(item.parent.children.indexOf(item),1);
+ item.parent=target;target.children.push(item);carry=null;selected=null;deskSelected=null;
+ render();note('Μεταφέρθηκε: '+item.name+' → '+target.name);
+}
+function render(){
+ renderGuide();
+ $('window').hidden=!visible;$('taskExplorer').hidden=!opened;$('taskExplorer').setAttribute('aria-pressed',String(visible));
+ const desk=$('deskIcons');desk.replaceChildren();desktop.children.forEach(item=>itemButton(desk,item,true));highlight(desk,deskSelected);
+ const here=current();
+ $('title').textContent='📁 '+here.name+' — Εξερευνητής';
+ const bar=$('path');bar.replaceChildren();
+ lineage(here).forEach((item,i)=>{
+  if(i)bar.append(n('span','›'));
+  const b=button(bar,item.name,()=>gotoFolder(item));
+  if(item===here)b.setAttribute('aria-current','location');
+ });
+ const items=$('items');items.replaceChildren();items.className='items'+(list?' list':'')+(big?' big':'');
+ if(list){const cols=n('div','','headers');cols.append(n('b','Όνομα'),n('b','Τύπος'),n('b','Μέγεθος'));items.append(cols);}
+ if(!here.children.length)items.append(n('p','Ο φάκελος είναι άδειος.'));
+ here.children.forEach(item=>itemButton(items,item,false));highlight(items,selected);
+ $('back').disabled=!history.length;$('view').textContent=list?'▦ Εικονίδια':'☷ Λίστα';$('zoom').textContent=big?'🔍 Κανονικά':'🔍 Μεγέθυνση';
+ updateControls();
+}
+function updateControls(){
+ $('deskOpen').disabled=!deskSelected;$('open').disabled=!selected;$('deskPaste').hidden=$('paste').hidden=!carry;
+ $('footer').textContent=carry?'Προς μετακίνηση: '+carry.name:selected?'Επιλογή: '+selected.name:current().children.length+' στοιχεία';
+}
+function edit(parent,item=null){
+ $('dialogTitle').textContent=item?'Μετονομασία':'Νέος φάκελος';
+ editOrigin=parent===desktop?$('deskControls'):$('caption');
+ $('name').value=item?item.name:'';$('error').textContent='';
+ editAction=name=>{
+  if(!name)return 'Γράψε ένα όνομα.';
+  if(parent.children.some(x=>x!==item&&norm(x.name)===norm(name)))return 'Υπάρχει ήδη στοιχείο με αυτό το όνομα.';
+  if(item){item.name=name;note('Νέο όνομα: '+name);}
+  else{const created=folder(name);parent.children.push(created);register(created,parent);if(parent===desktop)deskSelected=created;else selected=created;note('Δημιουργήθηκε ο φάκελος «'+name+'».');}
+  render();
+ };
+ const panel=$('editPanel');
+ panel.hidden=false;
+ panel.scrollIntoView({block:'nearest'});
+ if(!matchMedia('(pointer: coarse)').matches&&innerWidth>650)$('name').select();
+ else $('dialogTitle').focus({preventScroll:true});
+}
+function context(x,y,parent,item){
+ const menu=$('menu');menu.replaceChildren();
+ const add=(text,action)=>button(menu,text,()=>{menu.hidden=true;action();});
+ if(item){
+  add('Άνοιγμα',()=>open(item));
+  if(item.size||item.children)add('Μετονομασία',()=>edit(parent,item));
+  if(item.size)add('Αποκοπή',()=>{carry=item;updateControls();note('Άνοιξε τον φάκελο προορισμού και πάτησε «Μετακίνηση εδώ».');});
+ }
+ add('＋ Νέος φάκελος',()=>edit(parent));
+ if(carry){
+  add('Μετακίνηση εδώ',()=>transfer(carry,parent));
+  add('Ακύρωση αποκοπής',()=>{carry=null;updateControls();});
+ }
+ showMenu(x,y);
+}
+function showMenu(x,y){
+ const menu=$('menu');menu.hidden=false;
+ menu.style.left=Math.max(0,Math.min(x,innerWidth-menu.offsetWidth))+'px';
+ menu.style.top=Math.max(0,Math.min(y,innerHeight-menu.offsetHeight))+'px';
+ menu.querySelector('button')?.focus();
+}
+document.addEventListener('click',e=>{if(!e.target.closest('#menu,#start,#actions,#deskActions'))$('menu').hidden=true;});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('menu').hidden=true;});
+$('desktop').onclick=e=>{
+ if(e.target.closest('[data-item],.window,.deskControls,.guidePanel,.editPanel'))return;
+ deskSelected=null;highlight($('deskIcons'),null);updateControls();
+};
+$('desktop').oncontextmenu=e=>{if(e.target.closest('.window,.deskControls,.guidePanel,.editPanel'))return;e.preventDefault();context(e.clientX,e.clientY,desktop,null);};
+$('contents').oncontextmenu=e=>{e.preventDefault();context(e.clientX,e.clientY,current(),null);};
+dropZone($('desktop'));dropZone($('contents'));
+$('contents').ondrop=e=>{e.preventDefault();e.stopPropagation();$('contents').classList.remove('drop');transfer(data.get(e.dataTransfer.getData('text/plain')),current());};
+$('desktop').ondrop=e=>{e.preventDefault();$('desktop').classList.remove('drop');if(!e.target.closest('.window'))transfer(data.get(e.dataTransfer.getData('text/plain')),desktop);};
+function menuBy(button,parent,item){const rect=button.getBoundingClientRect();context(rect.left,rect.bottom,parent,item);}
+$('deskActions').onclick=()=>menuBy($('deskActions'),desktop,deskSelected);
+$('actions').onclick=()=>menuBy($('actions'),current(),selected);
+$('deskOpen').onclick=()=>open(deskSelected);$('open').onclick=()=>open(selected);
+$('deskNew').onclick=()=>edit(desktop);$('create').onclick=()=>edit(current());
+$('deskPaste').onclick=()=>transfer(carry,desktop);$('paste').onclick=()=>transfer(carry,current());
+$('placeDesk').onclick=()=>gotoFolder(desktop);$('placeGrade').onclick=()=>gotoFolder(grade);
+$('back').onclick=()=>{if(history.length){route=lineage(history.pop());selected=null;render();}};
+$('view').onclick=()=>{list=!list;render();};$('zoom').onclick=()=>{big=!big;render();};
+$('close').onclick=()=>{visible=false;opened=false;route=[];history=[];selected=null;render();};
+$('minimize').onclick=()=>{visible=false;render();$('taskExplorer').focus();};
+$('taskExplorer').onclick=()=>{visible=!visible;render();};
+$('start').onclick=()=>{
+ const menu=$('menu');
+ if(!menu.hidden){menu.hidden=true;return;}
+ menu.replaceChildren();
+ button(menu,'📁 Εξερευνητής',()=>{menu.hidden=true;gotoFolder(desktop);});
+ button(menu,'📋 Οδηγίες Γ1',()=>{menu.hidden=true;showGuide();});
+ button(menu,'↻ Επαναφορά εργαστηρίου',()=>{menu.hidden=true;$('previewTitle').textContent='Επαναφορά εργαστηρίου';const body=$('previewBody');
+ body.replaceChildren(n('p','Τα εικονίδια και τα αρχεία θα επανέλθουν στην αρχική τους θέση.'));
+ button(body,'Επαναφορά',()=>{$('preview').close();reset();note('Το εργαστήριο επανήλθε στην αρχική του κατάσταση.');});
+ $('preview').showModal();});
+ const rect=$('start').getBoundingClientRect();showMenu(rect.left,rect.top-menu.scrollHeight-8);
+};
+function closeEdit(){
+ const origin=editOrigin;
+ $('editPanel').hidden=true;editAction=null;editOrigin=null;
+ origin?.scrollIntoView({block:'nearest'});
+}
+$('cancel').onclick=closeEdit;
+$('closePreview').onclick=()=>$('preview').close();
+$('form').onsubmit=e=>{
+ e.preventDefault();
+ if(!editAction)return;
+ const error=editAction($('name').value.trim());
+ if(error){$('error').textContent=error;return;}
+ closeEdit();
+};
+const caption=$('caption');
+let moving=null;
+caption.onpointerdown=e=>{
+ if(e.target.closest('button')||innerWidth<=650||e.button!==0)return;
+ const box=$('window'), host=$('desktop').getBoundingClientRect(), rect=box.getBoundingClientRect();
+ moving={id:e.pointerId,x:e.clientX-rect.left,y:e.clientY-rect.top,host};
+ caption.setPointerCapture(e.pointerId);
+};
+caption.onpointermove=e=>{
+ if(moving?.id!==e.pointerId)return;
+ const box=$('window');
+ box.style.left=Math.max(0,Math.min(moving.host.width-box.offsetWidth-4,e.clientX-moving.host.left-moving.x))+'px';
+ box.style.top=Math.max(0,e.clientY-moving.host.top-moving.y)+'px';
+};
+caption.onpointerup=caption.onpointercancel=()=>{moving=null;};
+reset();
+</script></body></html>
